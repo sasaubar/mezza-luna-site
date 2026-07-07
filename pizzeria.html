@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Les soirées à La Mezza Luna | Karaoké, BBQ, Concerts à Clamart (92)</title>
-<meta name="description" content="Karaoké, BBQ terrasse, concerts jazz, soirées foot... La Mezza Luna organise des soirées thématiques toute l'année. Entrée libre, consommation à la carte. Réservation recommandée." />
-<link rel="canonical" href="https://lamezzalunaclamart.com/soirees/" />
-<link rel="icon" href="/assets/img/logo-red.png" type="image/png" />
-<link rel="preload" as="image" href="/assets/img/soirees-hero.jpg" />
+<title>Pizzeria à Clamart | Pizzas Napolitaines, Pâte Maison | La Mezza Luna</title>
+<meta name="description" content="Pizzeria familiale à Clamart (92) : 18 pizzas napolitaines, pâte pétrie chaque matin, sauce tomate maison, produits italiens certifiés (Speck IGP, Parmigiano DOP). Dès 11€. Sur place, à emporter ou en livraison." />
+<link rel="canonical" href="https://lamezzalunaclamart.com/pizzeria/" />
+<link rel="icon" href="assets/img/logo-red.png" type="image/png" />
+<link rel="preload" as="image" href="assets/img/galerie/pizza-ambiance.jpg" />
 <meta name="robots" content="index, follow" />
 <meta name="geo.region" content="FR-92" />
 <meta name="geo.placename" content="Clamart" />
@@ -16,18 +16,18 @@
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Les soirées à La Mezza Luna | Karaoké, BBQ, Concerts à Clamart" />
-<meta property="og:description" content="Soirées karaoké, BBQ terrasse, concerts live, soirées spéciales. Entrée libre. La Mezza Luna, restaurant franco-italien à Clamart (92). Réservation recommandée." />
-<meta property="og:url" content="https://lamezzalunaclamart.com/soirees/" />
-<meta property="og:image" content="https://lamezzalunaclamart.com/assets/img/soirees-hero.jpg" />
+<meta property="og:title" content="Pizzeria à Clamart | Pizzas Napolitaines, Pâte Maison | La Mezza Luna" />
+<meta property="og:description" content="18 pizzas napolitaines, pâte pétrie chaque matin, produits italiens certifiés. Dès 11€. Sur place, à emporter ou en livraison à Clamart." />
+<meta property="og:url" content="https://lamezzalunaclamart.com/pizzeria/" />
+<meta property="og:image" content="https://lamezzalunaclamart.com/assets/img/galerie/pizza-ambiance.jpg" />
 <meta property="og:locale" content="fr_FR" />
 <meta property="og:site_name" content="La Mezza Luna Clamart" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Les soirées à La Mezza Luna | Clamart" />
-<meta name="twitter:description" content="Karaoké, BBQ terrasse, concerts live à La Mezza Luna, Clamart. Entrée libre, réservation recommandée. ☎ 01 46 31 33 31" />
-<meta name="twitter:image" content="https://lamezzalunaclamart.com/assets/img/soirees-hero.jpg" />
+<meta name="twitter:title" content="Pizzeria à Clamart | La Mezza Luna" />
+<meta name="twitter:description" content="18 pizzas napolitaines, pâte maison pétrie chaque matin. Dès 11€. Sur place, à emporter ou en livraison. ☎ 01 46 31 33 31" />
+<meta name="twitter:image" content="https://lamezzalunaclamart.com/assets/img/galerie/pizza-ambiance.jpg" />
 
 <!-- Schema.org -->
 <script type="application/ld+json">
@@ -37,6 +37,8 @@
   "name": "La Mezza Luna",
   "url": "https://lamezzalunaclamart.com",
   "telephone": "+33146313331",
+  "servesCuisine": ["Pizza","Italian","French"],
+  "priceRange": "€€",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "18 rue de Versailles",
@@ -44,37 +46,52 @@
     "postalCode": "92140",
     "addressCountry": "FR"
   },
-  "servesCuisine": ["Italian","French"],
-  "priceRange": "€€",
-  "event": [
-    {
-      "@type": "Event",
-      "name": "Soirée Karaoké",
-      "description": "Soirée karaoké avec playlist variété française et tubes internationaux. Entrée libre, consommation à la carte.",
-      "isAccessibleForFree": true,
-      "location": {
-        "@type": "Place",
-        "name": "La Mezza Luna",
-        "address": { "@type": "PostalAddress", "streetAddress": "18 rue de Versailles", "addressLocality": "Clamart", "postalCode": "92140", "addressCountry": "FR" }
-      },
-      "organizer": { "@type": "Organization", "name": "La Mezza Luna" }
-    },
-    {
-      "@type": "Event",
-      "name": "Soirée BBQ Terrasse",
-      "description": "Soirée barbecue en terrasse. Entrée libre, consommation à la carte.",
-      "isAccessibleForFree": true,
-      "location": {
-        "@type": "Place",
-        "name": "La Mezza Luna",
-        "address": { "@type": "PostalAddress", "streetAddress": "18 rue de Versailles", "addressLocality": "Clamart", "postalCode": "92140", "addressCountry": "FR" }
-      },
-      "organizer": { "@type": "Organization", "name": "La Mezza Luna" }
-    }
-  ],
+  "geo": { "@type": "GeoCoordinates", "latitude": 48.7964, "longitude": 2.2621 },
+  "menu": "https://lamezzalunaclamart.com/carte.html",
+  "acceptsReservations": "True",
   "sameAs": [
     "https://www.facebook.com/mezzalunaclamart",
     "https://www.instagram.com/mezzalunaclamart"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "La pâte à pizza est-elle vraiment faite maison ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Stéphane pétrit la pâte sur place, chaque matin. La sauce tomate est également préparée maison. Chaque pizza est ensuite garnie et cuite à la minute, à la commande."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on commander des pizzas à emporter ou en livraison à Clamart ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Vous pouvez commander en click and collect pour venir chercher vos pizzas au restaurant, ou vous faire livrer via Uber Eats et Deliveroo à Clamart et dans les environs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Y a-t-il des pizzas végétariennes ou halal ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. La Vege est une pizza végétarienne au pesto verde, artichauts, olives et oignons confits. L'Orientale est préparée avec des merguez fraîches halal."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Faut-il réserver pour manger une pizza à La Mezza Luna ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La réservation est conseillée le soir et le week-end. Vous pouvez réserver en ligne en quelques clics ou appeler le 01 46 31 33 31."
+      }
+    }
   ]
 }
 </script>
@@ -369,34 +386,33 @@
      ================================================================ -->
 <header class="site">
   <div class="wrap nav">
-    <a href="/" class="brand" aria-label="La Mezza Luna — accueil">
-      <img class="lune-logo" src="/assets/img/logo-red.png" alt="La Mezza Luna" />
+    <a href="index.html" class="brand" aria-label="La Mezza Luna — accueil">
+      <img class="lune-logo" src="assets/img/logo-red.png" alt="La Mezza Luna" />
       <span class="nom">La Mezza Luna<small>Clamart</small></span>
     </a>
     <div class="nav-cta">
-      <a href="/carte.html" class="tel">La carte</a>
-      <a href="#inscription" class="btn btn-primary" style="padding:12px 22px;">Être informé</a>
+      <a href="carte.html" class="tel">La carte</a>
+      <a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener" class="btn btn-primary" style="padding:12px 22px;">Réserver</a>
       <button class="menu-trigger" id="menuTrigger" aria-label="Ouvrir le menu" aria-expanded="false">
         <span class="menu-trigger-lines"><span></span><span></span><span></span></span>
       </button>
     </div>
   </div>
 </header>
-
 <!-- ================================================================
      HERO
      ================================================================ -->
 <section class="hero-soir" style="padding:0;">
   <div class="hero-soir-media">
-    <img src="/assets/img/soirees-hero.jpg" alt="Soirée à La Mezza Luna" />
+    <img src="assets/img/galerie/pizza-ambiance.jpg" alt="Pizza napolitaine maison à la pizzeria La Mezza Luna, Clamart" />
   </div>
   <div class="wrap hero-soir-inner">
-    <span class="eyebrow filet">Les soirées à La Mezza Luna · Clamart</span>
-    <h1>Le restaurant qui s'anime,<br><em>une soirée à la fois.</em></h1>
-    <p class="lead">Karaoké, BBQ terrasse, concerts jazz, soirées Loups-Garous, matchs en direct… Environ une fois toutes les six semaines, La Mezza Luna sort du quotidien. Entrée libre, consommation à la carte. Réservation recommandée.</p>
+    <span class="eyebrow filet">Pizzeria · Clamart</span>
+    <h1>La pizzeria qui pétrit sa pâte<br><em>chaque matin.</em></h1>
+    <p class="lead">18 pizzas napolitaines, une pâte et une sauce tomate 100% maison, des produits italiens qu'on peut nommer. Sur place, à emporter ou en livraison à Clamart.</p>
     <div class="actions">
-      <a href="#inscription" class="btn btn-primary">Être prévenu en avant-première</a>
-      <a href="tel:+33146313331" class="btn btn-ghost-light">01 46 31 33 31</a>
+      <a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener" class="btn btn-primary">Réserver une table</a>
+      <a href="carte.html#pizzas" class="btn btn-ghost-light">Voir la carte</a>
     </div>
   </div>
 </section>
@@ -415,25 +431,25 @@
   <div class="wrap">
     <div class="strip-grid">
       <div class="strip-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M21.2 8A10 10 0 0 0 16 2.8V8h5.2z"/></svg>
+        <div class="titre">18 pizzas, dès 11€</div>
+        <div class="detail">De la Margherita classique<br>à la Tartufo à la truffe d'été.</div>
+      </div>
+      <div class="strip-item">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-        <div class="titre">1 fois / 6 semaines</div>
-        <div class="detail">Pas de calendrier fixe.<br>Inscrivez-vous pour être prévenu.</div>
+        <div class="titre">Pétrie chaque matin</div>
+        <div class="detail">Pâte et sauce tomate maison.<br>Garnie et cuite à la commande.</div>
       </div>
       <div class="strip-item">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        <div class="titre">Entrée libre</div>
-        <div class="detail">Consommation à la carte.<br>Buffet selon le type de soirée.</div>
-      </div>
-      <div class="strip-item">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <div class="titre">Réservation recommandée</div>
-        <div class="detail">Les soirées affichent souvent complet.<br>Appelez ou réservez en ligne.</div>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l9-6 9 6v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <div class="titre">Sur place ou chez vous</div>
+        <div class="detail">Salle, à emporter,<br>livraison Uber Eats et Deliveroo.</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Vague strip → karaoke -->
+<!-- Vague strip → pâte -->
 <div style="background:#900C27;line-height:0;display:block;">
   <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:80px;">
     <path d="M0,40 C300,80 700,0 1000,45 C1200,75 1340,18 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/>
@@ -441,33 +457,33 @@
 </div>
 
 <!-- ================================================================
-     KARAOKÉ
+     LA PÂTE DE STÉPHANE
      ================================================================ -->
-<section class="section-soir" id="karaoke" style="background:#fff;padding-top:clamp(32px,5vw,60px);">
+<section class="section-soir" id="pate" style="background:#fff;padding-top:clamp(32px,5vw,60px);">
   <div class="wrap">
     <div class="soir-inner">
       <div class="soir-content reveal">
         <span class="soir-badge badge-rouge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-          Karaoké
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="10" r="1"/><circle cx="11" cy="15" r="1"/></svg>
+          La pâte maison
         </span>
-        <h2>La scène est à vous</h2>
-        <p>On dégage la mezzanine, on installe le projecteur et les micros, on lance la playlist. Que vous soyez chanteur du dimanche ou habitué des scènes, l'ambiance est sans jugement et 100% festive.</p>
-        <p>La playlist est régulièrement renouvelée : variété française, tubes internationaux, classiques. Venez à deux, en groupe, entre collègues.</p>
+        <h2>Tout commence le matin, les mains dans la farine</h2>
+        <p>Chez nous, la pâte à pizza n'arrive pas en camion. Stéphane la pétrit sur place, chaque matin, comme la sauce tomate qui est elle aussi préparée maison. C'est plus de travail, mais c'est ce qui fait la différence entre une pizza correcte et une pizza dont on se souvient.</p>
+        <p>Chaque pizza est ensuite garnie et cuite à la minute, à la commande. Rien n'attend sous une lampe chauffante.</p>
         <div class="chips">
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Entrée libre</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Consommation à la carte</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Réservation recommandée</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Pâte pétrie sur place</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Sauce tomate maison</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Cuisson à la commande</span>
         </div>
       </div>
       <div class="soir-media reveal">
-        <img src="/assets/img/karaoke1.jpg" alt="Soirée karaoké à La Mezza Luna Clamart" />
+        <img src="assets/img/galerie/pizza-champignons.jpg" alt="Pizza aux champignons, pâte maison, pizzeria La Mezza Luna Clamart" />
       </div>
     </div>
   </div>
 </section>
 
-<!-- Vague karaoké → BBQ -->
+<!-- Vague pâte → produits -->
 <div style="background:#fff;line-height:0;display:block;">
   <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:80px;">
     <path d="M0,40 C200,80 500,0 800,45 C1050,80 1280,15 1440,40 L1440,80 L0,80 Z" fill="var(--bleu-clair)"/>
@@ -475,100 +491,33 @@
 </div>
 
 <!-- ================================================================
-     BBQ TERRASSE
+     LES PRODUITS
      ================================================================ -->
-<section class="section-soir" id="bbq" style="background:var(--bleu-clair);padding-top:clamp(32px,5vw,60px);">
+<section class="section-soir" id="produits" style="background:var(--bleu-clair);padding-top:clamp(32px,5vw,60px);">
   <div class="wrap">
     <div class="soir-inner reverse">
-      <div class="soir-content reveal">
-        <span class="soir-badge badge-or">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM20 8a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM8 8v8a4 4 0 0 0 8 0V8M12 8V5M10 5h4"/></svg>
-          BBQ Terrasse
-        </span>
-        <h2>Les grillades de Stéphane, en plein air</h2>
-        <p>Dès les beaux jours, on sort sur la terrasse et Stéphane prend les commandes du barbecue. Au menu : entrecôtes, merguez, brochettes, côte de bœuf… tout préparé minute devant vous.</p>
-        <p>Ce soir-là, une carte spéciale remplace la carte habituelle, pensée autour des grillades. Quelques spécialités du restaurant restent disponibles pour ceux qui préfèrent ne pas manger BBQ. Ambiance décontractée, tables dehors, bonne humeur garantie.</p>
-        <div class="chips">
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Saison estivale</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Réservation recommandée</span>
-        </div>
-      </div>
-      <div class="soir-media reveal">
-        <img src="/assets/img/grillade.jpg" alt="Soirée grillade BBQ terrasse à La Mezza Luna Clamart" />
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Vague BBQ → Concert -->
-<div style="background:var(--bleu-clair);line-height:0;display:block;">
-  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:80px;">
-    <path d="M0,40 C300,0 650,80 1000,35 C1200,10 1340,70 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/>
-  </svg>
-</div>
-
-<!-- ================================================================
-     CONCERTS JAZZ & LIVE
-     ================================================================ -->
-<section class="section-soir" id="concerts" style="background:#fff;padding-top:clamp(32px,5vw,60px);">
-  <div class="wrap">
-    <div class="soir-inner">
       <div class="soir-content reveal">
         <span class="soir-badge badge-vert">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-          Jazz Live
-        </span>
-        <h2>Une soirée jazz, comme au comptoir</h2>
-        <p>Plusieurs fois dans l'année, un groupe de jazz s'installe dans la salle et joue pour vous. Standards, compositions, ambiance feutrée : le niveau est là, les verres aussi.</p>
-        <p>La carte du restaurant reste la même ce soir-là, vous venez dîner normalement, avec la musique en plus.</p>
-        <div class="chips">
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Entrée libre</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Consommation à la carte</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Places limitées, réservez tôt</span>
-        </div>
-      </div>
-      <div class="soir-media reveal">
-        <img src="/assets/img/jazz1.jpg" alt="Soirée jazz live à La Mezza Luna Clamart" />
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Vague Concert → Soirées spéciales -->
-<div style="background:#fff;line-height:0;display:block;">
-  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:80px;">
-    <path d="M0,40 C200,80 500,0 800,45 C1050,80 1280,15 1440,40 L1440,80 L0,80 Z" fill="var(--bleu-clair)"/>
-  </svg>
-</div>
-
-<!-- ================================================================
-     LOUPS GAROUS
-     ================================================================ -->
-<section class="section-soir" id="loups-garous" style="background:var(--bleu-clair);padding-top:clamp(32px,5vw,60px);">
-  <div class="wrap">
-    <div class="soir-inner reverse">
-      <div class="soir-content reveal">
-        <span class="soir-badge badge-violet">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Jeu de rôle
+          De l'Italie à Clamart
         </span>
-        <h2>Les Loups-Garous de Thiercelieux</h2>
-        <p>Chaque joueur reçoit un rôle secret. Loups-Garous, Voyante, Sorcière ou simple Villageois : la mission est de démasquer l'adversaire avant qu'il ne vous élimine. Bluff, alliances, fausses pistes… le tout autour d'un bon repas.</p>
-        <p>Un animateur guide la partie du début à la fin pour que tout le monde joue, même les débutants. Venez seul ou en groupe, on vous intègre à la table.</p>
+        <h2>Des produits qu'on peut nommer</h2>
+        <p>Sur nos pizzas, le jambon a un nom : Speck IGP. Le fromage aussi : Parmigiano Reggiano DOP, mozzarella fior di latte. Ces sigles, c'est la garantie que le produit vient bien de sa région d'origine, fabriqué selon les règles.</p>
+        <p>Et quand c'est la saison, la truffe d'été arrive en lamelles sur la Tartufo. Ce sont ces produits qui donnent aux pizzas leur goût, on ne triche pas là-dessus.</p>
         <div class="chips">
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Animateur inclus</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Débutants bienvenus</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Réservation obligatoire</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Speck IGP</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Parmigiano Reggiano DOP</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Mozzarella fior di latte</span>
         </div>
       </div>
       <div class="soir-media reveal">
-        <img src="/assets/img/loup-garou-1.jpg" alt="Soirée Loups-Garous de Thiercelieux à La Mezza Luna Clamart" />
+        <img src="assets/img/galerie/charcuterie.jpg" alt="Charcuterie italienne Speck IGP, pizzeria La Mezza Luna Clamart" />
       </div>
     </div>
   </div>
 </section>
 
-<!-- Vague Loups Garous → Foot -->
+<!-- Vague produits → pizzas -->
 <div style="background:var(--bleu-clair);line-height:0;display:block;">
   <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:80px;">
     <path d="M0,40 C300,0 650,80 1000,35 C1200,10 1340,70 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/>
@@ -576,85 +525,110 @@
 </div>
 
 <!-- ================================================================
-     SOIRÉES FOOT
+     LES PIZZAS EMBLÉMATIQUES
      ================================================================ -->
-<section class="section-soir" id="foot" style="background:#fff;padding-top:clamp(32px,5vw,60px);">
+<section class="section-soir" id="pizzas" style="background:#fff;padding-top:clamp(32px,5vw,60px);">
   <div class="wrap">
-    <div class="soir-inner">
-      <div class="soir-content reveal">
-        <span class="soir-badge badge-foot">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 7.4 16.6M4.6 5.4A10 10 0 0 0 12 22"/><path d="M12 7l2 3h3l-2.5 2 1 3L12 13l-3.5 2 1-3L7 10h3z"/></svg>
-          Jour de match
-        </span>
-        <h2>Les grands soirs de foot, ensemble</h2>
-        <p>Finale de Ligue des Champions, Coupe du Monde, quarts de finale décisifs… Il y a des matchs qui méritent mieux qu'un canapé. La Mezza Luna retransmet les grands rendez-vous du foot en salle, dans une ambiance de fête, avec de bonnes assiettes et de bonne humeur à revendre.</p>
-        <p>Que vous soyez supporter passionné ou simple amateur d'ambiance, ces soirées ont quelque chose de particulier. On crie, on espère, on partage. C'est exactement ce qu'un restaurant devrait être par soir de match.</p>
-        <div class="chips">
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Retransmission live</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Grands matchs uniquement</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Réservation recommandée</span>
-        </div>
+    <div style="text-align:center;max-width:640px;margin:0 auto 44px;" class="reveal">
+      <span class="eyebrow filet">Le best of</span>
+      <h2 style="font-family:var(--serif);font-size:clamp(2rem,4.4vw,2.9rem);line-height:1.1;margin-top:14px;">Quelques pizzas de la carte</h2>
+      <p style="color:var(--charbon-doux);margin-top:14px;">Six exemples parmi les 18 de la carte, de la plus simple à la plus généreuse.</p>
+    </div>
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;max-width:980px;margin:0 auto;">
+      <div style="background:var(--bleu-clair);border-radius:var(--radius);padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;"><strong style="font-family:var(--serif);font-size:1.35rem;">Margherita</strong><span style="color:var(--rouge-vif);font-weight:700;white-space:nowrap;">11&nbsp;€</span></div>
+        <p style="color:var(--charbon-doux);font-size:.94rem;margin-top:8px;">Sauce tomate, mozzarella fior di latte, basilic frais. La base, bien faite.</p>
       </div>
-      <div class="soir-media reveal">
-        <img src="/assets/img/foot1.jpg" alt="Soirée foot retransmission match La Mezza Luna Clamart" style="object-position: center 30%;" />
+      <div style="background:var(--bleu-clair);border-radius:var(--radius);padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;"><strong style="font-family:var(--serif);font-size:1.35rem;">Orientale</strong><span style="color:var(--rouge-vif);font-weight:700;white-space:nowrap;">14&nbsp;€</span></div>
+        <p style="color:var(--charbon-doux);font-size:.94rem;margin-top:8px;">Sauce tomate, mozzarella, merguez fraîches halal, poivrons, œuf.</p>
       </div>
+      <div style="background:var(--bleu-clair);border-radius:var(--radius);padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;"><strong style="font-family:var(--serif);font-size:1.35rem;">La Vege</strong><span style="color:var(--rouge-vif);font-weight:700;white-space:nowrap;">15&nbsp;€</span></div>
+        <p style="color:var(--charbon-doux);font-size:.94rem;margin-top:8px;">Pesto verde, artichauts, olives, oignons confits, poivrons. 100% végétarienne.</p>
+      </div>
+      <div style="background:var(--bleu-clair);border-radius:var(--radius);padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;"><strong style="font-family:var(--serif);font-size:1.35rem;">Coppa e Formaggio</strong><span style="color:var(--rouge-vif);font-weight:700;white-space:nowrap;">16,50&nbsp;€</span></div>
+        <p style="color:var(--charbon-doux);font-size:.94rem;margin-top:8px;">Crème de gorgonzola, chèvre, noix, burrata, Coppa di Parma.</p>
+      </div>
+      <div style="background:var(--bleu-clair);border-radius:var(--radius);padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;"><strong style="font-family:var(--serif);font-size:1.35rem;">Parma</strong><span style="color:var(--rouge-vif);font-weight:700;white-space:nowrap;">17&nbsp;€</span></div>
+        <p style="color:var(--charbon-doux);font-size:.94rem;margin-top:8px;">Sauce tomate, mozzarella, roquette, Speck IGP, burrata, Parmigiano Reggiano DOP.</p>
+      </div>
+      <div style="background:var(--bleu-clair);border-radius:var(--radius);padding:24px;border:2px solid var(--or);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;"><strong style="font-family:var(--serif);font-size:1.35rem;">Tartufo</strong><span style="color:var(--rouge-vif);font-weight:700;white-space:nowrap;">18&nbsp;€</span></div>
+        <p style="color:var(--charbon-doux);font-size:.94rem;margin-top:8px;">Crème de truffe, champignons, roquette, burrata, lamelles de truffe d'été, Parmigiano Reggiano DOP.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:36px;" class="reveal">
+      <a href="carte.html" class="btn btn-primary">Voir les 18 pizzas sur la carte</a>
     </div>
   </div>
 </section>
 
-<!-- Vague Foot → newsletter -->
+<!-- Vague pizzas → commander -->
 <div style="background:#fff;line-height:0;display:block;">
-  <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:90px;">
-    <path d="M0,45 C200,90 400,10 600,50 C800,90 1050,5 1440,45 L1440,90 L0,90 Z" fill="#900C27"/>
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:80px;">
+    <path d="M0,40 C200,80 500,0 800,45 C1050,80 1280,15 1440,40 L1440,80 L0,80 Z" fill="var(--bleu-clair)"/>
   </svg>
 </div>
 
 <!-- ================================================================
-     INSCRIPTION NEWSLETTER
+     COMMANDER / VENIR
      ================================================================ -->
-<section class="newsletter" id="inscription">
+<section class="section-soir" id="commander" style="background:var(--bleu-clair);padding-top:clamp(32px,5vw,60px);">
   <div class="wrap">
-    <div class="newsletter-inner">
-      <span class="eyebrow filet">Ne ratez rien</span>
-      <h2>Soyez les premiers informés</h2>
-      <p>Inscrivez-vous pour recevoir nos annonces de soirées en avant-première, directement dans votre boîte mail. Pas de spam, juste nos soirées.</p>
-
-      <div id="sib-form-container" class="sib-form-container">
-        <div id="error-message" class="sib-form-message-panel" style="font-size:14px;text-align:left;color:#661d1d;background-color:#ffeded;border-color:#ff4949;border-radius:8px;max-width:480px;margin:0 auto 12px;">
-          <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
-            <span class="sib-form-message-panel__inner-text">Nous n'avons pas pu confirmer votre inscription.</span>
-          </div>
-        </div>
-        <div id="success-message" class="sib-form-message-panel" style="font-size:14px;text-align:left;color:#085229;background-color:#e7faf0;border-color:#13ce66;border-radius:8px;max-width:480px;margin:0 auto 12px;">
-          <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
-            <span class="sib-form-message-panel__inner-text">C'est noté ! Vous recevrez nos annonces en avant-première.</span>
-          </div>
-        </div>
-        <form id="sib-form" method="POST" action="https://fe0193fc.sibforms.com/serve/MUIFAOmTmAfItU7bGbCaV8kGlGkES0NL5HBrCRqifKzfX8AxxWIYexUyD-6kEgXyefJFTH4r31e8fNFJo9tWIAYJCF1Bd_ETeCxTcj97HCLaMR4j6h_gqHqPMg9VIaqQzfuIfdnx2wN2je72OhYQaHp0Sz72wDzXjAEeFy_szgHEW1UONkaBljrr0rAH3vQ609GKsjEjwudXfMm5Ng==" data-type="subscription">
-          <div class="nl-form">
-            <div class="nl-email" style="grid-column:1/-1;">
-              <input class="input" type="text" id="EMAIL" name="EMAIL" autocomplete="off" value="" placeholder="Votre adresse email" data-required="true" required />
-            </div>
-          </div>
-          <div class="nl-submit">
-            <button class="sib-form-block__button btn btn-primary" style="min-width:220px;" form="sib-form" type="submit">Je m'inscris</button>
-          </div>
-          <p class="nl-note">Désinscription possible à tout moment. Vos données ne sont pas transmises à des tiers.</p>
-          <input type="text" name="email_address_check" value="" class="input--hidden" style="display:none;">
-          <input type="hidden" name="locale" value="fr">
-        </form>
-      </div>
+    <div style="text-align:center;max-width:640px;margin:0 auto 36px;" class="reveal">
+      <span class="eyebrow filet">Sur place ou chez vous</span>
+      <h2 style="font-family:var(--serif);font-size:clamp(2rem,4.4vw,2.9rem);line-height:1.1;margin-top:14px;">Vos pizzas, comme vous voulez</h2>
+      <p style="color:var(--charbon-doux);margin-top:14px;">En salle chez nous rue de Versailles, à emporter en click and collect, ou livrées chez vous à Clamart et dans les environs. À 5 minutes du Plessis-Robinson, facile d'accès depuis Meudon et Châtillon.</p>
     </div>
+    <div class="reveal" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener" class="btn btn-primary">Réserver une table</a>
+      <a href="https://usellweb.co/fr/landingpage/la-mezza-luna" target="_blank" rel="noopener" class="btn" style="background:#fff;border:1.5px solid var(--rouge-vif);color:var(--rouge-vif);">Click &amp; collect</a>
+      <a href="https://www.ubereats.com/fr/store/la-mezza-luna/VQA4Y4U-Qn2oWRwi7Jn0kA" target="_blank" rel="noopener" class="btn" style="background:#1A1A1A;color:#fff;">Uber Eats</a>
+      <a href="https://deliveroo.fr/fr/menu/paris/clamart-plaine/mezza-luna-paris" target="_blank" rel="noopener" class="btn" style="background:#00CCBC;color:#fff;">Deliveroo</a>
+    </div>
+    <p class="reveal" style="text-align:center;margin-top:26px;color:var(--charbon-doux);">18 rue de Versailles, 92140 Clamart · <a href="tel:+33146313331" style="color:var(--rouge-vif);font-weight:700;">01 46 31 33 31</a><br>Ouvert midi du lundi au vendredi, soir du lundi au samedi · Tramway T6 et T10, parking à proximité</p>
   </div>
 </section>
 
-<!-- Vague newsletter → footer -->
-<div style="background:#900C27;line-height:0;display:block;">
-  <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:90px;">
-    <path d="M0,45 C300,90 650,0 1000,50 C1180,80 1340,20 1440,45 L1440,90 L0,90 Z" fill="#ffffff"/>
+<!-- Vague commander → FAQ -->
+<div style="background:var(--bleu-clair);line-height:0;display:block;">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:80px;">
+    <path d="M0,40 C300,0 650,80 1000,35 C1200,10 1340,70 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/>
   </svg>
 </div>
 
+<!-- ================================================================
+     FAQ
+     ================================================================ -->
+<section class="section-soir" id="faq" style="background:#fff;padding-top:clamp(32px,5vw,60px);">
+  <div class="wrap" style="max-width:840px;">
+    <div style="text-align:center;margin-bottom:36px;" class="reveal">
+      <span class="eyebrow filet">Questions fréquentes</span>
+      <h2 style="font-family:var(--serif);font-size:clamp(2rem,4.4vw,2.9rem);line-height:1.1;margin-top:14px;">On vous répond</h2>
+    </div>
+    <div class="reveal" style="display:grid;gap:14px;">
+      <details style="background:var(--bleu-clair);border-radius:var(--radius);padding:20px 24px;">
+        <summary style="font-weight:600;cursor:pointer;">La pâte à pizza est-elle vraiment faite maison ?</summary>
+        <p style="color:var(--charbon-doux);margin-top:12px;">Oui. Stéphane pétrit la pâte sur place, chaque matin. La sauce tomate est également préparée maison. Chaque pizza est ensuite garnie et cuite à la minute, à la commande.</p>
+      </details>
+      <details style="background:var(--bleu-clair);border-radius:var(--radius);padding:20px 24px;">
+        <summary style="font-weight:600;cursor:pointer;">Peut-on commander à emporter ou en livraison ?</summary>
+        <p style="color:var(--charbon-doux);margin-top:12px;">Oui. Commandez en click and collect pour venir chercher vos pizzas au restaurant, ou faites-vous livrer via Uber Eats et Deliveroo à Clamart et dans les environs.</p>
+      </details>
+      <details style="background:var(--bleu-clair);border-radius:var(--radius);padding:20px 24px;">
+        <summary style="font-weight:600;cursor:pointer;">Y a-t-il des pizzas végétariennes ou halal ?</summary>
+        <p style="color:var(--charbon-doux);margin-top:12px;">Oui. La Vege est 100% végétarienne (pesto verde, artichauts, olives, oignons confits). L'Orientale est préparée avec des merguez fraîches halal.</p>
+      </details>
+      <details style="background:var(--bleu-clair);border-radius:var(--radius);padding:20px 24px;">
+        <summary style="font-weight:600;cursor:pointer;">Faut-il réserver ?</summary>
+        <p style="color:var(--charbon-doux);margin-top:12px;">C'est conseillé le soir et le week-end. Réservez en ligne en quelques clics ou appelez le <a href="tel:+33146313331" style="color:var(--rouge-vif);font-weight:700;">01 46 31 33 31</a>.</p>
+      </details>
+    </div>
+  </div>
+</section>
 <!-- ================================================================
      FOOTER
      ================================================================ -->
@@ -663,7 +637,7 @@
     <div class="foot-grid">
       <div>
         <div class="brand">
-          <img class="lune-logo" src="/assets/img/logo-cream.png" alt="" style="width:48px;height:48px;object-fit:contain;" />
+          <img class="lune-logo" src="assets/img/logo-cream.png" alt="" style="width:48px;height:48px;object-fit:contain;" />
           <span class="nom serif" style="font-size:1.35rem;">La Mezza Luna</span>
         </div>
         <p class="foot-about">L'Italie à Clamart, faite maison et servie avec le cœur. Restaurant franco-italien familial tenu par Stéphane &amp; Gwen depuis 2013.</p>
@@ -679,10 +653,10 @@
       <div>
         <h4>Le restaurant</h4>
         <ul>
-          <li><a href="/">Accueil</a></li>
-          <li><a href="/carte.html">La carte complète</a></li>
-          <li><a href="/pizzeria/">La pizzeria</a></li>
-          <li><a href="/privatisation/">Privatisation</a></li>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="carte.html">La carte complète</a></li>
+          <li><a href="pizzeria.html">La pizzeria</a></li>
+          <li><a href="privatisation.html">Privatisation</a></li>
           <li><a href="https://usellweb.co/fr/landingpage/la-mezza-luna" target="_blank" rel="noopener">Commander en ligne ↗</a></li>
         </ul>
       </div>
@@ -690,7 +664,7 @@
         <h4>Réserver &amp; contact</h4>
         <ul>
           <li><a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener">Réserver une table</a></li>
-          <li><a href="#inscription">S'inscrire aux soirées</a></li>
+          <li><a href="soirees.html">S'inscrire aux soirées</a></li>
           <li><a href="tel:+33146313331">01 46 31 33 31</a></li>
           <li><a href="mailto:contact@lamezzalunaclamart.com">contact@lamezzalunaclamart.com</a></li>
         </ul>
@@ -699,8 +673,8 @@
     <div class="foot-bottom">
       <span>© 2026 La Mezza Luna · 18 rue de Versailles, 92140 Clamart</span>
       <span style="display:flex;gap:20px;flex-wrap:wrap;">
-        <a href="/mentions-legales/">Mentions légales</a>
-        <a href="/mentions-legales/#3-politique-de-cookies">Cookies</a>
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="mentions-legales.html#3-politique-de-cookies">Cookies</a>
       </span>
     </div>
   </div>
@@ -712,7 +686,7 @@
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <nav class="nav-drawer" id="navDrawer" aria-hidden="true">
   <div class="drawer-deco" aria-hidden="true">
-    <div class="drawer-deco-logo"><img src="/assets/img/logo-cream.png" alt="" /></div>
+    <div class="drawer-deco-logo"><img src="assets/img/logo-cream.png" alt="" /></div>
     <div class="drawer-deco-name">La Mezza Luna</div>
   </div>
   <button class="drawer-close" id="drawerClose" aria-label="Fermer le menu">
@@ -720,12 +694,12 @@
   </button>
   <span class="drawer-eyebrow">Navigation</span>
   <div class="drawer-nav">
-    <a href="/"          data-num="01">Accueil</a>
+    <a href="index.html"          data-num="01">Accueil</a>
     <a href="index.html#histoire" data-num="02">Notre histoire</a>
-    <a href="/carte.html"          data-num="03">La carte</a>
+    <a href="carte.html"          data-num="03">La carte</a>
     <a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener" data-num="04">Réserver</a>
-    <a href="/privatisation/"  data-num="05">Privatisation</a>
-    <a href="/soirees/"        data-num="06">Les soirées à La Mezza Luna</a>
+    <a href="privatisation.html"  data-num="05">Privatisation</a>
+    <a href="soirees.html"        data-num="06">Les soirées à La Mezza Luna</a>
     <a href="index.html#infos"    data-num="07">Infos pratiques</a>
   </div>
   <div class="drawer-foot">
