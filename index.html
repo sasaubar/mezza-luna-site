@@ -1005,11 +1005,26 @@
       <span class="eyebrow filet" style="color:var(--or);">Demande de devis</span>
       <h2 style="color:#fff;margin-top:14px;">Dites-nous tout par email</h2>
       <p style="color:rgba(245,237,214,.7);margin-bottom:2rem;">Type d'événement, nombre de personnes, date souhaitée… On vous répond sous 48h.</p>
-      <a href="mailto:contact@lamezzalunaclamart.com?subject=Demande%20de%20devis%20%E2%80%94%20La%20Mezza%20Luna" class="btn btn-vert" style="font-size:1.1rem;padding:16px 36px;display:inline-flex;align-items:center;gap:10px;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Envoyer un email pour un devis
-      </a>
-      <p style="color:rgba(245,237,214,.4);margin-top:1.5rem;font-size:0.9rem;">contact@lamezzalunaclamart.com</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <a href="mailto:contact@lamezzalunaclamart.com?subject=Demande%20de%20devis%20-%20La%20Mezza%20Luna" class="btn btn-vert" style="font-size:1.05rem;padding:16px 32px;display:inline-flex;align-items:center;gap:10px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Envoyer un email pour un devis
+        </a>
+        <button type="button" id="btn-copie-email" class="btn" style="background:transparent;border:1.5px solid var(--or);color:var(--or);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="btn-copie-email-txt">Copier l'adresse email</span>
+        </button>
+      </div>
+      <p style="color:rgba(245,237,214,.6);margin-top:1.5rem;font-size:1rem;">contact@lamezzalunaclamart.com <span style="color:rgba(245,237,214,.4);">· 01 46 31 33 31</span></p>
+      <script>
+        document.getElementById('btn-copie-email').addEventListener('click', function() {
+          var txt = document.getElementById('btn-copie-email-txt');
+          navigator.clipboard.writeText('contact@lamezzalunaclamart.com').then(function() {
+            txt.textContent = 'Adresse copiée !';
+            setTimeout(function() { txt.textContent = "Copier l'adresse email"; }, 2500);
+          });
+        });
+      </script>
     </div>
   </div>
 </section>
