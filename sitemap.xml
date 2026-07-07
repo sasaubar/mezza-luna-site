@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.lamezzalunaclamart.com/</loc>
-    <lastmod>2026-06-26</lastmod>
+    <loc>https://lamezzalunaclamart.com/</loc>
+    <lastmod>2026-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.lamezzalunaclamart.com/carte.html</loc>
-    <lastmod>2026-06-26</lastmod>
+    <loc>https://lamezzalunaclamart.com/carte.html</loc>
+    <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.lamezzalunaclamart.com/privatisation</loc>
-    <lastmod>2026-06-26</lastmod>
+    <loc>https://lamezzalunaclamart.com/privatisation/</loc>
+    <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.lamezzalunaclamart.com/soirees</loc>
-    <lastmod>2026-06-26</lastmod>
+    <loc>https://lamezzalunaclamart.com/soirees/</loc>
+    <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.lamezzalunaclamart.com/mentions-legales.html</loc>
+    <loc>https://lamezzalunaclamart.com/mentions-legales/</loc>
     <lastmod>2026-06-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
