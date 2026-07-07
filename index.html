@@ -1001,29 +1001,109 @@
       </div>
     </div>
 
-    <div class="form-inner reveal" style="margin-top:64px;text-align:center;padding:2.5rem 1.5rem;">
-      <span class="eyebrow filet" style="color:var(--or);">Demande de devis</span>
-      <h2 style="color:#fff;margin-top:14px;">Dites-nous tout par email</h2>
-      <p style="color:rgba(245,237,214,.7);margin-bottom:2rem;">Type d'événement, nombre de personnes, date souhaitée… On vous répond sous 48h.</p>
-      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
-        <a href="mailto:contact@lamezzalunaclamart.com?subject=Demande%20de%20devis%20-%20La%20Mezza%20Luna" class="btn btn-vert" style="font-size:1.05rem;padding:16px 32px;display:inline-flex;align-items:center;gap:10px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          Envoyer un email pour un devis
-        </a>
-        <button type="button" id="btn-copie-email" class="btn" style="background:transparent;border:1.5px solid var(--or);color:var(--or);">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span id="btn-copie-email-txt">Copier l'adresse email</span>
-        </button>
+    <div class="form-inner reveal" style="margin-top:64px;">
+      <div class="section-head" style="margin-bottom:38px;">
+        <span class="eyebrow filet" style="color:var(--or);">Demande de devis</span>
+        <h2 style="color:#fff;margin-top:14px;">Dites-nous tout</h2>
       </div>
-      <p style="color:rgba(245,237,214,.6);margin-top:1.5rem;font-size:1rem;">contact@lamezzalunaclamart.com <span style="color:rgba(245,237,214,.4);">· 01 46 31 33 31</span></p>
+
+      <form id="form-devis" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="e65463f6-16aa-4209-88f1-77741b37ed3b" />
+        <input type="hidden" name="subject" value="Nouvelle demande de devis evenement - La Mezza Luna" />
+        <input type="hidden" name="from_name" value="Site La Mezza Luna" />
+        <input type="checkbox" name="botcheck" style="display:none;" tabindex="-1" autocomplete="off" />
+        <div class="form-grid">
+          <div class="field">
+            <label for="devis-nom">Nom</label>
+            <input type="text" id="devis-nom" name="nom" placeholder="Votre nom" required />
+          </div>
+          <div class="field">
+            <label for="devis-prenom">Prénom</label>
+            <input type="text" id="devis-prenom" name="prenom" placeholder="Votre prénom" required />
+          </div>
+          <div class="field">
+            <label for="devis-tel">Téléphone</label>
+            <input type="tel" id="devis-tel" name="telephone" placeholder="06 12 34 56 78" required />
+          </div>
+          <div class="field">
+            <label for="devis-email">Email</label>
+            <input type="email" id="devis-email" name="email" placeholder="votre@email.fr" required />
+          </div>
+          <div class="field">
+            <label for="devis-type">Type d'événement</label>
+            <select id="devis-type" name="type_evenement" required>
+              <option value="">Choisir un type</option>
+              <option>Repas d'entreprise</option>
+              <option>Anniversaire</option>
+              <option>Séminaire / teambuilding</option>
+              <option>Repas de famille</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="devis-date">Date souhaitée</label>
+            <input type="date" id="devis-date" name="date" required />
+          </div>
+          <div class="field">
+            <label for="devis-personnes">Nombre de personnes</label>
+            <select id="devis-personnes" name="nombre_personnes" required>
+              <option value="">Nombre estimé</option>
+              <option>Moins de 10 personnes</option>
+              <option>10 à 20 personnes</option>
+              <option>20 à 30 personnes</option>
+              <option>30 à 50 personnes</option>
+              <option>Plus de 50 personnes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="devis-budget">Budget indicatif / personne</label>
+            <select id="devis-budget" name="budget">
+              <option value="">Pas encore défini</option>
+              <option>Moins de 25&nbsp;€/pers.</option>
+              <option>25 à 40&nbsp;€/pers.</option>
+              <option>40 à 60&nbsp;€/pers.</option>
+              <option>Plus de 60&nbsp;€/pers.</option>
+            </select>
+          </div>
+          <div class="field form-full">
+            <label for="devis-message">Votre projet</label>
+            <textarea id="devis-message" name="message" placeholder="Décrivez votre événement, vos souhaits, vos contraintes… Plus vous nous en dites, mieux on peut vous répondre." required></textarea>
+          </div>
+        </div>
+        <div class="form-cta">
+          <button type="submit" class="btn btn-vert">Envoyer ma demande de devis</button>
+          <p class="form-note" style="color:rgba(245,237,214,.5);">Réponse sous 48h · Vous pouvez aussi nous écrire à contact@lamezzalunaclamart.com ou appeler le <a href="tel:+33146313331" style="color:var(--or);">01 46 31 33 31</a></p>
+        </div>
+      </form>
+
+      <div class="form-success" id="devis-success">
+        <div class="check">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--or)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="color:#fff;">Demande reçue !</h3>
+        <p style="color:rgba(245,237,214,.8);">Nous vous répondons sous 48h pour construire ensemble votre événement. À très vite !</p>
+      </div>
+
       <script>
-        document.getElementById('btn-copie-email').addEventListener('click', function() {
-          var txt = document.getElementById('btn-copie-email-txt');
-          navigator.clipboard.writeText('contact@lamezzalunaclamart.com').then(function() {
-            txt.textContent = 'Adresse copiée !';
-            setTimeout(function() { txt.textContent = "Copier l'adresse email"; }, 2500);
+        (function(){
+          var form = document.getElementById('form-devis');
+          if(!form) return;
+          form.addEventListener('submit', function(e){
+            e.preventDefault();
+            var btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.textContent = 'Envoi en cours…';
+            fetch(form.action, { method:'POST', body:new FormData(form), headers:{ 'Accept':'application/json' } })
+              .then(function(r){ return r.json(); })
+              .then(function(res){
+                if(res.success){ form.style.display = 'none'; document.getElementById('devis-success').style.display = 'block'; }
+                else { throw new Error(); }
+              })
+              .catch(function(){
+                btn.disabled = false; btn.textContent = 'Envoyer ma demande de devis';
+                alert("L'envoi a échoué. Vous pouvez nous écrire directement à contact@lamezzalunaclamart.com ou appeler le 01 46 31 33 31.");
+              });
           });
-        });
+        })();
       </script>
     </div>
   </div>

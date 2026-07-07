@@ -896,19 +896,74 @@
         <p style="font-size:.95rem;color:var(--charbon-doux);margin-top:12px;">Réponse garantie sous 48h. Aucun engagement à ce stade.</p>
       </div>
 
-      <div style="text-align:center;padding:1.5rem 0;">
-        <p style="color:var(--charbon-doux);margin-bottom:2rem;">Envoyez-nous un email en précisant le type d'événement, la date envisagée et le nombre de personnes. Devis gratuit et sans engagement.</p>
-        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
-          <a href="mailto:contact@lamezzalunaclamart.com?subject=Demande%20de%20devis%20privatisation%20-%20La%20Mezza%20Luna" class="btn btn-primary" style="font-size:1.05rem;padding:16px 32px;display:inline-flex;align-items:center;gap:10px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            Envoyer un email pour un devis
-          </a>
-          <button type="button" id="btn-copie-email" class="btn" style="background:transparent;border:1.5px solid var(--rouge-vif);color:var(--rouge-vif);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span id="btn-copie-email-txt">Copier l'adresse email</span>
-          </button>
+      <form id="form-priv" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="e65463f6-16aa-4209-88f1-77741b37ed3b" />
+        <input type="hidden" name="subject" value="Nouvelle demande de privatisation - La Mezza Luna" />
+        <input type="hidden" name="from_name" value="Site La Mezza Luna" />
+        <input type="checkbox" name="botcheck" style="display:none;" tabindex="-1" autocomplete="off" />
+        <div class="form-grid">
+
+          <div class="field">
+            <label for="priv-nom">Votre nom *</label>
+            <input type="text" id="priv-nom" name="nom" placeholder="Marie Dupont" required />
+          </div>
+
+          <div class="field">
+            <label for="priv-tel">Téléphone *</label>
+            <input type="tel" id="priv-tel" name="telephone" placeholder="06 00 00 00 00" required />
+          </div>
+
+          <div class="field">
+            <label for="priv-email">Email *</label>
+            <input type="email" id="priv-email" name="email" placeholder="marie@exemple.fr" required />
+          </div>
+
+          <div class="field">
+            <label for="priv-type">Type d'événement *</label>
+            <select id="priv-type" name="type_evenement" required>
+              <option value="" disabled selected>Choisir…</option>
+              <optgroup label="Entreprise">
+                <option value="Dîner de fin d'année">Dîner de fin d'année</option>
+                <option value="Afterwork / pot de départ">Afterwork / pot de départ</option>
+                <option value="Repas client / séminaire">Repas client / séminaire</option>
+                <option value="Événement entreprise (autre)">Autre événement entreprise</option>
+              </optgroup>
+              <optgroup label="Particulier">
+                <option value="Anniversaire">Anniversaire</option>
+                <option value="EVJF / EVG">EVJF / EVG</option>
+                <option value="Baptême / communion">Baptême / communion</option>
+                <option value="Repas de famille">Repas de famille</option>
+                <option value="Autre">Autre</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="priv-date">Date envisagée</label>
+            <input type="date" id="priv-date" name="date" />
+          </div>
+
+          <div class="field">
+            <label for="priv-nb">Nombre de personnes *</label>
+            <input type="number" id="priv-nb" name="nombre_personnes" placeholder="ex : 60" min="10" required />
+          </div>
+
+          <div class="field form-full">
+            <label for="priv-msg">Votre demande</label>
+            <textarea id="priv-msg" name="message" placeholder="Décrivez votre événement : format souhaité (dîner assis, cocktail, buffet), besoins particuliers (DJ, piste de danse, équipement audiovisuel), allergies éventuelles…"></textarea>
+          </div>
+
         </div>
-        <p style="color:var(--charbon-doux);margin-top:1.5rem;">contact@lamezzalunaclamart.com · <a href="tel:+33146313331" style="color:var(--rouge-vif);font-weight:700;">01 46 31 33 31</a></p>
+
+        <div class="form-submit">
+          <button type="submit" class="btn btn-primary" style="min-width:240px;">Envoyer ma demande</button>
+          <p class="form-note">Réponse sous 48h · Devis gratuit et sans engagement · Vous pouvez aussi écrire à contact@lamezzalunaclamart.com ou appeler le <a href="tel:+33146313331" style="color:var(--rouge-vif);font-weight:700;">01 46 31 33 31</a></p>
+        </div>
+      </form>
+
+      <div id="priv-success">
+        <h3>Demande reçue !</h3>
+        <p>Nous vous répondrons dans les 48h avec un devis personnalisé.<br>À très vite, Gwen &amp; Stéphane.</p>
       </div>
 
     </div>
@@ -1060,16 +1115,24 @@
   }, { threshold:.15 });
   document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
 
-  /* Bouton copier l'adresse email */
+  /* Envoi formulaire devis */
   (function(){
-    var btn = document.getElementById('btn-copie-email');
-    if(!btn) return;
-    btn.addEventListener('click', function(){
-      var txt = document.getElementById('btn-copie-email-txt');
-      navigator.clipboard.writeText('contact@lamezzalunaclamart.com').then(function(){
-        txt.textContent = 'Adresse copiée !';
-        setTimeout(function(){ txt.textContent = "Copier l'adresse email"; }, 2500);
-      });
+    var form = document.getElementById('form-priv');
+    if(!form) return;
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true; btn.textContent = 'Envoi en cours…';
+      fetch(form.action, { method:'POST', body:new FormData(form), headers:{ 'Accept':'application/json' } })
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+          if(res.success){ form.style.display = 'none'; document.getElementById('priv-success').style.display = 'block'; }
+          else { throw new Error(); }
+        })
+        .catch(function(){
+          btn.disabled = false; btn.textContent = 'Envoyer ma demande';
+          alert("L'envoi a échoué. Vous pouvez nous écrire directement à contact@lamezzalunaclamart.com ou appeler le 01 46 31 33 31.");
+        });
     });
   })();
 </script>
