@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Commander en ligne | Click &amp; Collect | La Mezza Luna Clamart</title>
+<meta name="description" content="Commandez vos pizzas, pâtes et plats en ligne à La Mezza Luna, Clamart. Paiement sécurisé, retrait sur place à l'heure de votre choix. Minimum 15€." />
+<link rel="canonical" href="https://lamezzalunaclamart.com/commander.html" />
+<link rel="icon" href="assets/img/logo-red.png" type="image/png" />
+<meta name="robots" content="noindex, follow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --rouge-vif:#C70039;
+    --rouge-profond:#900C27;
+    --or:#F6C667;
+    --or-fonce:#d9a838;
+    --bleu-clair:#F1F8FD;
+    --vert:#417050;
+    --charbon:#1A1A1A;
+    --charbon-doux:#3a352e;
+    --serif:'Cormorant Garamond', Georgia, serif;
+    --sans:'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    --script:'Great Vibes', cursive;
+    --max:1180px;
+    --pad-x:clamp(20px, 5vw, 64px);
+    --radius:14px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; overflow-x:hidden; }
+  body{ font-family:var(--sans); color:var(--charbon); background:#fff; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden; position:relative; max-width:100vw; }
+  img{ display:block; max-width:100%; }
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ width:100%; max-width:var(--max); margin:0 auto; padding-left:var(--pad-x); padding-right:var(--pad-x); }
+
+  /* ---- Boutons ---- */
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:.5em; font-family:var(--sans); font-weight:600; font-size:.92rem; letter-spacing:.04em; text-transform:uppercase; padding:15px 30px; border-radius:50px; cursor:pointer; border:1.5px solid transparent; transition:transform .18s ease, background-color .18s ease, color .18s ease, box-shadow .18s ease; min-height:48px; }
+  .btn-primary{ background:var(--rouge-vif); color:#fff; box-shadow:0 6px 18px rgba(199,0,57,.25); }
+  .btn-primary:hover{ background:var(--rouge-profond); transform:translateY(-2px); }
+  .btn-ghost-light{ background:transparent; color:#fff; border-color:rgba(255,255,255,.6); }
+  .btn-ghost-light:hover{ background:rgba(255,255,255,.12); border-color:#fff; }
+
+  /* ---- Décos ---- */
+  .filet{ display:inline-flex; align-items:center; gap:14px; }
+  .filet::before, .filet::after{ content:""; height:1px; width:46px; background:var(--or-fonce); opacity:.8; }
+  .eyebrow{ font-family:var(--sans); font-weight:600; font-size:.74rem; letter-spacing:.28em; text-transform:uppercase; color:var(--rouge-vif); }
+
+  /* ================================================================
+     HEADER — identique à index.html
+     ================================================================ */
+  header.site{
+    position:fixed; top:0; left:0; right:0; width:100%; z-index:100;
+    background:linear-gradient(to bottom, rgba(0,0,0,.38) 0%, transparent 100%);
+    border-bottom:none;
+    transition:background .38s ease, box-shadow .38s ease;
+    overflow:visible;
+  }
+  header.site.scrolled{
+    background:rgba(255,255,255,.96);
+    backdrop-filter:blur(14px);
+    border-bottom:2px solid var(--rouge-vif);
+    box-shadow:0 2px 24px rgba(0,0,0,.09);
+  }
+  .nav{ display:flex; align-items:center; justify-content:space-between; gap:24px; padding-top:14px; padding-bottom:14px; transition:padding .38s ease; }
+  header.site.scrolled .nav{ padding-top:8px; padding-bottom:8px; }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand .lune-logo{ width:50px; height:50px; flex:none; object-fit:contain; background:rgba(255,255,255,.96); border-radius:50%; padding:4px; box-shadow:0 2px 14px rgba(0,0,0,.22); }
+  .brand .nom{ font-family:var(--serif); font-weight:600; font-size:1.35rem; line-height:1; letter-spacing:.01em; color:#fff; transition:color .38s ease; }
+  .brand .nom small{ display:block; font-family:var(--sans); font-size:.58rem; font-weight:600; letter-spacing:.32em; text-transform:uppercase; color:rgba(255,200,200,.9); margin-top:4px; transition:color .38s ease; }
+  header.site.scrolled .brand .nom{ color:var(--charbon); }
+  header.site.scrolled .brand .nom small{ color:var(--rouge-vif); }
+  .nav-cta{ display:flex; align-items:center; gap:14px; }
+  .nav-cta .tel{ font-size:.84rem; font-weight:600; color:rgba(255,255,255,.9); white-space:nowrap; transition:color .38s ease; }
+  header.site.scrolled .nav-cta .tel{ color:var(--charbon); }
+  .menu-trigger{ display:flex; flex-direction:column; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; padding:8px 10px; transform:rotate(-13deg); transform-origin:center; }
+  .menu-trigger-lines{ display:flex; flex-direction:column; gap:6px; width:28px; }
+  .menu-trigger-lines span{ display:block; height:2px; background:#fff; border-radius:1px; transition:width .35s cubic-bezier(.76,0,.24,1), background .38s ease; }
+  .menu-trigger-lines span:nth-child(1){ width:28px; }
+  .menu-trigger-lines span:nth-child(2){ width:18px; }
+  .menu-trigger-lines span:nth-child(3){ width:28px; }
+  .menu-trigger:hover .menu-trigger-lines span:nth-child(1){ width:18px; }
+  .menu-trigger:hover .menu-trigger-lines span:nth-child(2){ width:28px; }
+  .menu-trigger:hover .menu-trigger-lines span:nth-child(3){ width:18px; }
+  header.site.scrolled .menu-trigger-lines span{ background:var(--charbon); }
+  @media (max-width:1120px){ .nav-cta .tel{ display:none; } }
+
+  /* ================================================================
+     HERO
+     ================================================================ */
+  .hero-soir{
+    position:relative; min-height:min(78vh, 660px);
+    display:flex; align-items:center; overflow:hidden;
+  }
+  .hero-soir-media{ position:absolute; inset:0; z-index:0; overflow:hidden; }
+  .hero-soir-media img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .hero-soir-media::after{
+    content:""; position:absolute; inset:0;
+    background:
+      linear-gradient(90deg, rgba(10,4,4,.88) 0%, rgba(10,4,4,.62) 55%, rgba(10,4,4,.22) 100%),
+      linear-gradient(to bottom, transparent 50%, #14100a 100%);
+  }
+  .hero-soir-inner{ position:relative; z-index:4; padding-top:110px; padding-bottom:88px; max-width:700px; color:#fff; }
+  .hero-soir-inner .eyebrow{ color:var(--or); }
+  .hero-soir-inner h1{ font-family:var(--serif); font-weight:600; font-size:clamp(2rem, 4.8vw, 3.5rem); line-height:1.08; margin:14px 0 18px; text-wrap:balance; }
+  .hero-soir-inner h1 em{ font-style:italic; color:var(--or); }
+  .hero-soir-inner p.lead{ font-size:clamp(.9rem,1.8vw,1.05rem); font-weight:300; max-width:520px; color:rgba(255,255,255,.9); }
+  .hero-soir-inner .actions{ display:flex; gap:14px; flex-wrap:wrap; margin-top:34px; }
+
+  /* ================================================================
+     STRIP INFOS PRATIQUES
+     ================================================================ */
+  .strip-infos{ background:var(--rouge-profond); }
+  .strip-grid{ display:grid; grid-template-columns:repeat(3,1fr); }
+  .strip-item{ text-align:center; padding:28px 20px; border-right:1px solid rgba(255,255,255,.1); }
+  .strip-item:last-child{ border-right:none; }
+  .strip-item .ico{ width:32px; height:32px; color:var(--or); margin:0 auto 10px; }
+  .strip-item .titre{ font-family:var(--serif); font-size:1.15rem; font-weight:600; color:#fff; margin-bottom:4px; }
+  .strip-item .detail{ font-size:.8rem; color:rgba(255,255,255,.65); letter-spacing:.02em; line-height:1.5; }
+
+  /* ================================================================
+     SECTIONS SOIRÉES
+     ================================================================ */
+  .section-soir{ padding:clamp(64px, 9vw, 108px) 0; }
+  .section-soir:nth-child(even){ background:#fff; }
+  .section-soir:nth-child(odd){ background:var(--bleu-clair); }
+
+  .soir-inner{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(40px,5.5vw,88px); align-items:center; }
+  .soir-inner.reverse{ direction:rtl; }
+  .soir-inner.reverse > *{ direction:ltr; }
+
+  /* Badge type de soirée */
+  .soir-badge{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--sans); font-size:.68rem; font-weight:700;
+    letter-spacing:.22em; text-transform:uppercase;
+    padding:7px 16px; border-radius:50px; margin-bottom:18px;
+  }
+  .soir-badge svg{ width:14px; height:14px; flex:none; }
+  .badge-rouge{ background:rgba(199,0,57,.1); color:var(--rouge-vif); border:1px solid rgba(199,0,57,.2); }
+  .badge-or{ background:rgba(217,168,56,.14); color:var(--or-fonce); border:1px solid rgba(217,168,56,.28); }
+  .badge-vert{ background:rgba(65,112,80,.1); color:var(--vert); border:1px solid rgba(65,112,80,.2); }
+  .badge-sombre{ background:rgba(26,26,26,.08); color:var(--charbon); border:1px solid rgba(26,26,26,.15); }
+  .badge-violet{ background:rgba(94,58,136,.1); color:#5e3a88; border:1px solid rgba(94,58,136,.22); }
+  .badge-foot{ background:rgba(25,100,45,.1); color:#19642d; border:1px solid rgba(25,100,45,.22); }
+
+  .soir-content h2{ font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.2vw,3rem); line-height:1.08; margin-bottom:14px; }
+  .soir-content p{ font-size:1rem; color:var(--charbon-doux); line-height:1.7; margin-bottom:14px; }
+
+  /* Chips d'info pratique sous chaque soirée */
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; }
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#fff; border:1px solid rgba(26,26,26,.13);
+    font-size:.76rem; font-weight:500; color:var(--charbon-doux);
+    padding:6px 12px; border-radius:50px;
+  }
+  .chip svg{ width:12px; height:12px; color:var(--rouge-vif); flex:none; }
+  .section-soir:nth-child(odd) .chip{ background:rgba(255,255,255,.8); }
+
+  /* Photo */
+  .soir-media{ border-radius:var(--radius); overflow:hidden; aspect-ratio:4/3; position:relative; box-shadow:0 20px 60px rgba(0,0,0,.13); }
+  .soir-media img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+
+  /* ================================================================
+     SECTION NEWSLETTER
+     ================================================================ */
+  .newsletter{ background:var(--rouge-profond); color:#fff; padding:clamp(64px,9vw,100px) 0; }
+  .newsletter-inner{ max-width:640px; margin:0 auto; text-align:center; }
+  .newsletter .eyebrow{ color:var(--or); }
+  .newsletter h2{ font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.4vw,2.9rem); color:#fff; margin:14px 0 14px; }
+  .newsletter p{ font-size:.97rem; color:rgba(255,255,255,.8); margin-bottom:36px; }
+  .nl-form{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+  .nl-form input{
+    font-family:var(--sans); font-size:.9rem;
+    background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.22);
+    border-radius:10px; padding:13px 16px; color:#fff; width:100%;
+    transition:border-color .2s, background .2s;
+  }
+  .nl-form input::placeholder{ color:rgba(255,255,255,.45); }
+  .nl-form input:focus{ outline:none; border-color:var(--or); background:rgba(255,255,255,.14); }
+  .nl-email{ grid-column:1 / -1; }
+  .nl-submit{ text-align:center; margin-top:6px; }
+  .nl-note{ font-size:.78rem; color:rgba(255,255,255,.4); margin-top:14px; }
+  .sib-form-message-panel{ display:none; }
+  .sib-form-message-panel--active{ display:block; }
+  #nl-success{ display:none; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:var(--radius); padding:28px; }
+  #nl-success h3{ font-family:var(--serif); font-size:1.8rem; color:var(--or); margin-bottom:8px; }
+  #nl-success p{ color:rgba(255,255,255,.75); }
+
+  /* ================================================================
+     FOOTER — identique à index.html
+     ================================================================ */
+  footer.site{ background:#fff; color:var(--charbon-doux); padding:64px 0 30px; }
+  .foot-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:40px; padding-bottom:42px; border-bottom:1px solid rgba(0,0,0,.10); }
+  footer .brand .nom{ color:var(--charbon); }
+  footer .foot-about{ font-size:.92rem; max-width:320px; margin-top:18px; line-height:1.6; color:var(--charbon-doux); }
+  footer h4{ font-family:var(--sans); font-size:.74rem; letter-spacing:.2em; text-transform:uppercase; color:var(--rouge-vif); margin-bottom:18px; }
+  footer ul{ list-style:none; display:flex; flex-direction:column; gap:11px; }
+  footer ul a{ font-size:.92rem; color:var(--charbon-doux); transition:color .15s; }
+  footer ul a:hover{ color:var(--rouge-vif); }
+  .socials{ display:flex; gap:12px; margin-top:20px; }
+  .socials a{ width:42px; height:42px; border-radius:50%; border:1px solid rgba(0,0,0,.15); display:flex; align-items:center; justify-content:center; color:var(--charbon); transition:.18s; }
+  .socials a:hover{ background:var(--rouge-vif); border-color:var(--rouge-vif); color:#fff; }
+  .socials svg{ width:18px; height:18px; }
+  .foot-bottom{ display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-top:24px; font-size:.78rem; color:rgba(0,0,0,.4); }
+  .foot-bottom a:hover{ color:var(--rouge-vif); }
+
+  /* ================================================================
+     DRAWER — identique à index.html
+     ================================================================ */
+  .drawer-overlay{ display:none; }
+  .nav-drawer{ position:fixed; inset:0; width:100vw; height:100vh; background:var(--rouge-profond); z-index:200; transform:translateX(-100%); transition:transform .58s cubic-bezier(.76,0,.24,1); display:flex; flex-direction:column; justify-content:center; padding:clamp(80px,12vh,120px) clamp(48px,8vw,120px) clamp(48px,8vh,80px); overflow:hidden; }
+  .nav-drawer.open{ transform:translateX(0); }
+  .drawer-deco{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .drawer-deco-logo{ position:absolute; right:clamp(80px,10vw,160px); top:50%; transform:translateY(-58%); width:clamp(100px,14vw,170px); opacity:.09; }
+  .drawer-deco-name{ font-family:var(--serif); font-weight:600; font-size:clamp(9px,1.3vw,15px); color:rgba(255,255,255,.09); position:absolute; right:clamp(80px,10vw,160px); top:calc(50% + clamp(52px,7.2vw,89px)); width:clamp(100px,14vw,170px); text-align:center; letter-spacing:.18em; text-transform:uppercase; line-height:1; user-select:none; white-space:nowrap; }
+  .drawer-deco-logo img{ width:100%; }
+  .drawer-close{ position:absolute; top:clamp(22px,4vh,38px); right:clamp(26px,4vw,50px); background:none; border:none; cursor:pointer; color:rgba(255,255,255,.4); width:46px; height:46px; display:flex; align-items:center; justify-content:center; transition:color .2s, transform .2s; z-index:2; }
+  .drawer-close:hover{ color:#fff; transform:rotate(90deg); }
+  .drawer-close svg{ width:26px; height:26px; }
+  .drawer-eyebrow{ font-family:var(--sans); font-size:.58rem; font-weight:700; letter-spacing:.36em; text-transform:uppercase; color:var(--or); margin-bottom:clamp(22px,3.5vh,40px); display:flex; align-items:center; gap:12px; position:relative; z-index:1; }
+  .drawer-eyebrow::before{ content:""; width:32px; height:1px; background:var(--or); opacity:.7; }
+  .drawer-nav{ display:flex; flex-direction:column; gap:0; position:relative; z-index:1; }
+  .drawer-nav a{ font-family:var(--sans); font-size:clamp(1.2rem,2vw,2rem); font-weight:400; letter-spacing:.06em; color:rgba(255,255,255,.68); display:flex; align-items:center; gap:18px; padding:clamp(12px,1.8vh,18px) 0; opacity:0; transform:translateY(14px); transition:color .22s ease, transform .34s ease, opacity .34s ease; }
+  .drawer-nav a::before{ content:attr(data-num); font-family:var(--sans); font-size:.58rem; font-weight:600; letter-spacing:.14em; color:var(--or); opacity:0; transition:opacity .22s ease; min-width:24px; }
+  .drawer-nav a:hover{ color:#fff; }
+  .drawer-nav a:hover::before{ opacity:1; }
+  .nav-drawer.open .drawer-nav a{ opacity:1; transform:translateY(0); }
+  .nav-drawer.open .drawer-nav a:nth-child(1){ transition-delay:.11s; }
+  .nav-drawer.open .drawer-nav a:nth-child(2){ transition-delay:.17s; }
+  .nav-drawer.open .drawer-nav a:nth-child(3){ transition-delay:.23s; }
+  .nav-drawer.open .drawer-nav a:nth-child(4){ transition-delay:.29s; }
+  .nav-drawer.open .drawer-nav a:nth-child(5){ transition-delay:.35s; }
+  .nav-drawer.open .drawer-nav a:nth-child(6){ transition-delay:.41s; }
+  .nav-drawer.open .drawer-nav a:nth-child(7){ transition-delay:.47s; }
+  .drawer-foot{ margin-top:clamp(22px,3.5vh,38px); padding-top:clamp(16px,2.5vh,26px); display:flex; align-items:center; gap:28px; flex-wrap:wrap; position:relative; z-index:1; }
+  .drawer-foot a{ font-size:.82rem; color:rgba(255,255,255,.38); transition:color .2s; }
+  .drawer-foot a:hover{ color:var(--or); }
+  .drawer-foot-socials{ display:flex; gap:10px; margin-left:auto; }
+  .drawer-foot-socials a{ width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.45); transition:.2s; }
+  .drawer-foot-socials a:hover{ background:var(--rouge-vif); border-color:var(--rouge-vif); color:#fff; }
+  .drawer-foot-socials svg{ width:15px; height:15px; }
+
+  /* Bouton appel mobile */
+  .cta-mobile-call{ display:none; position:fixed; bottom:20px; right:20px; z-index:100; background:var(--rouge-vif); color:#fff; width:58px; height:58px; border-radius:50%; align-items:center; justify-content:center; box-shadow:0 6px 24px rgba(199,0,57,.45); border:none; cursor:pointer; animation:pulse 2.4s ease-in-out infinite; }
+  .cta-mobile-call svg{ width:26px; height:26px; }
+  @keyframes pulse{ 0%,100%{ box-shadow:0 6px 24px rgba(199,0,57,.45); } 50%{ box-shadow:0 6px 30px rgba(199,0,57,.7); transform:scale(1.06); } }
+  @media (max-width:768px){ .cta-mobile-call{ display:flex; } }
+
+  /* Reveal */
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{ opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s ease; }
+    .reveal.in{ opacity:1; transform:none; }
+  }
+  section[id]{ scroll-margin-top:96px; }
+
+  /* ================================================================
+     RESPONSIVE
+     ================================================================ */
+  @media (max-width:900px){
+    .soir-inner, .soir-inner.reverse{ grid-template-columns:1fr; direction:ltr; }
+    .soir-media{ aspect-ratio:16/9; order:-1; }
+    .strip-grid{ grid-template-columns:1fr; }
+    .strip-item{ border-right:none; border-bottom:1px solid rgba(255,255,255,.1); }
+    .strip-item:last-child{ border-bottom:none; }
+    .foot-grid{ grid-template-columns:1fr; }
+    .nl-form{ grid-template-columns:1fr; }
+    .nl-email{ grid-column:1; }
+  }
+  @media (max-width:600px){
+    .hero-soir-inner .actions .btn{ flex:1 1 auto; font-size:.78rem; padding:11px 16px; min-height:42px; }
+    .hero-soir-inner{ padding-top:130px; padding-bottom:60px; }
+    .hero-soir-inner h1{ font-size:1.6rem; line-height:1.1; margin:10px 0 14px; }
+    .hero-soir-inner p.lead{ font-size:.85rem; line-height:1.65; }
+    .hero-soir-inner .actions{ margin-top:24px; gap:10px; }
+    .soir-content h2{ font-size:1.5rem; }
+    .soir-content p{ font-size:.9rem; line-height:1.7; margin-bottom:14px; }
+    .soir-content p + p{ margin-top:14px; }
+    .section-soir{ padding-top:clamp(36px,6vw,48px); padding-bottom:clamp(36px,6vw,48px); }
+    .newsletter h2{ font-size:1.6rem; }
+    .newsletter p{ font-size:.88rem; }
+  }
+  @media (max-width:768px){
+    .nl-form input{ font-size:16px; }
+  }
+</style>
+</head>
+<body>
+
+<a href="tel:+33146313331" class="cta-mobile-call" aria-label="Appeler La Mezza Luna">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-3 2a12 12 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" stroke-linejoin="round"/></svg>
+</a>
+
+<!-- ================================================================
+     HEADER
+     ================================================================ -->
+<header class="site">
+  <div class="wrap nav">
+    <a href="index.html" class="brand" aria-label="La Mezza Luna — accueil">
+      <img class="lune-logo" src="assets/img/logo-red.png" alt="La Mezza Luna" />
+      <span class="nom">La Mezza Luna<small>Clamart</small></span>
+    </a>
+    <div class="nav-cta">
+      <a href="carte.html" class="tel">La carte</a>
+      <a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener" class="btn btn-primary" style="padding:12px 22px;">Réserver</a>
+      <button class="menu-trigger" id="menuTrigger" aria-label="Ouvrir le menu" aria-expanded="false">
+        <span class="menu-trigger-lines"><span></span><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
+</header>
+<!-- ================================================================
+     COMMANDER — CLICK & COLLECT
+     ================================================================ -->
+<section style="padding:120px 0 20px;">
+  <div class="wrap" style="max-width:760px;text-align:center;">
+    <span class="eyebrow filet">Click &amp; Collect</span>
+    <h1 style="font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.2rem);line-height:1.1;margin:14px 0 18px;">Commandez, on prépare, vous passez</h1>
+    <p style="color:var(--charbon-doux);font-size:1.05rem;">Choisissez vos plats, réglez en ligne, et venez récupérer votre commande au restaurant à l'heure qui vous convient. Montant minimum 15€ · Préparation 20-25 min.</p>
+  </div>
+</section>
+
+<section style="padding:20px 0 80px;">
+  <div class="wrap" style="max-width:1180px;">
+    <div id="commande-layout" style="display:grid;grid-template-columns:1fr 380px;gap:36px;align-items:start;">
+
+      <!-- MENU -->
+      <div id="commande-menu"></div>
+
+      <!-- PANIER -->
+      <aside id="commande-panier" style="position:sticky;top:100px;background:var(--bleu-clair);border-radius:var(--radius);padding:24px;">
+        <h2 style="font-family:var(--serif);font-size:1.5rem;margin-bottom:16px;">Votre panier</h2>
+        <div id="panier-lignes" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;"></div>
+        <p id="panier-vide" style="color:var(--charbon-doux);font-size:.92rem;">Votre panier est vide. Ajoutez des plats depuis la carte.</p>
+
+        <div id="panier-recap" style="display:none;">
+          <div style="border-top:1px solid rgba(0,0,0,.1);padding-top:14px;margin-top:6px;display:flex;justify-content:space-between;font-weight:700;font-size:1.15rem;">
+            <span>Total</span><span id="panier-total">0,00 €</span>
+          </div>
+          <p id="panier-minimum-alerte" style="display:none;color:var(--rouge-vif);font-size:.85rem;margin-top:10px;">Montant minimum de commande : 15€. Il vous manque <strong id="panier-manque">0,00 €</strong>.</p>
+
+          <div style="margin-top:20px;display:flex;flex-direction:column;gap:12px;">
+            <div class="field">
+              <label for="cmd-nom" style="font-size:.85rem;font-weight:600;display:block;margin-bottom:4px;">Nom</label>
+              <input type="text" id="cmd-nom" placeholder="Votre nom" required style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);" />
+            </div>
+            <div class="field">
+              <label for="cmd-tel" style="font-size:.85rem;font-weight:600;display:block;margin-bottom:4px;">Téléphone</label>
+              <input type="tel" id="cmd-tel" placeholder="06 12 34 56 78" required style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);" />
+            </div>
+            <div class="field">
+              <label for="cmd-email" style="font-size:.85rem;font-weight:600;display:block;margin-bottom:4px;">Email</label>
+              <input type="email" id="cmd-email" placeholder="votre@email.fr" required style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);" />
+            </div>
+            <div class="field">
+              <label for="cmd-jour" style="font-size:.85rem;font-weight:600;display:block;margin-bottom:4px;">Jour de retrait</label>
+              <select id="cmd-jour" required style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);"></select>
+            </div>
+            <div class="field">
+              <label for="cmd-heure" style="font-size:.85rem;font-weight:600;display:block;margin-bottom:4px;">Heure de retrait</label>
+              <select id="cmd-heure" required style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);"></select>
+            </div>
+          </div>
+
+          <button id="cmd-payer" class="btn btn-primary" style="width:100%;margin-top:20px;" disabled>Payer <span id="cmd-payer-total">0,00 €</span></button>
+          <p id="cmd-erreur" style="display:none;color:var(--rouge-vif);font-size:.85rem;margin-top:10px;"></p>
+          <p style="color:var(--charbon-doux);font-size:.78rem;margin-top:12px;text-align:center;">Paiement sécurisé par Stripe. Aucune donnée bancaire ne transite par notre site.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width:900px){
+    #commande-layout{ grid-template-columns:1fr; }
+    #commande-panier{ position:static; }
+  }
+  .menu-cat{ margin-bottom:44px; }
+  .menu-cat h3{ font-family:var(--serif); font-size:1.6rem; color:var(--rouge-vif); margin-bottom:6px; }
+  .menu-cat .menu-cat-desc{ color:var(--charbon-doux); font-size:.9rem; margin-bottom:16px; }
+  .menu-item{ display:flex; justify-content:space-between; align-items:center; gap:16px; padding:14px 0; border-bottom:1px solid rgba(0,0,0,.08); }
+  .menu-item-txt{ flex:1; }
+  .menu-item-txt strong{ font-size:1.02rem; }
+  .menu-item-txt p{ color:var(--charbon-doux); font-size:.86rem; margin-top:3px; }
+  .menu-item-price{ font-weight:700; color:var(--rouge-vif); white-space:nowrap; min-width:56px; text-align:right; }
+  .menu-item-add{ display:flex; align-items:center; gap:8px; }
+  .qty-btn{ width:28px; height:28px; border-radius:50%; border:1.5px solid var(--rouge-vif); background:#fff; color:var(--rouge-vif); font-size:1.1rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .qty-btn:hover{ background:var(--rouge-vif); color:#fff; }
+  .qty-val{ min-width:18px; text-align:center; font-weight:600; }
+  .panier-ligne{ display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.92rem; }
+  .panier-ligne-nom{ flex:1; }
+  .panier-ligne-nom .qty{ color:var(--charbon-doux); }
+</style>
+
+<script>
+(function(){
+  var MENU = [
+    { cat:"Grignotages", items:[
+      { id:"g1", name:"Arancini al tartufo", desc:"Lamelles de truffe d'été et crème de truffe", price:5 },
+      { id:"g2", name:"Planche de charcuterie", desc:"Coppa di Parma, Spianata piccante et Speck IGP", price:8 }
+    ]},
+    { cat:"Entrées", items:[
+      { id:"e1", name:"Carpaccio de bœuf (VBF Charolaise)", desc:"", price:9 },
+      { id:"e2", name:"Salade tiède au poulpe", desc:"", price:9 },
+      { id:"e3", name:"Œuf mollet en croûte", desc:"Roquette et crème de truffe", price:8 }
+    ]},
+    { cat:"Salades", items:[
+      { id:"s1", name:"La Verdura", desc:"Salade végétarienne, burrata, artichauts, pesto verde", price:17.50 },
+      { id:"s2", name:"La Nordique", desc:"Saumon fumé, œuf mollet, crème de ciboulette", price:16.50 },
+      { id:"s3", name:"La César", desc:"", price:15.50 }
+    ]},
+    { cat:"Pizzas", desc:"Pâte et sauce tomate maison, cuites à la commande.", items:[
+      { id:"p1", name:"Margherita", desc:"Sauce tomate, mozzarella fior di latte, basilic frais", price:11 },
+      { id:"p2", name:"Orientale", desc:"Sauce tomate, mozzarella, merguez fraîches halal, poivrons, œuf", price:14 },
+      { id:"p3", name:"La Vege", desc:"Pesto verde, artichauts, olives, oignons confits, poivrons", price:15 },
+      { id:"p4", name:"Coppa e Formaggio", desc:"Gorgonzola, mozzarella, chèvre, roquette, noix, burrata, Coppa di Parma", price:16.50 },
+      { id:"p5", name:"Parma", desc:"Sauce tomate, mozzarella, roquette, Speck IGP, burrata, Parmigiano Reggiano DOP", price:17 },
+      { id:"p6", name:"Tartufo", desc:"Crème de truffe, champignons, roquette, burrata, lamelles de truffe d'été, Parmigiano Reggiano DOP", price:18 }
+    ]},
+    { cat:"Pâtes", items:[
+      { id:"pa1", name:"Penne Luna", desc:"Crème fraîche, champignons, Spianata piccante, basilic frais", price:14.50 },
+      { id:"pa2", name:"Tagliatelles carbonara", desc:"", price:15 },
+      { id:"pa3", name:"Raviolis aux cèpes", desc:"Lamelles de truffe d'été et crème de truffe", price:16.80 }
+    ]},
+    { cat:"Viandes", desc:"Viande de bœuf française VBF Charolaise.", items:[
+      { id:"v1", name:"Luna Burger", desc:"Steak haché VBF Charolaise 180g, pain brioché, sauce gorgonzola ou pesto verde", price:18 },
+      { id:"v2", name:"Escalope de veau Saltimbocca", desc:"Mozzarella, Speck IGP, risotto aux champignons", price:21 },
+      { id:"v3", name:"Filet de bœuf 200g", desc:"Sauce gorgonzola ou crème de truffe, frites et légumes de saison", price:24 }
+    ]},
+    { cat:"Poissons", items:[
+      { id:"po1", name:"Pavé de saumon grillé", desc:"Sauce vierge et légumes de saison", price:18 },
+      { id:"po2", name:"Tartare de saumon", desc:"Courgettes, fruits de la passion, sauce vierge, frites", price:18 },
+      { id:"po3", name:"Risotto au poulpe", desc:"", price:22 }
+    ]},
+    { cat:"Desserts", desc:"Faits maison.", items:[
+      { id:"d1", name:"Tiramisu café intense", desc:"", price:7.50 },
+      { id:"d2", name:"Moelleux au chocolat noir et glace vanille", desc:"", price:8 },
+      { id:"d3", name:"Affogato", desc:"Amaretto, expresso, glace vanille, amandes grillées", price:8 }
+    ]},
+    { cat:"Glaces artisanales", desc:"Glaces des Alpes, Maître Artisan Glacier.", items:[
+      { id:"gl1", name:"Coupe Dame Blanche", desc:"3 boules vanille, sauce chocolat et crème fouettée", price:8 },
+      { id:"gl2", name:"Coupe Colonel", desc:"2 boules citron vert, vodka", price:8 }
+    ]}
+  ];
+
+  var MONTANT_MIN = 15;
+  var cart = {}; // { itemId: qty }
+
+  function fmt(n){ return n.toFixed(2).replace('.', ',') + ' €'; }
+  function findItem(id){
+    for (var c=0;c<MENU.length;c++){
+      for (var i=0;i<MENU[c].items.length;i++){
+        if (MENU[c].items[i].id === id) return MENU[c].items[i];
+      }
+    }
+    return null;
+  }
+  function cartTotal(){
+    var total = 0;
+    Object.keys(cart).forEach(function(id){
+      var item = findItem(id);
+      if (item) total += item.price * cart[id];
+    });
+    return total;
+  }
+
+  function renderMenu(){
+    var container = document.getElementById('commande-menu');
+    var html = '';
+    MENU.forEach(function(cat){
+      html += '<div class="menu-cat reveal">';
+      html += '<h3>' + cat.cat + '</h3>';
+      if (cat.desc) html += '<p class="menu-cat-desc">' + cat.desc + '</p>';
+      cat.items.forEach(function(item){
+        html += '<div class="menu-item" data-id="' + item.id + '">';
+        html += '<div class="menu-item-txt"><strong>' + item.name + '</strong>' + (item.desc ? '<p>' + item.desc + '</p>' : '') + '</div>';
+        html += '<div class="menu-item-price">' + fmt(item.price) + '</div>';
+        html += '<div class="menu-item-add">';
+        html += '<button type="button" class="qty-btn" data-action="minus" data-id="' + item.id + '">−</button>';
+        html += '<span class="qty-val" data-qty="' + item.id + '">0</span>';
+        html += '<button type="button" class="qty-btn" data-action="plus" data-id="' + item.id + '">+</button>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+    });
+    container.innerHTML = html;
+    container.addEventListener('click', function(e){
+      var btn = e.target.closest('.qty-btn');
+      if (!btn) return;
+      var id = btn.dataset.id;
+      var action = btn.dataset.action;
+      var qty = cart[id] || 0;
+      if (action === 'plus') qty += 1;
+      if (action === 'minus') qty = Math.max(0, qty - 1);
+      if (qty === 0) delete cart[id]; else cart[id] = qty;
+      document.querySelector('[data-qty="' + id + '"]').textContent = qty;
+      renderPanier();
+    });
+  }
+
+  function renderPanier(){
+    var lignes = document.getElementById('panier-lignes');
+    var vide = document.getElementById('panier-vide');
+    var recap = document.getElementById('panier-recap');
+    var ids = Object.keys(cart);
+
+    if (ids.length === 0){
+      lignes.innerHTML = '';
+      vide.style.display = 'block';
+      recap.style.display = 'none';
+      document.getElementById('cmd-payer').disabled = true;
+      return;
+    }
+
+    vide.style.display = 'none';
+    recap.style.display = 'block';
+
+    var html = '';
+    ids.forEach(function(id){
+      var item = findItem(id);
+      html += '<div class="panier-ligne">';
+      html += '<span class="panier-ligne-nom">' + item.name + ' <span class="qty">× ' + cart[id] + '</span></span>';
+      html += '<span>' + fmt(item.price * cart[id]) + '</span>';
+      html += '</div>';
+    });
+    lignes.innerHTML = html;
+
+    var total = cartTotal();
+    document.getElementById('panier-total').textContent = fmt(total);
+    document.getElementById('cmd-payer-total').textContent = fmt(total);
+
+    var alerte = document.getElementById('panier-minimum-alerte');
+    var payerBtn = document.getElementById('cmd-payer');
+    if (total < MONTANT_MIN){
+      alerte.style.display = 'block';
+      document.getElementById('panier-manque').textContent = fmt(MONTANT_MIN - total);
+      payerBtn.disabled = true;
+    } else {
+      alerte.style.display = 'none';
+      payerBtn.disabled = false;
+    }
+  }
+
+  // Créneaux de retrait : midi lun-ven 12h-14h15, soir lun-sam 19h-21h45 (dernier créneau avant fermeture)
+  function buildJoursOptions(){
+    var select = document.getElementById('cmd-jour');
+    var jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+    var today = new Date();
+    var html = '';
+    for (var i=0;i<7;i++){
+      var d = new Date(today);
+      d.setDate(today.getDate() + i);
+      var dow = d.getDay();
+      if (dow === 0) continue; // fermé le dimanche
+      var label = (i===0 ? "Aujourd'hui" : i===1 ? "Demain" : jours[dow]) + ' ' + d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
+      html += '<option value="' + d.toISOString().slice(0,10) + '|' + dow + '">' + label + '</option>';
+    }
+    select.innerHTML = html;
+    buildHeuresOptions();
+    select.addEventListener('change', buildHeuresOptions);
+  }
+
+  function buildHeuresOptions(){
+    var jourSelect = document.getElementById('cmd-jour');
+    var heureSelect = document.getElementById('cmd-heure');
+    var dow = parseInt((jourSelect.value || '').split('|')[1], 10);
+    var creneaux = [];
+    if (dow >= 1 && dow <= 5){
+      for (var h=12; h<=14; h++){ creneaux.push(h+':00'); if(h<14) creneaux.push(h+':30'); }
+      creneaux.push('14:15');
+    }
+    if (dow >= 1 && dow <= 6){
+      for (var h2=19; h2<=21; h2++){ creneaux.push(h2+':00'); creneaux.push(h2+':30'); }
+      creneaux.push('21:45');
+    }
+    creneaux = creneaux.filter(function(v,i,a){ return a.indexOf(v)===i; }).sort();
+    heureSelect.innerHTML = creneaux.map(function(c){ return '<option value="' + c + '">' + c + '</option>'; }).join('');
+  }
+
+  renderMenu();
+  buildJoursOptions();
+
+  document.getElementById('cmd-payer').addEventListener('click', function(){
+    var erreur = document.getElementById('cmd-erreur');
+    erreur.style.display = 'none';
+
+    var nom = document.getElementById('cmd-nom').value.trim();
+    var tel = document.getElementById('cmd-tel').value.trim();
+    var email = document.getElementById('cmd-email').value.trim();
+    var jour = document.getElementById('cmd-jour').value;
+    var heure = document.getElementById('cmd-heure').value;
+
+    if (!nom || !tel || !email || !jour || !heure){
+      erreur.textContent = 'Merci de remplir tous les champs avant de payer.';
+      erreur.style.display = 'block';
+      return;
+    }
+
+    var items = Object.keys(cart).map(function(id){
+      var item = findItem(id);
+      return { id: id, name: item.name, price: item.price, quantity: cart[id] };
+    });
+
+    var btn = document.getElementById('cmd-payer');
+    btn.disabled = true;
+    var totalTxt = document.getElementById('cmd-payer-total').textContent;
+    btn.innerHTML = 'Redirection vers le paiement…';
+
+    // À CONFIGURER : URL de la fonction serveur une fois hébergée (Vercel).
+    var API_URL = 'https://api-stripe-gold.vercel.app/api/create-checkout-session';
+
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: items,
+        customer: { nom: nom, telephone: tel, email: email },
+        retrait: { jour: jour.split('|')[0], heure: heure }
+      })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.url){ window.location.href = data.url; }
+      else { throw new Error(data.error || 'Erreur inconnue'); }
+    })
+    .catch(function(err){
+      erreur.textContent = "Le paiement n'a pas pu démarrer. Réessayez ou appelez-nous au 01 46 31 33 31. (" + err.message + ")";
+      erreur.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = 'Payer <span id="cmd-payer-total">' + totalTxt + '</span>';
+    });
+  });
+})();
+</script>
+<footer class="site" style="border-top:none;padding-top:20px;">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand">
+          <img class="lune-logo" src="assets/img/logo-cream.png" alt="" style="width:48px;height:48px;object-fit:contain;" />
+          <span class="nom serif" style="font-size:1.35rem;">La Mezza Luna</span>
+        </div>
+        <p class="foot-about">L'Italie à Clamart, faite maison et servie avec le cœur. Restaurant franco-italien familial tenu par Stéphane &amp; Gwen depuis 2013.</p>
+        <div class="socials">
+          <a href="https://instagram.com/mezzalunaclamart" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="https://facebook.com/mezzalunaclamart" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V5h-3c-2.2 0-4 1.8-4 4v2H7v4h3v6h4v-6h3l1-4h-4V9c0-.6.4-1 1-1z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h4>Le restaurant</h4>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="carte.html">La carte complète</a></li>
+          <li><a href="pizzeria.html">La pizzeria</a></li>
+          <li><a href="privatisation.html">Privatisation</a></li>
+          <li><a href="https://usellweb.co/fr/landingpage/la-mezza-luna" target="_blank" rel="noopener">Commander en ligne ↗</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Réserver &amp; contact</h4>
+        <ul>
+          <li><a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener">Réserver une table</a></li>
+          <li><a href="soirees.html">S'inscrire aux soirées</a></li>
+          <li><a href="tel:+33146313331">01 46 31 33 31</a></li>
+          <li><a href="mailto:contact@lamezzalunaclamart.com">contact@lamezzalunaclamart.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 La Mezza Luna · 18 rue de Versailles, 92140 Clamart</span>
+      <span style="display:flex;gap:20px;flex-wrap:wrap;">
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="mentions-legales.html#3-politique-de-cookies">Cookies</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- ================================================================
+     DRAWER
+     ================================================================ -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<nav class="nav-drawer" id="navDrawer" aria-hidden="true">
+  <div class="drawer-deco" aria-hidden="true">
+    <div class="drawer-deco-logo"><img src="assets/img/logo-cream.png" alt="" /></div>
+    <div class="drawer-deco-name">La Mezza Luna</div>
+  </div>
+  <button class="drawer-close" id="drawerClose" aria-label="Fermer le menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <span class="drawer-eyebrow">Navigation</span>
+  <div class="drawer-nav">
+    <a href="index.html"          data-num="01">Accueil</a>
+    <a href="index.html#histoire" data-num="02">Notre histoire</a>
+    <a href="carte.html"          data-num="03">La carte</a>
+    <a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener" data-num="04">Réserver</a>
+    <a href="commander.html" data-num="04b">Commander en ligne</a>
+    <a href="privatisation.html"  data-num="05">Privatisation</a>
+    <a href="soirees.html"        data-num="06">Les soirées à La Mezza Luna</a>
+    <a href="index.html#infos"    data-num="07">Infos pratiques</a>
+  </div>
+  <div class="drawer-foot">
+    <a href="tel:+33146313331">01 46 31 33 31</a>
+    <a href="mailto:contact@lamezzalunaclamart.com">contact@lamezzalunaclamart.com</a>
+    <div class="drawer-foot-socials">
+      <a href="https://instagram.com/mezzalunaclamart" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="https://facebook.com/mezzalunaclamart" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V5h-3c-2.2 0-4 1.8-4 4v2H7v4h3v6h4v-6h3l1-4h-4V9c0-.6.4-1 1-1z"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<script>
+  (function(){
+    var hdr = document.querySelector('header.site');
+    function syncNav(){ hdr.classList.toggle('scrolled', window.scrollY > 60); }
+    window.addEventListener('scroll', syncNav, { passive:true });
+    syncNav();
+  })();
+
+  (function(){
+    var trigger  = document.getElementById('menuTrigger');
+    var drawer   = document.getElementById('navDrawer');
+    var closeBtn = document.getElementById('drawerClose');
+    function open(){ drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); trigger.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
+    function close(){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); trigger.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
+    trigger.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    drawer.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', close); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+  })();
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold:.15 });
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+</script>
+
+</body>
+</html>
