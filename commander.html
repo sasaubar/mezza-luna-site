@@ -320,6 +320,7 @@
     <span class="eyebrow filet">Click &amp; Collect</span>
     <h1 style="font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.2rem);line-height:1.1;margin:14px 0 18px;">Commandez, on prépare, vous passez</h1>
     <p style="color:var(--charbon-doux);font-size:1.05rem;">Choisissez vos plats, réglez en ligne, et venez récupérer votre commande au restaurant à l'heure qui vous convient. Montant minimum 15€ · Préparation 20-25 min.</p>
+    <p style="color:var(--charbon-doux);font-size:.88rem;margin-top:10px;">Suppléments, glaces à la boule, boissons chaudes et Menu Bambino ne sont pas disponibles en ligne pour le moment : appelez-nous au <a href="tel:+33146313331" style="color:var(--rouge-vif);font-weight:600;">01 46 31 33 31</a> pour ces demandes.</p>
   </div>
 </section>
 
@@ -363,6 +364,10 @@
               <label for="cmd-heure" style="font-size:.85rem;font-weight:600;display:block;margin-bottom:4px;">Heure de retrait</label>
               <select id="cmd-heure" required style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);"></select>
             </div>
+            <div class="field">
+              <label for="cmd-notes" style="font-size:.85rem;font-weight:600;display:block;margin-bottom:4px;">Instructions particulières (optionnel)</label>
+              <textarea id="cmd-notes" placeholder="Allergie, supplément (ex : + Speck IGP), sans oignons…" rows="2" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);resize:vertical;"></textarea>
+            </div>
           </div>
 
           <button id="cmd-payer" class="btn btn-primary" style="width:100%;margin-top:20px;" disabled>Payer <span id="cmd-payer-total">0,00 €</span></button>
@@ -400,50 +405,82 @@
 (function(){
   var MENU = [
     { cat:"Grignotages", items:[
-      { id:"g1", name:"Arancini al tartufo", desc:"Lamelles de truffe d'été et crème de truffe", price:5 },
-      { id:"g2", name:"Planche de charcuterie", desc:"Coppa di Parma, Spianata piccante et Speck IGP", price:8 }
+      { id:"g1a", name:"Arancini al tartufo (3 pièces)", desc:"Lamelles de truffe d'été et crème de truffe", price:5 },
+      { id:"g1b", name:"Arancini al tartufo (6 pièces)", desc:"Lamelles de truffe d'été et crème de truffe", price:9 },
+      { id:"g2a", name:"Crunchy de poulet (4 pièces)", desc:"", price:5 },
+      { id:"g2b", name:"Crunchy de poulet (8 pièces)", desc:"", price:9 },
+      { id:"g3a", name:"Cromesquis tomate mozzarella (6 pièces)", desc:"", price:5 },
+      { id:"g3b", name:"Cromesquis tomate mozzarella (12 pièces)", desc:"", price:9 },
+      { id:"g4a", name:"Beignets de calamars à la romaine (6 pièces)", desc:"", price:5 },
+      { id:"g4b", name:"Beignets de calamars à la romaine (12 pièces)", desc:"", price:9 },
+      { id:"g5a", name:"Le Petit Assortiment (simple)", desc:"6 cromesquis, 4 beignets de calamars, 2 crunchy poulet, 2 arancini al tartufo", price:13 },
+      { id:"g5b", name:"Le Petit Assortiment (double)", desc:"6 cromesquis, 4 beignets de calamars, 2 crunchy poulet, 2 arancini al tartufo", price:24 },
+      { id:"g6a", name:"Planche de Charcuterie (simple)", desc:"Coppa di Parma, Spianata piccante, Speck IGP", price:8 },
+      { id:"g6b", name:"Planche de Charcuterie (double)", desc:"Coppa di Parma, Spianata piccante, Speck IGP", price:14 }
     ]},
     { cat:"Entrées", items:[
-      { id:"e1", name:"Carpaccio de bœuf (VBF Charolaise)", desc:"", price:9 },
-      { id:"e2", name:"Salade tiède au poulpe", desc:"", price:9 },
-      { id:"e3", name:"Œuf mollet en croûte", desc:"Roquette et crème de truffe", price:8 }
+      { id:"e1", name:"Salade tiède au poulpe", desc:"", price:9 },
+      { id:"e2", name:"Carpaccio de bœuf (VBF Charolaise)", desc:"", price:9 },
+      { id:"e3", name:"Œuf mollet en croûte", desc:"Roquette, crème de truffe", price:8 }
     ]},
     { cat:"Salades", items:[
-      { id:"s1", name:"La Verdura", desc:"Salade végétarienne, burrata, artichauts, pesto verde", price:17.50 },
-      { id:"s2", name:"La Nordique", desc:"Saumon fumé, œuf mollet, crème de ciboulette", price:16.50 },
-      { id:"s3", name:"La César", desc:"", price:15.50 }
+      { id:"s1", name:"La César / Veggie César", desc:"Crunchy de poulet ou cromesquis tomate mozza, Parmigiano Reggiano DOP, croûtons, sauce César maison", price:15.50 },
+      { id:"s2", name:"La Verdura", desc:"Pesto verde, artichauts, poivrons, oignons confits, champignons, olives noires, burrata 125g", price:17.50 },
+      { id:"s3", name:"L'Italienne", desc:"Oignons, champignons, lardons, Speck IGP, Parmigiano Reggiano DOP", price:16 },
+      { id:"s4", name:"La Nordique", desc:"Saumon fumé, œuf mollet en croûte, crème de ciboulette", price:16.50 }
     ]},
-    { cat:"Pizzas", desc:"Pâte et sauce tomate maison, cuites à la commande.", items:[
-      { id:"p1", name:"Margherita", desc:"Sauce tomate, mozzarella fior di latte, basilic frais", price:11 },
-      { id:"p2", name:"Orientale", desc:"Sauce tomate, mozzarella, merguez fraîches halal, poivrons, œuf", price:14 },
-      { id:"p3", name:"La Vege", desc:"Pesto verde, artichauts, olives, oignons confits, poivrons", price:15 },
-      { id:"p4", name:"Coppa e Formaggio", desc:"Gorgonzola, mozzarella, chèvre, roquette, noix, burrata, Coppa di Parma", price:16.50 },
-      { id:"p5", name:"Parma", desc:"Sauce tomate, mozzarella, roquette, Speck IGP, burrata, Parmigiano Reggiano DOP", price:17 },
-      { id:"p6", name:"Tartufo", desc:"Crème de truffe, champignons, roquette, burrata, lamelles de truffe d'été, Parmigiano Reggiano DOP", price:18 }
+    { cat:"Pizzas", desc:"18 pizzas, pâte et sauce tomate maison, cuites à la commande.", items:[
+      { id:"p1",  name:"Tartufo", desc:"Crème de truffe, mozzarella, champignons, roquette, burrata 125g, lamelles de truffe d'été, Parmigiano Reggiano DOP", price:18 },
+      { id:"p2",  name:"Coppa e Formaggio", desc:"Crème de gorgonzola, mozzarella, chèvre, roquette, noix, burrata 125g, Coppa di Parma", price:16.50 },
+      { id:"p3",  name:"Parma", desc:"Sauce tomate, mozzarella, roquette, Speck IGP, burrata 125g, Parmigiano Reggiano DOP", price:17 },
+      { id:"p4",  name:"Paolo le Poulpe", desc:"Sauce tomate, mozzarella, roquette, poulpe mariné, burrata 125g, crème de balsamique", price:17 },
+      { id:"p5",  name:"La Vege", desc:"Pesto verde, artichauts, olives noires, oignons confits, poivrons, roquette", price:15 },
+      { id:"p6",  name:"Bergère", desc:"Crème fraîche, mozzarella, chèvre, miel, Speck IGP", price:13.50 },
+      { id:"p7",  name:"4 Fromages", desc:"Sauce tomate, mozzarella, gorgonzola DOP, chèvre, Parmigiano Reggiano DOP", price:14 },
+      { id:"p8",  name:"Montagnarde", desc:"Crème fraîche, mozzarella, pommes de terre, Reblochon AOP, jambon blanc", price:14.50 },
+      { id:"p9",  name:"4 Saisons", desc:"Sauce tomate, mozzarella, jambon blanc, champignons, artichauts, olives noires", price:14.50 },
+      { id:"p10", name:"Saumon", desc:"Sauce tomate, mozzarella, saumon fumé, crème fraîche, citron", price:14.50 },
+      { id:"p11", name:"Calabrese", desc:"Sauce tomate, mozzarella, Spianata piccante, gorgonzola DOP, œuf", price:14 },
+      { id:"p12", name:"Calzone", desc:"Pizza en chausson : sauce tomate, mozzarella, jambon blanc, champignons, œuf", price:14 },
+      { id:"p13", name:"Orientale", desc:"Sauce tomate, mozzarella, merguez fraîches (VBF), poivrons, œuf", price:14 },
+      { id:"p14", name:"Texas", desc:"Sauce tomate, mozzarella, viande hachée de bœuf, Spianata piccante, œuf", price:14 },
+      { id:"p15", name:"Emiliana", desc:"Sauce tomate, mozzarella, viande hachée de bœuf, oignons confits, champignons, origan", price:13 },
+      { id:"p16", name:"Regina", desc:"Sauce tomate, mozzarella, jambon blanc, champignons", price:13 },
+      { id:"p17", name:"Napolitaine", desc:"Sauce tomate, mozzarella, anchois, câpres, olives noires", price:12 },
+      { id:"p18", name:"Margherita", desc:"Sauce tomate, mozzarella fior di latte, origan et basilic frais", price:11 }
     ]},
     { cat:"Pâtes", items:[
-      { id:"pa1", name:"Penne Luna", desc:"Crème fraîche, champignons, Spianata piccante, basilic frais", price:14.50 },
-      { id:"pa2", name:"Tagliatelles carbonara", desc:"", price:15 },
-      { id:"pa3", name:"Raviolis aux cèpes", desc:"Lamelles de truffe d'été et crème de truffe", price:16.80 }
+      { id:"pa1", name:"Raviolis aux cèpes", desc:"Lamelles de truffe d'été et crème de truffe", price:16.80 },
+      { id:"pa2", name:"Tagliatelles aux 2 saumons", desc:"", price:16.20 },
+      { id:"pa3", name:"Tagliatelles à la carbonara", desc:"", price:15 },
+      { id:"pa4", name:"Penne Luna", desc:"Crème fraîche, champignons, Spianata piccante, basilic frais", price:14.50 }
     ]},
     { cat:"Viandes", desc:"Viande de bœuf française VBF Charolaise.", items:[
-      { id:"v1", name:"Luna Burger", desc:"Steak haché VBF Charolaise 180g, pain brioché, sauce gorgonzola ou pesto verde", price:18 },
-      { id:"v2", name:"Escalope de veau Saltimbocca", desc:"Mozzarella, Speck IGP, risotto aux champignons", price:21 },
-      { id:"v3", name:"Filet de bœuf 200g", desc:"Sauce gorgonzola ou crème de truffe, frites et légumes de saison", price:24 }
+      { id:"v1", name:"Filet de bœuf 200g", desc:"Sauce gorgonzola ou crème de truffe, frites et légumes de saison", price:24 },
+      { id:"v2", name:"Escalope de veau Saltimbocca à la crème", desc:"Mozzarella, Speck IGP, risotto aux champignons", price:21 },
+      { id:"v3", name:"Escalope de veau sauce gorgonzola", desc:"Gnocchis et noix", price:19.50 },
+      { id:"v4", name:"Luna Burger", desc:"Steak haché VBF Charolaise 180g, pain brioché, sauce gorgonzola ou pesto verde, frites et salade verte", price:18 },
+      { id:"v5", name:"Double Carpaccio de bœuf, frites", desc:"Sauce vierge, câpres, basilic, Parmigiano Reggiano DOP", price:18 },
+      { id:"v6", name:"Tartare de bœuf préparé 180g", desc:"Frites et salade verte", price:16.80 }
     ]},
     { cat:"Poissons", items:[
-      { id:"po1", name:"Pavé de saumon grillé", desc:"Sauce vierge et légumes de saison", price:18 },
-      { id:"po2", name:"Tartare de saumon", desc:"Courgettes, fruits de la passion, sauce vierge, frites", price:18 },
-      { id:"po3", name:"Risotto au poulpe", desc:"", price:22 }
+      { id:"po1", name:"Risotto au poulpe", desc:"", price:22 },
+      { id:"po2", name:"Pavé de saumon grillé", desc:"Sauce vierge et légumes de saison", price:18 },
+      { id:"po3", name:"Tartare de saumon", desc:"Courgettes, fruits de la passion, sauce vierge, frites et salade verte", price:18 }
     ]},
     { cat:"Desserts", desc:"Faits maison.", items:[
-      { id:"d1", name:"Tiramisu café intense", desc:"", price:7.50 },
-      { id:"d2", name:"Moelleux au chocolat noir et glace vanille", desc:"", price:8 },
-      { id:"d3", name:"Affogato", desc:"Amaretto, expresso, glace vanille, amandes grillées", price:8 }
+      { id:"d1", name:"Tiramisu, café intense", desc:"", price:7.50 },
+      { id:"d2", name:"Tarte tatin revisitée et sa glace Palet Breton", desc:"", price:7.50 },
+      { id:"d3", name:"Moelleux au chocolat noir et sa boule de glace vanille", desc:"", price:8 },
+      { id:"d4", name:"Brioche façon pain perdu", desc:"Et sa boule de glace, parfum au choix", price:7 },
+      { id:"d5", name:"Affogato", desc:"Amaretto, expresso, glace vanille, amandes grillées", price:8 },
+      { id:"d6", name:"Pizza au Nutella, amandes effilées", desc:"À partager", price:10 }
     ]},
-    { cat:"Glaces artisanales", desc:"Glaces des Alpes, Maître Artisan Glacier.", items:[
+    { cat:"Coupes de glaces", desc:"Glaces des Alpes, Maître Artisan Glacier.", items:[
       { id:"gl1", name:"Coupe Dame Blanche", desc:"3 boules vanille, sauce chocolat et crème fouettée", price:8 },
-      { id:"gl2", name:"Coupe Colonel", desc:"2 boules citron vert, vodka", price:8 }
+      { id:"gl2", name:"Coupe Chocolat ou Café Liégeois", desc:"3 boules, sauce et crème fouettée", price:8 },
+      { id:"gl3", name:"Coupe Délice Menthe", desc:"3 boules menthe chocolat, sirop de menthe, crème fouettée", price:8 },
+      { id:"gl4", name:"Coupe Colonel", desc:"2 boules citron vert, vodka", price:8 }
     ]}
   ];
 
@@ -593,6 +630,7 @@
     var email = document.getElementById('cmd-email').value.trim();
     var jour = document.getElementById('cmd-jour').value;
     var heure = document.getElementById('cmd-heure').value;
+    var notes = document.getElementById('cmd-notes').value.trim();
 
     if (!nom || !tel || !email || !jour || !heure){
       erreur.textContent = 'Merci de remplir tous les champs avant de payer.';
@@ -619,7 +657,8 @@
       body: JSON.stringify({
         items: items,
         customer: { nom: nom, telephone: tel, email: email },
-        retrait: { jour: jour.split('|')[0], heure: heure }
+        retrait: { jour: jour.split('|')[0], heure: heure },
+        notes: notes
       })
     })
     .then(function(r){ return r.json(); })
