@@ -504,7 +504,7 @@
   ];
 
   var MONTANT_MIN = 15;
-  // cart est une liste de lignes : { key, itemId, qty, supplements:[...], supplementNote:'' }
+  // cart est une liste de lignes : { key, itemId, qty, supplements:[...], autresIngredients:[...] }
   // Une pizza avec des suppléments différents forme une ligne distincte (même si même pizza de base),
   // ce qui permet par exemple une 4 Fromages nature ET une 4 Fromages + œuf dans la même commande.
   var cart = {};
@@ -515,9 +515,9 @@
     { id:"poulpe",  name:"Poulpe mariné", price:4 },
     { id:"saumon",  name:"Saumon fumé", price:4 },
     { id:"speck",   name:"Speck IGP", price:2 },
-    { id:"coppa",   name:"Coppa di Parma", price:2 },
-    { id:"autre",   name:"Autre ingrédient", price:1.50 }
+    { id:"coppa",   name:"Coppa di Parma", price:2 }
   ];
+  var PRIX_AUTRE_INGREDIENT = 1.50; // par ingrédient personnalisé ajouté, autant qu'on veut
 
   function fmt(n){ return n.toFixed(2).replace('.', ',') + ' €'; }
   function findItem(id){
@@ -534,9 +534,9 @@
   }
   var CUISSON_OPTIONS = ['Bleu', 'Saignant', 'À point', 'Bien cuit'];
 
-  function lineKey(itemId, supplements, note, cuisson, itemNote){
+  function lineKey(itemId, supplements, autresIngredients, cuisson, itemNote){
     var sig = supplements.slice().sort().join(',');
-    if (supplements.indexOf('autre') !== -1) sig += '|' + note;
+    if (autresIngredients.length > 0) sig += '|autres:' + autresIngredients.join(',');
     if (cuisson) sig += '|cuisson:' + cuisson;
     if (itemNote) sig += '|note:' + itemNote;
     return itemId + '::' + sig;
@@ -548,20 +548,19 @@
       var supp = findSupplement(suppId);
       if (supp) price += supp.price;
     });
+    price += (line.autresIngredients ? line.autresIngredients.length : 0) * PRIX_AUTRE_INGREDIENT;
     return price;
   }
   function lineLabel(line){
     var item = findItem(line.itemId);
     var nom = item.name;
     if (line.cuisson) nom += ' (' + line.cuisson + ')';
-    if (line.supplements.length > 0){
-      var labels = line.supplements.map(function(suppId){
-        var supp = findSupplement(suppId);
-        if (suppId === 'autre' && line.supplementNote) return supp.name + ' (' + line.supplementNote + ')';
-        return supp.name;
-      });
-      nom += ' + ' + labels.join(' + ');
-    }
+    var labels = line.supplements.map(function(suppId){
+      var supp = findSupplement(suppId);
+      return supp ? supp.name : suppId;
+    });
+    (line.autresIngredients || []).forEach(function(ing){ labels.push(ing); });
+    if (labels.length > 0) nom += ' + ' + labels.join(' + ');
     if (line.itemNote) nom += ' — ' + line.itemNote;
     return nom;
   }
@@ -605,8 +604,9 @@
             html += '</label>';
           });
           html += '</div>';
-          html += '<input type="text" class="supp-autre-text" data-for="' + item.id + '" placeholder="Précisez l\'ingrédient" style="display:none;margin-top:8px;width:100%;max-width:300px;padding:6px 10px;border-radius:6px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);font-size:.85rem;">';
-          html += '<p class="supp-autre-erreur" data-for="' + item.id + '" style="display:none;color:var(--rouge-vif);font-size:.78rem;margin-top:6px;">Merci de préciser l\'ingrédient souhaité.</p>';
+          html += '<div class="autres-ingredients-list" data-for="' + item.id + '" style="margin-top:10px;display:flex;flex-direction:column;gap:6px;"></div>';
+          html += '<button type="button" class="btn-ajouter-autre-ingredient" data-for="' + item.id + '" style="margin-top:8px;background:transparent;border:1.5px dashed var(--rouge-vif);color:var(--rouge-vif);border-radius:20px;padding:6px 14px;font-size:.8rem;font-weight:600;cursor:pointer;">+ Ajouter un ingrédient (+' + fmt(PRIX_AUTRE_INGREDIENT) + ' chacun)</button>';
+          html += '<p class="supp-autre-erreur" data-for="' + item.id + '" style="display:none;color:var(--rouge-vif);font-size:.78rem;margin-top:6px;">Merci de préciser chaque ingrédient ajouté (ou retirez la ligne vide).</p>';
           html += '</div>';
         }
         if (item.cuisson){
@@ -638,25 +638,44 @@
       confirmTimers[id] = setTimeout(function(){ badge.style.display = 'none'; }, 1600);
     }
 
+    function ouvrirOptions(id){
+      var details = container.querySelector('.menu-item[data-id="' + id + '"]').closest('.menu-entry').querySelector('.item-options');
+      if (details) details.open = true;
+    }
+
+    function ajouterLigneIngredient(id){
+      var liste = container.querySelector('.autres-ingredients-list[data-for="' + id + '"]');
+      if (!liste) return;
+      var ligne = document.createElement('div');
+      ligne.className = 'autre-ingredient-row';
+      ligne.style.cssText = 'display:flex;gap:8px;align-items:center;';
+      ligne.innerHTML =
+        '<input type="text" class="autre-ingredient-text" data-for="' + id + '" placeholder="Ex : œuf, miel…" style="flex:1;min-width:0;padding:6px 10px;border-radius:6px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);font-size:.85rem;">' +
+        '<button type="button" class="retirer-autre-ingredient" aria-label="Retirer cet ingrédient" style="flex:none;width:26px;height:26px;border-radius:50%;border:1px solid rgba(0,0,0,.15);background:#fff;color:var(--rouge-vif);cursor:pointer;">×</button>';
+      liste.appendChild(ligne);
+      ligne.querySelector('input').focus();
+    }
+
     function ajouterConfigurable(id){
       var item = findItem(id);
       var supplements = [];
-      var note = '';
+      var autresIngredients = [];
       var cuisson = '';
 
       if (item.pizza){
-        var checked = Array.prototype.slice.call(container.querySelectorAll('input[type="checkbox"][data-for="' + id + '"]:checked'));
+        var checked = Array.prototype.slice.call(container.querySelectorAll('input[type="checkbox"][data-supp][data-for="' + id + '"]:checked'));
         supplements = checked.map(function(cb){ return cb.dataset.supp; });
-        var texte = container.querySelector('.supp-autre-text[data-for="' + id + '"]');
+
+        var lignesIngredients = Array.prototype.slice.call(container.querySelectorAll('.autre-ingredient-text[data-for="' + id + '"]'));
         var erreurAutre = container.querySelector('.supp-autre-erreur[data-for="' + id + '"]');
-        note = (supplements.indexOf('autre') !== -1 && texte) ? texte.value.trim() : '';
-        if (supplements.indexOf('autre') !== -1 && !note){
+        var uneVide = lignesIngredients.some(function(inp){ return !inp.value.trim(); });
+        if (uneVide){
           if (erreurAutre) erreurAutre.style.display = 'block';
-          var detailsAutre = container.querySelector('.menu-item[data-id="' + id + '"]').closest('.menu-entry').querySelector('.item-options');
-          if (detailsAutre) detailsAutre.open = true;
+          ouvrirOptions(id);
           return;
         }
         if (erreurAutre) erreurAutre.style.display = 'none';
+        autresIngredients = lignesIngredients.map(function(inp){ return inp.value.trim(); });
       }
       if (item.cuisson){
         var select = container.querySelector('.cuisson-select[data-for="' + id + '"]');
@@ -664,8 +683,7 @@
         var erreur = container.querySelector('.cuisson-erreur[data-for="' + id + '"]');
         if (!cuisson){
           if (erreur) erreur.style.display = 'block';
-          var details = container.querySelector('.menu-item[data-id="' + id + '"]').closest('.menu-entry').querySelector('.item-options');
-          if (details) details.open = true;
+          ouvrirOptions(id);
           return;
         }
         if (erreur) erreur.style.display = 'none';
@@ -673,8 +691,8 @@
       var instructionsInput = container.querySelector('.item-instructions[data-for="' + id + '"]');
       var itemNote = instructionsInput ? instructionsInput.value.trim() : '';
 
-      var key = lineKey(id, supplements, note, cuisson, itemNote);
-      if (!cart[key]) cart[key] = { itemId:id, qty:0, supplements:supplements, supplementNote:note, cuisson:cuisson, itemNote:itemNote };
+      var key = lineKey(id, supplements, autresIngredients, cuisson, itemNote);
+      if (!cart[key]) cart[key] = { itemId:id, qty:0, supplements:supplements, autresIngredients:autresIngredients, cuisson:cuisson, itemNote:itemNote };
       cart[key].qty += 1;
       afficherConfirmation(id);
       renderPanier();
@@ -682,15 +700,13 @@
 
     container.addEventListener('click', function(e){
       var addBtn = e.target.closest('.btn-ajouter-config');
-      if (addBtn){ ajouterConfigurable(addBtn.dataset.id); }
-    });
+      if (addBtn){ ajouterConfigurable(addBtn.dataset.id); return; }
 
-    container.addEventListener('change', function(e){
-      if (e.target.matches('input[type="checkbox"][data-supp]') && e.target.dataset.supp === 'autre'){
-        var id = e.target.dataset.for;
-        var texte = container.querySelector('.supp-autre-text[data-for="' + id + '"]');
-        if (texte) texte.style.display = e.target.checked ? 'block' : 'none';
-      }
+      var addIngredientBtn = e.target.closest('.btn-ajouter-autre-ingredient');
+      if (addIngredientBtn){ ajouterLigneIngredient(addIngredientBtn.dataset.for); return; }
+
+      var removeBtn = e.target.closest('.retirer-autre-ingredient');
+      if (removeBtn){ removeBtn.closest('.autre-ingredient-row').remove(); return; }
     });
   }
 
@@ -827,7 +843,7 @@
 
     var items = Object.keys(cart).map(function(key){
       var line = cart[key];
-      return { id: line.itemId, quantity: line.qty, supplements: line.supplements, supplementNote: line.supplementNote, cuisson: line.cuisson, itemNote: line.itemNote };
+      return { id: line.itemId, quantity: line.qty, supplements: line.supplements, autresIngredients: line.autresIngredients, cuisson: line.cuisson, itemNote: line.itemNote };
     });
 
     var btn = document.getElementById('cmd-payer');
