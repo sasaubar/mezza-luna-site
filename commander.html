@@ -506,10 +506,11 @@
   }
   var CUISSON_OPTIONS = ['Bleu', 'Saignant', 'À point', 'Bien cuit'];
 
-  function lineKey(itemId, supplements, note, cuisson){
+  function lineKey(itemId, supplements, note, cuisson, itemNote){
     var sig = supplements.slice().sort().join(',');
     if (supplements.indexOf('autre') !== -1) sig += '|' + note;
     if (cuisson) sig += '|cuisson:' + cuisson;
+    if (itemNote) sig += '|note:' + itemNote;
     return itemId + '::' + sig;
   }
   function unitPrice(line){
@@ -533,6 +534,7 @@
       });
       nom += ' + ' + labels.join(' + ');
     }
+    if (line.itemNote) nom += ' — ' + line.itemNote;
     return nom;
   }
   function cartTotal(){
@@ -555,16 +557,10 @@
         html += '<div class="menu-item" data-id="' + item.id + '">';
         html += '<div class="menu-item-txt"><strong>' + item.name + '</strong>' + (item.desc ? '<p>' + item.desc + '</p>' : '') + '</div>';
         html += '<div class="menu-item-price">' + fmt(item.price) + '</div>';
-        var configurable = item.pizza || item.cuisson;
-        if (configurable){
-          html += '<div class="menu-item-add"><button type="button" class="btn-ajouter-config" data-id="' + item.id + '" style="background:var(--rouge-vif);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:.85rem;font-weight:600;cursor:pointer;">+ Ajouter</button></div>';
-        } else {
-          html += '<div class="menu-item-add">';
-          html += '<button type="button" class="qty-btn" data-action="minus" data-id="' + item.id + '">−</button>';
-          html += '<span class="qty-val" data-qty="' + item.id + '">0</span>';
-          html += '<button type="button" class="qty-btn" data-action="plus" data-id="' + item.id + '">+</button>';
-          html += '</div>';
-        }
+        html += '<div class="menu-item-add">';
+        html += '<button type="button" class="btn-ajouter-config" data-id="' + item.id + '" style="background:var(--rouge-vif);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:.85rem;font-weight:600;cursor:pointer;">+ Ajouter</button>';
+        html += '<span class="ajoute-ok" data-confirm="' + item.id + '" style="display:none;color:var(--vert);font-weight:700;font-size:.85rem;margin-left:10px;">✓ Ajouté !</span>';
+        html += '</div>';
         html += '</div>';
         if (item.pizza){
           html += '<div class="pizza-supplements" data-supp-block="' + item.id + '" style="padding:6px 0 14px;">';
@@ -588,10 +584,22 @@
           html += '<p class="cuisson-erreur" data-for="' + item.id + '" style="display:none;color:var(--rouge-vif);font-size:.78rem;margin-top:6px;">Merci de choisir une cuisson avant d\'ajouter.</p>';
           html += '</div>';
         }
+        html += '<div class="instructions-block" style="padding:0 0 14px;">';
+        html += '<input type="text" class="item-instructions" data-for="' + item.id + '" placeholder="Instructions pour cet article (ex : sans oignons, pas trop cuit…)" style="width:100%;max-width:420px;padding:7px 10px;border-radius:6px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);font-size:.82rem;">';
+        html += '</div>';
       });
       html += '</div>';
     });
     container.innerHTML = html;
+
+    var confirmTimers = {};
+    function afficherConfirmation(id){
+      var badge = container.querySelector('.ajoute-ok[data-confirm="' + id + '"]');
+      if (!badge) return;
+      badge.style.display = 'inline';
+      if (confirmTimers[id]) clearTimeout(confirmTimers[id]);
+      confirmTimers[id] = setTimeout(function(){ badge.style.display = 'none'; }, 1600);
+    }
 
     function ajouterConfigurable(id){
       var item = findItem(id);
@@ -615,32 +623,19 @@
         }
         if (erreur) erreur.style.display = 'none';
       }
+      var instructionsInput = container.querySelector('.item-instructions[data-for="' + id + '"]');
+      var itemNote = instructionsInput ? instructionsInput.value.trim() : '';
 
-      var key = lineKey(id, supplements, note, cuisson);
-      if (!cart[key]) cart[key] = { itemId:id, qty:0, supplements:supplements, supplementNote:note, cuisson:cuisson };
+      var key = lineKey(id, supplements, note, cuisson, itemNote);
+      if (!cart[key]) cart[key] = { itemId:id, qty:0, supplements:supplements, supplementNote:note, cuisson:cuisson, itemNote:itemNote };
       cart[key].qty += 1;
+      afficherConfirmation(id);
       renderPanier();
     }
 
     container.addEventListener('click', function(e){
       var addBtn = e.target.closest('.btn-ajouter-config');
-      if (addBtn){ ajouterConfigurable(addBtn.dataset.id); return; }
-
-      var btn = e.target.closest('.qty-btn');
-      if (!btn) return;
-      var id = btn.dataset.id;
-      var action = btn.dataset.action;
-      var qty = cart[id] ? cart[id].qty : 0;
-      if (action === 'plus') qty += 1;
-      if (action === 'minus') qty = Math.max(0, qty - 1);
-      if (qty === 0){
-        delete cart[id];
-      } else {
-        if (!cart[id]) cart[id] = { itemId:id, qty:0, supplements:[], supplementNote:'', cuisson:'' };
-        cart[id].qty = qty;
-      }
-      document.querySelector('[data-qty="' + id + '"]').textContent = qty;
-      renderPanier();
+      if (addBtn){ ajouterConfigurable(addBtn.dataset.id); }
     });
 
     container.addEventListener('change', function(e){
@@ -776,7 +771,7 @@
 
     var items = Object.keys(cart).map(function(key){
       var line = cart[key];
-      return { id: line.itemId, quantity: line.qty, supplements: line.supplements, supplementNote: line.supplementNote, cuisson: line.cuisson };
+      return { id: line.itemId, quantity: line.qty, supplements: line.supplements, supplementNote: line.supplementNote, cuisson: line.cuisson, itemNote: line.itemNote };
     });
 
     var btn = document.getElementById('cmd-payer');
