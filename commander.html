@@ -606,6 +606,7 @@
           });
           html += '</div>';
           html += '<input type="text" class="supp-autre-text" data-for="' + item.id + '" placeholder="Précisez l\'ingrédient" style="display:none;margin-top:8px;width:100%;max-width:300px;padding:6px 10px;border-radius:6px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);font-size:.85rem;">';
+          html += '<p class="supp-autre-erreur" data-for="' + item.id + '" style="display:none;color:var(--rouge-vif);font-size:.78rem;margin-top:6px;">Merci de préciser l\'ingrédient souhaité.</p>';
           html += '</div>';
         }
         if (item.cuisson){
@@ -647,7 +648,15 @@
         var checked = Array.prototype.slice.call(container.querySelectorAll('input[type="checkbox"][data-for="' + id + '"]:checked'));
         supplements = checked.map(function(cb){ return cb.dataset.supp; });
         var texte = container.querySelector('.supp-autre-text[data-for="' + id + '"]');
+        var erreurAutre = container.querySelector('.supp-autre-erreur[data-for="' + id + '"]');
         note = (supplements.indexOf('autre') !== -1 && texte) ? texte.value.trim() : '';
+        if (supplements.indexOf('autre') !== -1 && !note){
+          if (erreurAutre) erreurAutre.style.display = 'block';
+          var detailsAutre = container.querySelector('.menu-item[data-id="' + id + '"]').closest('.menu-entry').querySelector('.item-options');
+          if (detailsAutre) detailsAutre.open = true;
+          return;
+        }
+        if (erreurAutre) erreurAutre.style.display = 'none';
       }
       if (item.cuisson){
         var select = container.querySelector('.cuisson-select[data-for="' + id + '"]');
