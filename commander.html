@@ -320,7 +320,7 @@
     <span class="eyebrow filet">Click &amp; Collect</span>
     <h1 style="font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.2rem);line-height:1.1;margin:14px 0 18px;">Commandez, on prépare, vous passez</h1>
     <p style="color:var(--charbon-doux);font-size:1.05rem;">Choisissez vos plats, réglez en ligne, et venez récupérer votre commande au restaurant à l'heure qui vous convient. Montant minimum 15€ · Préparation 20-25 min.</p>
-    <p style="color:var(--charbon-doux);font-size:.88rem;margin-top:10px;">Suppléments, glaces à la boule, boissons chaudes et Menu Bambino ne sont pas disponibles en ligne pour le moment : appelez-nous au <a href="tel:+33146313331" style="color:var(--rouge-vif);font-weight:600;">01 46 31 33 31</a> pour ces demandes.</p>
+    <p style="color:var(--charbon-doux);font-size:.88rem;margin-top:10px;">Besoin d'autre chose ? Appelez-nous au <a href="tel:+33146313331" style="color:var(--rouge-vif);font-weight:600;">01 46 31 33 31</a>.</p>
   </div>
 </section>
 
@@ -456,10 +456,10 @@
       { id:"pa4", name:"Penne Luna", desc:"Crème fraîche, champignons, Spianata piccante, basilic frais", price:14.50 }
     ]},
     { cat:"Viandes", desc:"Viande de bœuf française VBF Charolaise.", items:[
-      { id:"v1", name:"Filet de bœuf 200g", desc:"Sauce gorgonzola ou crème de truffe, frites et légumes de saison", price:24 },
+      { id:"v1", name:"Filet de bœuf 200g", desc:"Sauce gorgonzola ou crème de truffe, frites et légumes de saison", price:24, cuisson:true },
       { id:"v2", name:"Escalope de veau Saltimbocca à la crème", desc:"Mozzarella, Speck IGP, risotto aux champignons", price:21 },
       { id:"v3", name:"Escalope de veau sauce gorgonzola", desc:"Gnocchis et noix", price:19.50 },
-      { id:"v4", name:"Luna Burger", desc:"Steak haché VBF Charolaise 180g, pain brioché, sauce gorgonzola ou pesto verde, frites et salade verte", price:18 },
+      { id:"v4", name:"Luna Burger", desc:"Steak haché VBF Charolaise 180g, pain brioché, sauce gorgonzola ou pesto verde, frites et salade verte", price:18, cuisson:true },
       { id:"v5", name:"Double Carpaccio de bœuf, frites", desc:"Sauce vierge, câpres, basilic, Parmigiano Reggiano DOP", price:18 },
       { id:"v6", name:"Tartare de bœuf préparé 180g", desc:"Frites et salade verte", price:16.80 }
     ]},
@@ -504,9 +504,12 @@
     for (var i=0;i<SUPPLEMENTS.length;i++){ if (SUPPLEMENTS[i].id === id) return SUPPLEMENTS[i]; }
     return null;
   }
-  function lineKey(itemId, supplements, note){
+  var CUISSON_OPTIONS = ['Bleu', 'Saignant', 'À point', 'Bien cuit'];
+
+  function lineKey(itemId, supplements, note, cuisson){
     var sig = supplements.slice().sort().join(',');
     if (supplements.indexOf('autre') !== -1) sig += '|' + note;
+    if (cuisson) sig += '|cuisson:' + cuisson;
     return itemId + '::' + sig;
   }
   function unitPrice(line){
@@ -521,6 +524,7 @@
   function lineLabel(line){
     var item = findItem(line.itemId);
     var nom = item.name;
+    if (line.cuisson) nom += ' (' + line.cuisson + ')';
     if (line.supplements.length > 0){
       var labels = line.supplements.map(function(suppId){
         var supp = findSupplement(suppId);
@@ -551,8 +555,9 @@
         html += '<div class="menu-item" data-id="' + item.id + '">';
         html += '<div class="menu-item-txt"><strong>' + item.name + '</strong>' + (item.desc ? '<p>' + item.desc + '</p>' : '') + '</div>';
         html += '<div class="menu-item-price">' + fmt(item.price) + '</div>';
-        if (item.pizza){
-          html += '<div class="menu-item-add"><button type="button" class="btn-ajouter-pizza" data-id="' + item.id + '" style="background:var(--rouge-vif);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:.85rem;font-weight:600;cursor:pointer;">+ Ajouter</button></div>';
+        var configurable = item.pizza || item.cuisson;
+        if (configurable){
+          html += '<div class="menu-item-add"><button type="button" class="btn-ajouter-config" data-id="' + item.id + '" style="background:var(--rouge-vif);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:.85rem;font-weight:600;cursor:pointer;">+ Ajouter</button></div>';
         } else {
           html += '<div class="menu-item-add">';
           html += '<button type="button" class="qty-btn" data-action="minus" data-id="' + item.id + '">−</button>';
@@ -574,25 +579,52 @@
           html += '<input type="text" class="supp-autre-text" data-for="' + item.id + '" placeholder="Précisez l\'ingrédient" style="display:none;margin-top:8px;width:100%;max-width:300px;padding:6px 10px;border-radius:6px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);font-size:.85rem;">';
           html += '</div>';
         }
+        if (item.cuisson){
+          html += '<div class="cuisson-block" style="padding:6px 0 14px;">';
+          html += '<label style="font-size:.85rem;display:flex;align-items:center;gap:8px;">Cuisson : <select class="cuisson-select" data-for="' + item.id + '" style="padding:6px 10px;border-radius:6px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);font-size:.85rem;">';
+          html += '<option value="">Choisir…</option>';
+          CUISSON_OPTIONS.forEach(function(c){ html += '<option value="' + c + '">' + c + '</option>'; });
+          html += '</select></label>';
+          html += '<p class="cuisson-erreur" data-for="' + item.id + '" style="display:none;color:var(--rouge-vif);font-size:.78rem;margin-top:6px;">Merci de choisir une cuisson avant d\'ajouter.</p>';
+          html += '</div>';
+        }
       });
       html += '</div>';
     });
     container.innerHTML = html;
 
-    function ajouterPizza(id){
-      var checked = Array.prototype.slice.call(container.querySelectorAll('input[type="checkbox"][data-for="' + id + '"]:checked'));
-      var supplements = checked.map(function(cb){ return cb.dataset.supp; });
-      var texte = container.querySelector('.supp-autre-text[data-for="' + id + '"]');
-      var note = (supplements.indexOf('autre') !== -1 && texte) ? texte.value.trim() : '';
-      var key = lineKey(id, supplements, note);
-      if (!cart[key]) cart[key] = { itemId:id, qty:0, supplements:supplements, supplementNote:note };
+    function ajouterConfigurable(id){
+      var item = findItem(id);
+      var supplements = [];
+      var note = '';
+      var cuisson = '';
+
+      if (item.pizza){
+        var checked = Array.prototype.slice.call(container.querySelectorAll('input[type="checkbox"][data-for="' + id + '"]:checked'));
+        supplements = checked.map(function(cb){ return cb.dataset.supp; });
+        var texte = container.querySelector('.supp-autre-text[data-for="' + id + '"]');
+        note = (supplements.indexOf('autre') !== -1 && texte) ? texte.value.trim() : '';
+      }
+      if (item.cuisson){
+        var select = container.querySelector('.cuisson-select[data-for="' + id + '"]');
+        cuisson = select ? select.value : '';
+        var erreur = container.querySelector('.cuisson-erreur[data-for="' + id + '"]');
+        if (!cuisson){
+          if (erreur) erreur.style.display = 'block';
+          return;
+        }
+        if (erreur) erreur.style.display = 'none';
+      }
+
+      var key = lineKey(id, supplements, note, cuisson);
+      if (!cart[key]) cart[key] = { itemId:id, qty:0, supplements:supplements, supplementNote:note, cuisson:cuisson };
       cart[key].qty += 1;
       renderPanier();
     }
 
     container.addEventListener('click', function(e){
-      var addBtn = e.target.closest('.btn-ajouter-pizza');
-      if (addBtn){ ajouterPizza(addBtn.dataset.id); return; }
+      var addBtn = e.target.closest('.btn-ajouter-config');
+      if (addBtn){ ajouterConfigurable(addBtn.dataset.id); return; }
 
       var btn = e.target.closest('.qty-btn');
       if (!btn) return;
@@ -604,7 +636,7 @@
       if (qty === 0){
         delete cart[id];
       } else {
-        if (!cart[id]) cart[id] = { itemId:id, qty:0, supplements:[], supplementNote:'' };
+        if (!cart[id]) cart[id] = { itemId:id, qty:0, supplements:[], supplementNote:'', cuisson:'' };
         cart[id].qty = qty;
       }
       document.querySelector('[data-qty="' + id + '"]').textContent = qty;
@@ -744,7 +776,7 @@
 
     var items = Object.keys(cart).map(function(key){
       var line = cart[key];
-      return { id: line.itemId, quantity: line.qty, supplements: line.supplements, supplementNote: line.supplementNote };
+      return { id: line.itemId, quantity: line.qty, supplements: line.supplements, supplementNote: line.supplementNote, cuisson: line.cuisson };
     });
 
     var btn = document.getElementById('cmd-payer');
