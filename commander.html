@@ -550,7 +550,7 @@
     var container = document.getElementById('commande-menu');
     var html = '';
     MENU.forEach(function(cat){
-      html += '<div class="menu-cat reveal">';
+      html += '<div class="menu-cat">';
       html += '<h3>' + cat.cat + '</h3>';
       if (cat.desc) html += '<p class="menu-cat-desc">' + cat.desc + '</p>';
       cat.items.forEach(function(item){
