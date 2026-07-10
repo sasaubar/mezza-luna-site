@@ -387,24 +387,44 @@
   .menu-cat{ margin-bottom:44px; }
   .menu-cat h3{ font-family:var(--serif); font-size:1.6rem; color:var(--rouge-vif); margin-bottom:6px; }
   .menu-cat .menu-cat-desc{ color:var(--charbon-doux); font-size:.9rem; margin-bottom:16px; }
-  .menu-item{ display:flex; justify-content:space-between; align-items:center; gap:16px; padding:14px 0; border-bottom:1px solid rgba(0,0,0,.08); }
-  .menu-item-txt{ flex:1; }
+  .menu-cat-img{ width:100%; height:130px; object-fit:cover; border-radius:var(--radius); margin-bottom:14px; display:block; }
+  .menu-item{ display:flex; justify-content:space-between; align-items:center; gap:16px; padding:14px 0; }
+  .menu-item-txt{ flex:1; min-width:0; }
   .menu-item-txt strong{ font-size:1.02rem; }
   .menu-item-txt p{ color:var(--charbon-doux); font-size:.86rem; margin-top:3px; }
   .menu-item-price{ font-weight:700; color:var(--rouge-vif); white-space:nowrap; min-width:56px; text-align:right; }
-  .menu-item-add{ display:flex; align-items:center; gap:8px; }
-  .qty-btn{ width:28px; height:28px; border-radius:50%; border:1.5px solid var(--rouge-vif); background:#fff; color:var(--rouge-vif); font-size:1.1rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .menu-item-add{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .qty-btn{ width:28px; height:28px; border-radius:50%; border:1.5px solid var(--rouge-vif); background:#fff; color:var(--rouge-vif); font-size:1.1rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:none; }
   .qty-btn:hover{ background:var(--rouge-vif); color:#fff; }
   .qty-val{ min-width:18px; text-align:center; font-weight:600; }
-  .panier-ligne{ display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.92rem; }
-  .panier-ligne-nom{ flex:1; }
+  .panier-ligne{ display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.92rem; flex-wrap:wrap; }
+  .panier-ligne-nom{ flex:1; min-width:140px; overflow-wrap:anywhere; }
   .panier-ligne-nom .qty{ color:var(--charbon-doux); }
+
+  /* Bloc article : ligne + options repliables, avec le trait de séparation en dessous du tout */
+  .menu-entry{ border-bottom:1px solid rgba(0,0,0,.08); }
+  .item-options{ margin:0 0 12px; }
+  .item-options summary{ list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:.83rem; font-weight:600; color:var(--charbon-doux); padding:2px 0 6px; user-select:none; }
+  .item-options summary::-webkit-details-marker{ display:none; }
+  .item-options summary .fleche{ transition:transform .2s ease; font-size:.7rem; color:var(--rouge-vif); }
+  .item-options[open] summary .fleche{ transform:rotate(180deg); }
+  .item-options .options-inner{ padding:4px 0 6px; }
+
+  /* Mobile : rien ne doit déborder */
+  @media (max-width:640px){
+    .menu-item{ flex-wrap:wrap; gap:8px 12px; }
+    .menu-item-txt{ flex:1 1 100%; }
+    .menu-item-price{ min-width:auto; text-align:left; }
+    .menu-item-add{ margin-left:auto; }
+    .menu-cat-img{ height:100px; }
+    .instructions-block input, .pizza-supplements input[type="text"]{ max-width:100% !important; }
+  }
 </style>
 
 <script>
 (function(){
   var MENU = [
-    { cat:"Grignotages", items:[
+    { cat:"Grignotages", img:"assets/img/galerie/charcuterie.jpg", items:[
       { id:"g1a", name:"Arancini al tartufo (3 pièces)", desc:"Lamelles de truffe d'été et crème de truffe", price:5 },
       { id:"g1b", name:"Arancini al tartufo (6 pièces)", desc:"Lamelles de truffe d'été et crème de truffe", price:9 },
       { id:"g2a", name:"Crunchy de poulet (4 pièces)", desc:"", price:5 },
@@ -423,13 +443,13 @@
       { id:"e2", name:"Carpaccio de bœuf (VBF Charolaise)", desc:"", price:9 },
       { id:"e3", name:"Œuf mollet en croûte", desc:"Roquette, crème de truffe", price:8 }
     ]},
-    { cat:"Salades", items:[
+    { cat:"Salades", img:"assets/img/galerie/salade-nordique.jpg", items:[
       { id:"s1", name:"La César / Veggie César", desc:"Crunchy de poulet ou cromesquis tomate mozza, Parmigiano Reggiano DOP, croûtons, sauce César maison", price:15.50 },
       { id:"s2", name:"La Verdura", desc:"Pesto verde, artichauts, poivrons, oignons confits, champignons, olives noires, burrata 125g", price:17.50 },
       { id:"s3", name:"L'Italienne", desc:"Oignons, champignons, lardons, Speck IGP, Parmigiano Reggiano DOP", price:16 },
       { id:"s4", name:"La Nordique", desc:"Saumon fumé, œuf mollet en croûte, crème de ciboulette", price:16.50 }
     ]},
-    { cat:"Pizzas", desc:"18 pizzas, pâte et sauce tomate maison, cuites à la commande. Suppléments disponibles sur chaque pizza.", items:[
+    { cat:"Pizzas", img:"assets/img/galerie/pizza-ambiance.jpg", desc:"18 pizzas, pâte et sauce tomate maison, cuites à la commande. Suppléments disponibles sur chaque pizza.", items:[
       { id:"p1",  name:"Tartufo", desc:"Crème de truffe, mozzarella, champignons, roquette, burrata 125g, lamelles de truffe d'été, Parmigiano Reggiano DOP", price:18, pizza:true },
       { id:"p2",  name:"Coppa e Formaggio", desc:"Crème de gorgonzola, mozzarella, chèvre, roquette, noix, burrata 125g, Coppa di Parma", price:16.50, pizza:true },
       { id:"p3",  name:"Parma", desc:"Sauce tomate, mozzarella, roquette, Speck IGP, burrata 125g, Parmigiano Reggiano DOP", price:17, pizza:true },
@@ -449,13 +469,13 @@
       { id:"p17", name:"Napolitaine", desc:"Sauce tomate, mozzarella, anchois, câpres, olives noires", price:12, pizza:true },
       { id:"p18", name:"Margherita", desc:"Sauce tomate, mozzarella fior di latte, origan et basilic frais", price:11, pizza:true }
     ]},
-    { cat:"Pâtes", items:[
+    { cat:"Pâtes", img:"assets/img/galerie/V2/tagliatelles-aux-2-saumons.JPG", items:[
       { id:"pa1", name:"Raviolis aux cèpes", desc:"Lamelles de truffe d'été et crème de truffe", price:16.80 },
       { id:"pa2", name:"Tagliatelles aux 2 saumons", desc:"", price:16.20 },
       { id:"pa3", name:"Tagliatelles à la carbonara", desc:"", price:15 },
       { id:"pa4", name:"Penne Luna", desc:"Crème fraîche, champignons, Spianata piccante, basilic frais", price:14.50 }
     ]},
-    { cat:"Viandes", desc:"Viande de bœuf française VBF Charolaise.", items:[
+    { cat:"Viandes", img:"assets/img/galerie/grillade.jpg", desc:"Viande de bœuf française VBF Charolaise.", items:[
       { id:"v1", name:"Filet de bœuf 200g", desc:"Sauce gorgonzola ou crème de truffe, frites et légumes de saison", price:24, cuisson:true },
       { id:"v2", name:"Escalope de veau Saltimbocca à la crème", desc:"Mozzarella, Speck IGP, risotto aux champignons", price:21 },
       { id:"v3", name:"Escalope de veau sauce gorgonzola", desc:"Gnocchis et noix", price:19.50 },
@@ -463,12 +483,12 @@
       { id:"v5", name:"Double Carpaccio de bœuf, frites", desc:"Sauce vierge, câpres, basilic, Parmigiano Reggiano DOP", price:18 },
       { id:"v6", name:"Tartare de bœuf préparé 180g", desc:"Frites et salade verte", price:16.80 }
     ]},
-    { cat:"Poissons", items:[
+    { cat:"Poissons", img:"assets/img/galerie/V2/salade-de-poulpe.JPG", items:[
       { id:"po1", name:"Risotto au poulpe", desc:"", price:22 },
       { id:"po2", name:"Pavé de saumon grillé", desc:"Sauce vierge et légumes de saison", price:18 },
       { id:"po3", name:"Tartare de saumon", desc:"Courgettes, fruits de la passion, sauce vierge, frites et salade verte", price:18 }
     ]},
-    { cat:"Desserts", desc:"Faits maison.", items:[
+    { cat:"Desserts", img:"assets/img/galerie/V2/tiramisu-mezza-luna.JPG", desc:"Faits maison.", items:[
       { id:"d1", name:"Tiramisu, café intense", desc:"", price:7.50 },
       { id:"d2", name:"Tarte tatin revisitée et sa glace Palet Breton", desc:"", price:7.50 },
       { id:"d3", name:"Moelleux au chocolat noir et sa boule de glace vanille", desc:"", price:8 }
@@ -556,9 +576,11 @@
     var html = '';
     MENU.forEach(function(cat){
       html += '<div class="menu-cat">';
+      if (cat.img) html += '<img class="menu-cat-img" src="' + cat.img + '" alt="' + cat.cat + '" loading="lazy">';
       html += '<h3>' + cat.cat + '</h3>';
       if (cat.desc) html += '<p class="menu-cat-desc">' + cat.desc + '</p>';
       cat.items.forEach(function(item){
+        html += '<div class="menu-entry">';
         html += '<div class="menu-item" data-id="' + item.id + '">';
         html += '<div class="menu-item-txt"><strong>' + item.name + '</strong>' + (item.desc ? '<p>' + item.desc + '</p>' : '') + '</div>';
         html += '<div class="menu-item-price">' + fmt(item.price) + '</div>';
@@ -567,6 +589,9 @@
         html += '<span class="ajoute-ok" data-confirm="' + item.id + '" style="display:none;color:var(--vert);font-weight:700;font-size:.85rem;margin-left:10px;">✓ Ajouté !</span>';
         html += '</div>';
         html += '</div>';
+
+        html += '<details class="item-options"><summary>Options (suppléments, cuisson, instructions) <span class="fleche">▾</span></summary>';
+        html += '<div class="options-inner">';
         if (item.pizza){
           html += '<div class="pizza-supplements" data-supp-block="' + item.id + '" style="padding:6px 0 14px;">';
           html += '<p style="font-size:.8rem;color:var(--charbon-doux);margin-bottom:6px;">Suppléments pour cette pizza (facultatif) :</p>';
@@ -589,9 +614,12 @@
           html += '<p class="cuisson-erreur" data-for="' + item.id + '" style="display:none;color:var(--rouge-vif);font-size:.78rem;margin-top:6px;">Merci de choisir une cuisson avant d\'ajouter.</p>';
           html += '</div>';
         }
-        html += '<div class="instructions-block" style="padding:0 0 14px;">';
+        html += '<div class="instructions-block" style="padding:0 0 6px;">';
         html += '<input type="text" class="item-instructions" data-for="' + item.id + '" placeholder="Instructions pour cet article (ex : sans oignons, pas trop cuit…)" style="width:100%;max-width:420px;padding:7px 10px;border-radius:6px;border:1px solid rgba(0,0,0,.15);font-family:var(--sans);font-size:.82rem;">';
         html += '</div>';
+        html += '</div></details>';
+
+        html += '</div>'; // .menu-entry
       });
       html += '</div>';
     });
@@ -624,6 +652,8 @@
         var erreur = container.querySelector('.cuisson-erreur[data-for="' + id + '"]');
         if (!cuisson){
           if (erreur) erreur.style.display = 'block';
+          var details = container.querySelector('.menu-item[data-id="' + id + '"]').closest('.menu-entry').querySelector('.item-options');
+          if (details) details.open = true;
           return;
         }
         if (erreur) erreur.style.display = 'none';
