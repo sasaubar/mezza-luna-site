@@ -414,7 +414,7 @@
       { id:"g4a", name:"Beignets de calamars à la romaine (6 pièces)", desc:"", price:5 },
       { id:"g4b", name:"Beignets de calamars à la romaine (12 pièces)", desc:"", price:9 },
       { id:"g5a", name:"Le Petit Assortiment (simple)", desc:"6 cromesquis, 4 beignets de calamars, 2 crunchy poulet, 2 arancini al tartufo", price:13 },
-      { id:"g5b", name:"Le Petit Assortiment (double)", desc:"6 cromesquis, 4 beignets de calamars, 2 crunchy poulet, 2 arancini al tartufo", price:24 },
+      { id:"g5b", name:"Le Grand Assortiment", desc:"12 cromesquis, 8 beignets de calamars, 4 crunchy poulet, 4 arancini al tartufo", price:24 },
       { id:"g6a", name:"Planche de Charcuterie (simple)", desc:"Coppa di Parma, Spianata piccante, Speck IGP", price:8 },
       { id:"g6b", name:"Planche de Charcuterie (double)", desc:"Coppa di Parma, Spianata piccante, Speck IGP", price:14 }
     ]},
@@ -476,7 +476,10 @@
   ];
 
   var MONTANT_MIN = 15;
-  var cart = {}; // { itemId: { qty, supplements:[...], supplementNote:'' } }
+  // cart est une liste de lignes : { key, itemId, qty, supplements:[...], supplementNote:'' }
+  // Une pizza avec des suppléments différents forme une ligne distincte (même si même pizza de base),
+  // ce qui permet par exemple une 4 Fromages nature ET une 4 Fromages + œuf dans la même commande.
+  var cart = {};
 
   // Doit rester identique à SUPPLEMENTS dans api-stripe/api/_menu.js
   var SUPPLEMENTS = [
@@ -501,22 +504,38 @@
     for (var i=0;i<SUPPLEMENTS.length;i++){ if (SUPPLEMENTS[i].id === id) return SUPPLEMENTS[i]; }
     return null;
   }
-  function unitPrice(id){
-    var item = findItem(id);
-    var line = cart[id];
+  function lineKey(itemId, supplements, note){
+    var sig = supplements.slice().sort().join(',');
+    if (supplements.indexOf('autre') !== -1) sig += '|' + note;
+    return itemId + '::' + sig;
+  }
+  function unitPrice(line){
+    var item = findItem(line.itemId);
     var price = item.price;
-    if (line && line.supplements){
-      line.supplements.forEach(function(suppId){
-        var supp = findSupplement(suppId);
-        if (supp) price += supp.price;
-      });
-    }
+    line.supplements.forEach(function(suppId){
+      var supp = findSupplement(suppId);
+      if (supp) price += supp.price;
+    });
     return price;
+  }
+  function lineLabel(line){
+    var item = findItem(line.itemId);
+    var nom = item.name;
+    if (line.supplements.length > 0){
+      var labels = line.supplements.map(function(suppId){
+        var supp = findSupplement(suppId);
+        if (suppId === 'autre' && line.supplementNote) return supp.name + ' (' + line.supplementNote + ')';
+        return supp.name;
+      });
+      nom += ' + ' + labels.join(' + ');
+    }
+    return nom;
   }
   function cartTotal(){
     var total = 0;
-    Object.keys(cart).forEach(function(id){
-      total += unitPrice(id) * cart[id].qty;
+    Object.keys(cart).forEach(function(key){
+      var line = cart[key];
+      total += unitPrice(line) * line.qty;
     });
     return total;
   }
@@ -532,14 +551,19 @@
         html += '<div class="menu-item" data-id="' + item.id + '">';
         html += '<div class="menu-item-txt"><strong>' + item.name + '</strong>' + (item.desc ? '<p>' + item.desc + '</p>' : '') + '</div>';
         html += '<div class="menu-item-price">' + fmt(item.price) + '</div>';
-        html += '<div class="menu-item-add">';
-        html += '<button type="button" class="qty-btn" data-action="minus" data-id="' + item.id + '">−</button>';
-        html += '<span class="qty-val" data-qty="' + item.id + '">0</span>';
-        html += '<button type="button" class="qty-btn" data-action="plus" data-id="' + item.id + '">+</button>';
-        html += '</div></div>';
         if (item.pizza){
-          html += '<div class="pizza-supplements" data-supp-for="' + item.id + '" style="display:none;flex-basis:100%;padding:8px 0 4px;">';
-          html += '<p style="font-size:.8rem;color:var(--charbon-doux);margin-bottom:6px;">Suppléments (s\'appliquent à toutes les ' + item.name + ' de la commande) :</p>';
+          html += '<div class="menu-item-add"><button type="button" class="btn-ajouter-pizza" data-id="' + item.id + '" style="background:var(--rouge-vif);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:.85rem;font-weight:600;cursor:pointer;">+ Ajouter</button></div>';
+        } else {
+          html += '<div class="menu-item-add">';
+          html += '<button type="button" class="qty-btn" data-action="minus" data-id="' + item.id + '">−</button>';
+          html += '<span class="qty-val" data-qty="' + item.id + '">0</span>';
+          html += '<button type="button" class="qty-btn" data-action="plus" data-id="' + item.id + '">+</button>';
+          html += '</div>';
+        }
+        html += '</div>';
+        if (item.pizza){
+          html += '<div class="pizza-supplements" data-supp-block="' + item.id + '" style="padding:6px 0 14px;">';
+          html += '<p style="font-size:.8rem;color:var(--charbon-doux);margin-bottom:6px;">Suppléments pour cette pizza (facultatif) :</p>';
           html += '<div style="display:flex;flex-wrap:wrap;gap:10px 16px;">';
           SUPPLEMENTS.forEach(function(supp){
             html += '<label style="font-size:.85rem;display:flex;align-items:center;gap:5px;cursor:pointer;">';
@@ -555,7 +579,21 @@
     });
     container.innerHTML = html;
 
+    function ajouterPizza(id){
+      var checked = Array.prototype.slice.call(container.querySelectorAll('input[type="checkbox"][data-for="' + id + '"]:checked'));
+      var supplements = checked.map(function(cb){ return cb.dataset.supp; });
+      var texte = container.querySelector('.supp-autre-text[data-for="' + id + '"]');
+      var note = (supplements.indexOf('autre') !== -1 && texte) ? texte.value.trim() : '';
+      var key = lineKey(id, supplements, note);
+      if (!cart[key]) cart[key] = { itemId:id, qty:0, supplements:supplements, supplementNote:note };
+      cart[key].qty += 1;
+      renderPanier();
+    }
+
     container.addEventListener('click', function(e){
+      var addBtn = e.target.closest('.btn-ajouter-pizza');
+      if (addBtn){ ajouterPizza(addBtn.dataset.id); return; }
+
       var btn = e.target.closest('.qty-btn');
       if (!btn) return;
       var id = btn.dataset.id;
@@ -566,32 +604,18 @@
       if (qty === 0){
         delete cart[id];
       } else {
-        if (!cart[id]) cart[id] = { qty:0, supplements:[], supplementNote:'' };
+        if (!cart[id]) cart[id] = { itemId:id, qty:0, supplements:[], supplementNote:'' };
         cart[id].qty = qty;
       }
       document.querySelector('[data-qty="' + id + '"]').textContent = qty;
-      var suppBlock = container.querySelector('[data-supp-for="' + id + '"]');
-      if (suppBlock) suppBlock.style.display = qty > 0 ? 'block' : 'none';
       renderPanier();
     });
 
     container.addEventListener('change', function(e){
-      if (e.target.matches('input[type="checkbox"][data-supp]')){
+      if (e.target.matches('input[type="checkbox"][data-supp]') && e.target.dataset.supp === 'autre'){
         var id = e.target.dataset.for;
-        var suppId = e.target.dataset.supp;
-        if (!cart[id]) return;
-        var idx = cart[id].supplements.indexOf(suppId);
-        if (e.target.checked && idx === -1) cart[id].supplements.push(suppId);
-        if (!e.target.checked && idx !== -1) cart[id].supplements.splice(idx, 1);
-        if (suppId === 'autre'){
-          var texte = container.querySelector('.supp-autre-text[data-for="' + id + '"]');
-          if (texte) texte.style.display = e.target.checked ? 'block' : 'none';
-        }
-        renderPanier();
-      }
-      if (e.target.matches('.supp-autre-text')){
-        var id2 = e.target.dataset.for;
-        if (cart[id2]) cart[id2].supplementNote = e.target.value.trim();
+        var texte = container.querySelector('.supp-autre-text[data-for="' + id + '"]');
+        if (texte) texte.style.display = e.target.checked ? 'block' : 'none';
       }
     });
   }
@@ -600,9 +624,9 @@
     var lignes = document.getElementById('panier-lignes');
     var vide = document.getElementById('panier-vide');
     var recap = document.getElementById('panier-recap');
-    var ids = Object.keys(cart);
+    var keys = Object.keys(cart);
 
-    if (ids.length === 0){
+    if (keys.length === 0){
       lignes.innerHTML = '';
       vide.style.display = 'block';
       recap.style.display = 'none';
@@ -614,24 +638,37 @@
     recap.style.display = 'block';
 
     var html = '';
-    ids.forEach(function(id){
-      var item = findItem(id);
-      var line = cart[id];
-      var nomComplet = item.name;
-      if (line.supplements.length > 0){
-        var labels = line.supplements.map(function(suppId){
-          var supp = findSupplement(suppId);
-          if (suppId === 'autre' && line.supplementNote) return supp.name + ' (' + line.supplementNote + ')';
-          return supp.name;
-        });
-        nomComplet += ' + ' + labels.join(' + ');
-      }
-      html += '<div class="panier-ligne">';
-      html += '<span class="panier-ligne-nom">' + nomComplet + ' <span class="qty">× ' + line.qty + '</span></span>';
-      html += '<span>' + fmt(unitPrice(id) * line.qty) + '</span>';
-      html += '</div>';
+    keys.forEach(function(key){
+      var line = cart[key];
+      html += '<div class="panier-ligne" data-key="' + key + '">';
+      html += '<span class="panier-ligne-nom">' + lineLabel(line) + '</span>';
+      html += '<span style="display:flex;align-items:center;gap:8px;">';
+      html += '<button type="button" class="qty-btn panier-qty-btn" data-action="minus" data-key="' + key + '" style="width:22px;height:22px;font-size:.9rem;">−</button>';
+      html += '<span class="qty">' + line.qty + '</span>';
+      html += '<button type="button" class="qty-btn panier-qty-btn" data-action="plus" data-key="' + key + '" style="width:22px;height:22px;font-size:.9rem;">+</button>';
+      html += '<span style="min-width:60px;text-align:right;">' + fmt(unitPrice(line) * line.qty) + '</span>';
+      html += '</span></div>';
     });
     lignes.innerHTML = html;
+
+    lignes.addEventListener('click', function(e){
+      var btn = e.target.closest('.panier-qty-btn');
+      if (!btn) return;
+      var key = btn.dataset.key;
+      var line = cart[key];
+      if (!line) return;
+      if (btn.dataset.action === 'plus') line.qty += 1;
+      if (btn.dataset.action === 'minus') line.qty -= 1;
+      var menuQtyVal = document.querySelector('[data-qty="' + line.itemId + '"]');
+      if (line.qty <= 0){
+        delete cart[key];
+        if (menuQtyVal) menuQtyVal.textContent = '0';
+      } else if (menuQtyVal && line.supplements.length === 0) {
+        // Uniquement pour les articles simples (sans supplément) : une seule ligne possible par id.
+        menuQtyVal.textContent = line.qty;
+      }
+      renderPanier();
+    }, { once:true });
 
     var total = cartTotal();
     document.getElementById('panier-total').textContent = fmt(total);
@@ -705,9 +742,9 @@
       return;
     }
 
-    var items = Object.keys(cart).map(function(id){
-      var line = cart[id];
-      return { id: id, quantity: line.qty, supplements: line.supplements, supplementNote: line.supplementNote };
+    var items = Object.keys(cart).map(function(key){
+      var line = cart[key];
+      return { id: line.itemId, quantity: line.qty, supplements: line.supplements, supplementNote: line.supplementNote };
     });
 
     var btn = document.getElementById('cmd-payer');
