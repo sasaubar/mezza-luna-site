@@ -326,7 +326,7 @@
 
 <section style="padding:20px 0 80px;">
   <div class="wrap" style="max-width:1180px;">
-    <div id="commande-layout" style="display:grid;grid-template-columns:1fr 380px;gap:36px;align-items:start;">
+    <div id="commande-layout" style="display:grid;gap:36px;align-items:start;">
 
       <!-- MENU -->
       <div id="commande-menu"></div>
@@ -380,6 +380,7 @@
 </section>
 
 <style>
+  #commande-layout{ grid-template-columns:1fr 380px; }
   @media (max-width:900px){
     #commande-layout{ grid-template-columns:1fr; }
     #commande-panier{ position:static; }
@@ -475,7 +476,7 @@
       { id:"pa3", name:"Tagliatelles à la carbonara", desc:"", price:15 },
       { id:"pa4", name:"Penne Luna", desc:"Crème fraîche, champignons, Spianata piccante, basilic frais", price:14.50 }
     ]},
-    { cat:"Viandes", img:"assets/img/galerie/grillade.jpg", desc:"Viande de bœuf française VBF Charolaise.", items:[
+    { cat:"Viandes", img:"assets/img/grillade.jpg", desc:"Viande de bœuf française VBF Charolaise.", items:[
       { id:"v1", name:"Filet de bœuf 200g", desc:"Sauce gorgonzola ou crème de truffe, frites et légumes de saison", price:24, cuisson:true },
       { id:"v2", name:"Escalope de veau Saltimbocca à la crème", desc:"Mozzarella, Speck IGP, risotto aux champignons", price:21 },
       { id:"v3", name:"Escalope de veau sauce gorgonzola", desc:"Gnocchis et noix", price:19.50 },
@@ -483,7 +484,7 @@
       { id:"v5", name:"Double Carpaccio de bœuf, frites", desc:"Sauce vierge, câpres, basilic, Parmigiano Reggiano DOP", price:18 },
       { id:"v6", name:"Tartare de bœuf préparé 180g", desc:"Frites et salade verte", price:16.80 }
     ]},
-    { cat:"Poissons", img:"assets/img/galerie/V2/salade-de-poulpe.JPG", items:[
+    { cat:"Poissons", items:[
       { id:"po1", name:"Risotto au poulpe", desc:"", price:22 },
       { id:"po2", name:"Pavé de saumon grillé", desc:"Sauce vierge et légumes de saison", price:18 },
       { id:"po3", name:"Tartare de saumon", desc:"Courgettes, fruits de la passion, sauce vierge, frites et salade verte", price:18 }
