@@ -31,6 +31,12 @@
     background:var(--rouge-vif); color:#fff;
   }
   .msg-erreur{ color:var(--rouge-vif); font-size:.88rem; margin-top:10px; }
+  .btn-supprimer{
+    background:none; border:1.5px solid rgba(199,0,57,.3); color:var(--rouge-vif);
+    font-size:.76rem; font-weight:600; padding:6px 12px; border-radius:50px; cursor:pointer;
+    text-transform:uppercase; letter-spacing:.03em; white-space:nowrap;
+  }
+  .btn-supprimer:hover{ background:var(--rouge-vif); color:#fff; }
 
   #ecranListe{ display:none; }
   .stats{ display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
@@ -123,12 +129,42 @@
         '<td class="tampons' + (pret ? ' pret' : '') + '">' + c.tampons + ' / 8' + (pret ? ' — prêt' : '') + '</td>' +
         '<td>' + (c.recompenses || 0) + '</td>' +
         '<td>' + date + '</td>' +
+        '<td><button class="btn-supprimer" data-id="' + c.id + '" data-nom="' + escapeHtml(c.nom) + '">Supprimer</button></td>' +
         '</tr>';
     }).join('');
 
     container.innerHTML = '<table><thead><tr>' +
-      '<th>Nom</th><th>Téléphone</th><th>Email</th><th>Emails OK</th><th>Tampons</th><th>Récompenses données</th><th>Inscrit le</th>' +
+      '<th>Nom</th><th>Téléphone</th><th>Email</th><th>Emails OK</th><th>Tampons</th><th>Récompenses données</th><th>Inscrit le</th><th></th>' +
       '</tr></thead><tbody>' + lignes + '</tbody></table>';
+
+    document.querySelectorAll('.btn-supprimer').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-id');
+        var nom = btn.getAttribute('data-nom');
+        if(!confirm('Supprimer définitivement la carte de ' + nom + ' ? Cette action est irréversible.')) return;
+        supprimerClient(id);
+      });
+    });
+  }
+
+  function supprimerClient(id){
+    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+    fetch(API_BASE + '/fidelite-supprimer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': pin },
+      body: JSON.stringify({ id: id }),
+    })
+      .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+      .then(function(res){
+        if(!res.ok){
+          alert(res.data && res.data.error ? res.data.error : 'Erreur lors de la suppression');
+          return;
+        }
+        chargerListe();
+      })
+      .catch(function(){
+        alert('Erreur réseau lors de la suppression');
+      });
   }
 
   function escapeHtml(str){
