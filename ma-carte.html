@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ma carte fidélité | La Mezza Luna Clamart</title>
+<link rel="icon" href="assets/img/logo-red.png" type="image/png" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --rouge-vif:#C70039;
+    --rouge-profond:#900C27;
+    --or:#F6C667;
+    --creme:#F1F8FD;
+    --charbon:#1A1A1A;
+    --charbon-doux:#3a352e;
+    --serif:'Cormorant Garamond', Georgia, serif;
+    --sans:'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius:14px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family:var(--sans); color:var(--charbon); background:var(--creme); line-height:1.6;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .carte{
+    background:#fff; border-radius:var(--radius); max-width:420px; width:100%;
+    padding:34px 32px; box-shadow:0 20px 50px rgba(0,0,0,.12); text-align:center;
+  }
+  .lune-logo{ width:56px; height:56px; object-fit:contain; margin:0 auto 14px; display:block; }
+  .eyebrow{ font-weight:600; font-size:.74rem; letter-spacing:.24em; text-transform:uppercase; color:var(--rouge-vif); display:block; margin-bottom:8px; }
+  h1{ font-family:var(--serif); font-weight:700; font-size:1.7rem; line-height:1.15; margin-bottom:4px; color:var(--charbon); }
+  .sous-titre{ font-size:.9rem; color:var(--charbon-doux); margin-bottom:22px; }
+  #qrcode{ display:flex; justify-content:center; margin:0 auto 22px; }
+  #qrcode img{ border-radius:8px; }
+  .tampons{ display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .tampon{
+    width:34px; height:34px; border-radius:50%; border:2px solid rgba(199,0,57,.3);
+    display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+  }
+  .tampon.rempli{ background:var(--rouge-vif); border-color:var(--rouge-vif); color:#fff; }
+  .statut{ font-size:.94rem; color:var(--charbon-doux); margin-bottom:6px; }
+  .statut.pret{ color:var(--rouge-vif); font-weight:700; }
+  .astuce{
+    margin-top:22px; padding-top:18px; border-top:1px solid rgba(26,26,26,.1);
+    font-size:.82rem; color:var(--charbon-doux);
+  }
+  .chargement, .erreur{ font-size:.95rem; color:var(--charbon-doux); }
+  .erreur{ color:var(--rouge-vif); }
+</style>
+</head>
+<body>
+
+<div class="carte">
+  <img class="lune-logo" src="assets/img/logo-red.png" alt="La Mezza Luna" />
+  <span class="eyebrow">Carte fidélité</span>
+  <div id="contenu">
+    <p class="chargement">Chargement de votre carte...</p>
+  </div>
+</div>
+
+<script>
+  var API_BASE = 'https://api-stripe-gold.vercel.app/api';
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  var contenu = document.getElementById('contenu');
+
+  if(!id){
+    contenu.innerHTML = '<p class="erreur">Lien invalide. Demandez votre carte au comptoir.</p>';
+  } else {
+    fetch(API_BASE + '/fidelite-carte?id=' + encodeURIComponent(id))
+      .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+      .then(function(res){
+        if(!res.ok){ throw new Error(res.data && res.data.error ? res.data.error : 'Carte introuvable'); }
+        afficherCarte(res.data);
+      })
+      .catch(function(err){
+        contenu.innerHTML = '<p class="erreur">' + (err.message || 'Carte introuvable') + '</p>';
+      });
+  }
+
+  function afficherCarte(data){
+    var restants = data.objectif - data.tampons;
+    var pret = data.tampons >= data.objectif;
+
+    var pastilles = '';
+    for(var i = 1; i <= data.objectif; i++){
+      pastilles += '<div class="tampon' + (i <= data.tampons ? ' rempli' : '') + '">' + (i <= data.tampons ? '✓' : '') + '</div>';
+    }
+
+    var statut = pret
+      ? '<p class="statut pret">Bravo, votre récompense est prête ! Montrez cette carte au comptoir.</p>'
+      : '<p class="statut">Encore ' + restants + ' passage' + (restants > 1 ? 's' : '') + ' avant votre dessert et café offerts.</p>';
+
+    contenu.innerHTML =
+      '<h1>Bonjour ' + escapeHtml(data.nom) + '</h1>' +
+      '<div class="sous-titre">' + data.tampons + ' / ' + data.objectif + ' tampons</div>' +
+      '<div id="qrcode"></div>' +
+      '<div class="tampons">' + pastilles + '</div>' +
+      statut +
+      '<div class="astuce">Montrez ce QR code au comptoir à chaque passage pour ajouter un tampon. Ajoutez cette page à votre écran d\'accueil pour la retrouver facilement.</div>';
+
+    new QRCode(document.getElementById('qrcode'), {
+      text: id,
+      width: 180,
+      height: 180,
+      colorDark: '#1A1A1A',
+      colorLight: '#ffffff',
+    });
+  }
+
+  function escapeHtml(str){
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>

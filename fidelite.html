@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Carte fidélité | La Mezza Luna Clamart</title>
+<meta name="description" content="Créez votre carte fidélité dématérialisée La Mezza Luna : 8 passages, un dessert et un café offerts." />
+<link rel="canonical" href="https://lamezzalunaclamart.com/fidelite.html" />
+<link rel="icon" href="assets/img/logo-red.png" type="image/png" />
+<meta name="robots" content="noindex, follow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --rouge-vif:#C70039;
+    --rouge-profond:#900C27;
+    --or:#F6C667;
+    --creme:#F1F8FD;
+    --charbon:#1A1A1A;
+    --charbon-doux:#3a352e;
+    --serif:'Cormorant Garamond', Georgia, serif;
+    --sans:'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius:14px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family:var(--sans); color:var(--charbon); background:var(--creme); line-height:1.6;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .carte{
+    background:#fff; border-radius:var(--radius); max-width:420px; width:100%;
+    padding:38px 32px; box-shadow:0 20px 50px rgba(0,0,0,.12); text-align:center;
+  }
+  .lune-logo{ width:64px; height:64px; object-fit:contain; margin:0 auto 18px; display:block; }
+  .eyebrow{ font-weight:600; font-size:.74rem; letter-spacing:.24em; text-transform:uppercase; color:var(--rouge-vif); display:block; margin-bottom:10px; }
+  h1{ font-family:var(--serif); font-weight:700; font-size:1.9rem; line-height:1.15; margin-bottom:14px; color:var(--charbon); }
+  p.lead{ font-size:.96rem; color:var(--charbon-doux); margin-bottom:24px; }
+  .champ{ margin-bottom:16px; text-align:left; }
+  .champ label{ display:block; font-size:.82rem; font-weight:600; color:var(--charbon-doux); margin-bottom:6px; }
+  .champ input{
+    width:100%; padding:13px 14px; border:1.5px solid rgba(26,26,26,.16); border-radius:10px;
+    font-family:var(--sans); font-size:1rem; color:var(--charbon);
+  }
+  .champ input:focus{ outline:none; border-color:var(--rouge-vif); }
+  .champ-checkbox{ margin-bottom:18px; text-align:left; }
+  .champ-checkbox label{ display:flex; align-items:flex-start; gap:10px; cursor:pointer; }
+  .champ-checkbox input{ width:auto; margin-top:3px; flex:none; accent-color:var(--rouge-vif); }
+  .champ-checkbox span{ font-size:.82rem; color:var(--charbon-doux); line-height:1.5; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; width:100%;
+    font-weight:600; font-size:.92rem; letter-spacing:.04em; text-transform:uppercase;
+    padding:15px 30px; border-radius:50px; cursor:pointer; border:none;
+    background:var(--rouge-vif); color:#fff; box-shadow:0 6px 18px rgba(199,0,57,.25);
+    margin-top:6px; transition:background .18s ease, transform .18s ease;
+  }
+  .btn:hover{ background:var(--rouge-profond); transform:translateY(-2px); }
+  .btn:disabled{ opacity:.6; cursor:default; transform:none; }
+  .msg-erreur{ color:var(--rouge-vif); font-size:.88rem; margin-top:10px; display:none; }
+  .regle{
+    margin-top:26px; padding-top:20px; border-top:1px solid rgba(26,26,26,.1);
+    font-size:.84rem; color:var(--charbon-doux);
+  }
+</style>
+</head>
+<body>
+
+<div class="carte">
+  <img class="lune-logo" src="assets/img/logo-red.png" alt="La Mezza Luna" />
+  <span class="eyebrow">Carte fidélité</span>
+  <h1>Créez votre carte</h1>
+  <p class="lead">8 passages au restaurant, un dessert et un café offerts. Renseignez vos coordonnées pour recevoir votre carte.</p>
+
+  <form id="formInscription">
+    <div class="champ">
+      <label for="nom">Prénom</label>
+      <input type="text" id="nom" name="nom" autocomplete="given-name" required />
+    </div>
+    <div class="champ">
+      <label for="telephone">Téléphone</label>
+      <input type="tel" id="telephone" name="telephone" autocomplete="tel" placeholder="06 XX XX XX XX" required />
+    </div>
+    <div class="champ">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" autocomplete="email" placeholder="vous@exemple.fr" required />
+    </div>
+    <div class="champ-checkbox">
+      <label>
+        <input type="checkbox" id="consentement" name="consentement" />
+        <span>J'accepte de recevoir des emails de La Mezza Luna pour être informé(e) des nouveautés, soirées et offres spéciales.</span>
+      </label>
+    </div>
+    <button type="submit" class="btn" id="btnValider">Créer ma carte</button>
+    <div class="msg-erreur" id="msgErreur"></div>
+  </form>
+
+  <div class="regle">Un tampon par passage au restaurant. Au 8<sup>e</sup> tampon, un dessert et un café vous sont offerts.</div>
+  <div class="regle" style="margin-top:10px;padding-top:0;border-top:none;">Déjà une carte ? Retapez simplement votre prénom et numéro, on la retrouve automatiquement.</div>
+</div>
+
+<script>
+  var API_BASE = 'https://api-stripe-gold.vercel.app/api';
+  var form = document.getElementById('formInscription');
+  var btn = document.getElementById('btnValider');
+  var msgErreur = document.getElementById('msgErreur');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    msgErreur.style.display = 'none';
+    var nom = document.getElementById('nom').value.trim();
+    var telephone = document.getElementById('telephone').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var consentementMarketing = document.getElementById('consentement').checked;
+    if(!nom || !telephone || !email){ return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Création en cours...';
+
+    fetch(API_BASE + '/fidelite-inscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom: nom, telephone: telephone, email: email, consentementMarketing: consentementMarketing }),
+    })
+      .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+      .then(function(res){
+        if(!res.ok){ throw new Error(res.data && res.data.error ? res.data.error : 'Erreur'); }
+        window.location.href = 'ma-carte.html?id=' + encodeURIComponent(res.data.id);
+      })
+      .catch(function(err){
+        msgErreur.textContent = err.message || 'Une erreur est survenue, réessayez.';
+        msgErreur.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Créer ma carte';
+      });
+  });
+</script>
+
+</body>
+</html>
