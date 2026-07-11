@@ -128,8 +128,28 @@
     ecranPin.style.display = 'none';
     ecranScanner.style.display = 'block';
     html5QrCode = new Html5Qrcode('lecteur');
+
+    // On liste d'abord les caméras (ça déclenche proprement la demande de permission
+    // sur iOS Safari) puis on démarre avec l'id de la caméra arrière plutôt qu'avec
+    // la contrainte facingMode, peu fiable sur Safari.
+    Html5Qrcode.getCameras().then(function(cameras){
+      if(!cameras || cameras.length === 0){
+        statutScan.textContent = 'Aucune caméra détectée sur cet appareil.';
+        return;
+      }
+      var arriere = cameras.find(function(c){ return /back|arri[eè]re|rear|environment/i.test(c.label || ''); });
+      var camera = arriere || cameras[cameras.length - 1];
+      lancerFlux(camera.id);
+    }).catch(function(err){
+      // Repli sur l'ancienne méthode si getCameras() échoue (certains navigateurs
+      // n'autorisent pas l'énumération mais acceptent quand même facingMode).
+      lancerFlux({ facingMode: 'environment' });
+    });
+  }
+
+  function lancerFlux(cible){
     html5QrCode.start(
-      { facingMode: 'environment' },
+      cible,
       { fps: 10, qrbox: 240 },
       onScanReussi,
       function(){}
