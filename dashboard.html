@@ -105,7 +105,7 @@
     <div class="sidebar">
       <div class="marque"><img src="assets/img/logo-red.png" alt="" /><span>La Mezza Luna</span></div>
       <button class="onglet actif" data-page="pageCommandes">🍕 Commandes<span class="puce" id="badgeCommandes" style="display:none;"></span></button>
-      <button class="onglet" data-page="pageReservations">📅 Réservations</button>
+      <button class="onglet" data-page="pageReservations">📅 Réservations<span class="puce" id="badgeReservations" style="display:none;"></span></button>
       <button class="onglet" data-page="pageFidelite">🎟️ Fidélité</button>
     </div>
 
@@ -193,6 +193,11 @@
         badge.style.display = 'none';
         badge.textContent = '';
       }
+      if (btn.getAttribute('data-page') === 'pageReservations') {
+        var badgeResa = document.getElementById('badgeReservations');
+        badgeResa.style.display = 'none';
+        badgeResa.textContent = '';
+      }
     });
   });
 
@@ -224,12 +229,25 @@
       });
   }
 
+  var dernierNombreReservations = null;
+
   function chargerReservationsAVenir() {
     var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
     fetch(API_BASE + '/reservation?action=aVenir&pin=' + encodeURIComponent(pin))
       .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
       .then(function (res) {
         if (!res.ok) return;
+        var nombre = res.data.reservations.length;
+        if (dernierNombreReservations !== null && nombre > dernierNombreReservations) {
+          jouerSonNotification('reservation');
+          var badge = document.getElementById('badgeReservations');
+          var pageReservationsActive = document.getElementById('pageReservations').classList.contains('actif');
+          if (!pageReservationsActive) {
+            badge.textContent = '+' + (nombre - dernierNombreReservations);
+            badge.style.display = 'inline-flex';
+          }
+        }
+        dernierNombreReservations = nombre;
         afficherReservationsAVenir(res.data.reservations);
       });
   }
@@ -358,10 +376,16 @@
   // ================= COMMANDES =================
   var dernierNombreCommandes = null;
 
-  function jouerSonNotification() {
+  var MOTIFS_SON = {
+    commande: [880, 1180],        // deux notes montantes, aigu, style "caisse"
+    reservation: [660, 990, 660], // trois notes, plus grave, style "carillon"
+  };
+
+  function jouerSonNotification(type) {
     try {
       var ctx = new (window.AudioContext || window.webkitAudioContext)();
-      [880, 1180].forEach(function (frequence, i) {
+      var notes = MOTIFS_SON[type] || MOTIFS_SON.commande;
+      notes.forEach(function (frequence, i) {
         var osc = ctx.createOscillator();
         var gain = ctx.createGain();
         osc.connect(gain);
@@ -384,7 +408,7 @@
         if (!res.ok) { surErreurPin(res); return; }
         var nombre = res.data.commandes.length;
         if (dernierNombreCommandes !== null && nombre > dernierNombreCommandes) {
-          jouerSonNotification();
+          jouerSonNotification('commande');
           var badge = document.getElementById('badgeCommandes');
           var pageCommandesActive = document.getElementById('pageCommandes').classList.contains('actif');
           if (!pageCommandesActive) {
