@@ -514,7 +514,10 @@
   // Actualisation automatique : toutes les 25 secondes, on revérifie les commandes
   // (avec son si une nouvelle arrive) et les réservations à venir.
   setInterval(function () {
-    if (document.getElementById('ecranDashboard').style.display === 'none') return;
+    // Ne rien faire tant qu'on n'est pas connecté (sinon les appels échoueraient en
+    // affichant "Code personnel invalide" sur l'écran de saisie sans raison).
+    if (!sessionStorage.getItem(PIN_STORAGE_KEY)) return;
+    if (document.getElementById('ecranDashboard').style.display !== 'block') return;
     chargerCommandes();
     chargerReservationsAVenir();
   }, 25000);
