@@ -110,8 +110,8 @@
       </div>
 
       <div class="champ">
-        <label for="couverts">Nombre de couverts</label>
-        <input type="number" id="couverts" min="1" max="20" value="2" required />
+        <label for="couverts">Nombre de couverts (12 maximum en ligne, appelez-nous au-delà)</label>
+        <input type="number" id="couverts" min="1" max="12" value="2" required />
       </div>
       <div class="champ">
         <label for="nom">Prénom / Nom</label>
@@ -147,7 +147,7 @@
   var API_BASE = 'https://api.lamezzalunaclamart.com/api';
   var HEURES = {
     dejeuner: ['12:00', '12:30', '13:00', '13:30', '14:00'],
-    diner: ['19:00', '19:30', '20:00', '20:30', '21:00', '21:30'],
+    diner: ['19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '20:45', '21:00', '21:15', '21:30'],
   };
 
   var champDate = document.getElementById('date');
