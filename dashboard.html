@@ -87,6 +87,11 @@
   .btn-mini:hover{ background:var(--rouge-vif); color:#fff; }
   .vide{ padding:30px; text-align:center; color:var(--charbon-doux); background:#fff; border-radius:10px; }
 
+  .ligne-a-recuperer{ background:#EAF6EE !important; }
+  .decompte{ font-variant-numeric:tabular-nums; margin-right:8px; color:var(--charbon-doux); }
+  .btn-terminer{ border-color:rgba(65,112,80,.4); color:var(--vert); }
+  .btn-terminer:hover{ background:var(--vert); color:#fff; }
+
   .ligne-nouvelle{ background:#FFF3CD !important; animation:pulseNouvelle 1.6s ease-in-out infinite; }
   @keyframes pulseNouvelle{ 0%,100%{ background:#FFF3CD; } 50%{ background:#FFE29A; } }
   .etiquette-nouveau{
@@ -155,10 +160,14 @@
       <div class="page actif" id="pageCommandes">
         <h1>Commandes (click &amp; collect)</h1>
         <div class="stats">
-          <div class="stat-carte"><div class="valeur" id="statCmdTotal">0</div><div class="label">Commandes</div></div>
+          <div class="stat-carte"><div class="valeur" id="statCmdEnCours">0</div><div class="label">En cours</div></div>
+          <div class="stat-carte"><div class="valeur" id="statCmdTotal">0</div><div class="label">Commandes (total)</div></div>
           <div class="stat-carte"><div class="valeur" id="statCmdCA">0 €</div><div class="label">Chiffre d'affaires</div></div>
         </div>
         <div id="tableCommandes"></div>
+
+        <h2 class="section-titre">Commandes terminées</h2>
+        <div id="tableCommandesTerminees"></div>
       </div>
 
     </div>
@@ -470,28 +479,93 @@
       });
   }
 
+  function ligneCommandeBase(c) {
+    var date = new Date(c.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    var detail = (c.lignes || []).map(function (l) { return l.quantite + '× ' + l.description; }).join(', ');
+    return '<td>' + date + '</td><td>' + escapeHtml(c.nom) + '</td><td>' + escapeHtml(c.telephone) + '</td>' +
+      '<td>' + c.montant.toFixed(2).replace('.', ',') + ' €</td>' +
+      '<td>' + escapeHtml(c.jourRetrait || '—') + ' ' + escapeHtml(c.heureRetrait || '') + '</td>' +
+      '<td style="white-space:normal;max-width:320px;">' + escapeHtml(detail) + '</td>';
+  }
+
   function afficherCommandes(commandes) {
+    var enCours = commandes.filter(function (c) { return c.statut !== 'terminee'; });
+    var terminees = commandes.filter(function (c) { return c.statut === 'terminee'; });
+
     var total = commandes.reduce(function (s, c) { return s + c.montant; }, 0);
+    document.getElementById('statCmdEnCours').textContent = enCours.length;
     document.getElementById('statCmdTotal').textContent = commandes.length;
     document.getElementById('statCmdCA').textContent = total.toFixed(2).replace('.', ',') + ' €';
 
     var container = document.getElementById('tableCommandes');
-    if (commandes.length === 0) {
-      container.innerHTML = '<div class="vide">Aucune commande pour l\'instant.</div>';
-      return;
+    if (enCours.length === 0) {
+      container.innerHTML = '<div class="vide">Aucune commande en cours.</div>';
+    } else {
+      var lignes = enCours.map(function (c) {
+        var actions;
+        if (c.statut === 'a_recuperer') {
+          var echeance = new Date(c.dateARecuperer).getTime() + 20 * 60000;
+          actions = '<span class="decompte" data-echeance="' + echeance + '"></span> ' +
+            '<button class="btn-mini btn-terminer" data-id="' + c.id + '" data-statut="terminee">Terminé</button>';
+        } else {
+          actions = '<button class="btn-mini" data-id="' + c.id + '" data-statut="a_recuperer">À récupérer</button>';
+        }
+        return '<tr' + (c.statut === 'a_recuperer' ? ' class="ligne-a-recuperer"' : '') + '>' +
+          ligneCommandeBase(c) + '<td>' + actions + '</td></tr>';
+      }).join('');
+      container.innerHTML = '<table><thead><tr><th>Date</th><th>Nom</th><th>Téléphone</th><th>Montant</th><th>Retrait</th><th>Détail</th><th>Statut</th></tr></thead><tbody>' + lignes + '</tbody></table>';
+
+      container.querySelectorAll('[data-statut]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          changerStatutCommande(btn.getAttribute('data-id'), btn.getAttribute('data-statut'));
+        });
+      });
+      majDecomptes();
     }
-    var lignes = commandes.map(function (c) {
-      var date = new Date(c.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-      var detail = (c.lignes || []).map(function (l) { return l.quantite + '× ' + l.description; }).join(', ');
-      return '<tr>' +
-        '<td>' + date + '</td><td>' + escapeHtml(c.nom) + '</td><td>' + escapeHtml(c.telephone) + '</td>' +
-        '<td>' + c.montant.toFixed(2).replace('.', ',') + ' €</td>' +
-        '<td>' + escapeHtml(c.jourRetrait || '—') + ' ' + escapeHtml(c.heureRetrait || '') + '</td>' +
-        '<td style="white-space:normal;max-width:320px;">' + escapeHtml(detail) + '</td>' +
-        '</tr>';
-    }).join('');
-    container.innerHTML = '<table><thead><tr><th>Date</th><th>Nom</th><th>Téléphone</th><th>Montant</th><th>Retrait</th><th>Détail</th></tr></thead><tbody>' + lignes + '</tbody></table>';
+
+    var containerTerminees = document.getElementById('tableCommandesTerminees');
+    if (terminees.length === 0) {
+      containerTerminees.innerHTML = '<div class="vide">Aucune commande terminée pour l\'instant.</div>';
+    } else {
+      var lignesTerminees = terminees.map(function (c) {
+        return '<tr style="opacity:.65;">' + ligneCommandeBase(c) + '</tr>';
+      }).join('');
+      containerTerminees.innerHTML = '<table><thead><tr><th>Date</th><th>Nom</th><th>Téléphone</th><th>Montant</th><th>Retrait</th><th>Détail</th></tr></thead><tbody>' + lignesTerminees + '</tbody></table>';
+    }
   }
+
+  function changerStatutCommande(id, statut) {
+    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+    fetch(API_BASE + '/commande?action=statut', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': pin },
+      body: JSON.stringify({ id: id, statut: statut }),
+    })
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) { alert(res.data && res.data.error ? res.data.error : 'Erreur'); return; }
+        chargerCommandes();
+      })
+      .catch(function () { alert('Erreur réseau.'); });
+  }
+
+  // Met à jour chaque seconde les décomptes de 20 minutes des commandes "à récupérer".
+  function majDecomptes() {
+    document.querySelectorAll('.decompte').forEach(function (el) {
+      var restant = Number(el.getAttribute('data-echeance')) - Date.now();
+      if (restant <= 0) {
+        el.textContent = 'Prête !';
+        el.style.color = 'var(--vert)';
+        el.style.fontWeight = '700';
+      } else {
+        var min = Math.floor(restant / 60000);
+        var sec = Math.floor((restant % 60000) / 1000);
+        el.textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+        el.style.fontWeight = '600';
+      }
+    });
+  }
+  setInterval(majDecomptes, 1000);
 
   document.getElementById('btnReparerIndex').addEventListener('click', function () {
     var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
