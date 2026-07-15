@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tableau de bord | La Mezza Luna</title>
+<link rel="icon" href="assets/img/logo-red.png" type="image/png" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --rouge-vif:#C70039; --rouge-profond:#900C27; --vert:#417050; --or:#F6C667;
+    --charbon:#1A1A1A; --charbon-doux:#3a352e; --creme:#F1F8FD;
+    --serif:'Cormorant Garamond', Georgia, serif; --sans:'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius:14px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:var(--sans); color:var(--charbon); background:var(--creme); line-height:1.6; }
+
+  /* Ecran PIN */
+  .pin-ecran{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .pin-carte{ background:#fff; border-radius:var(--radius); padding:32px; max-width:340px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.1); }
+  .pin-carte img{ width:48px; height:48px; margin:0 auto 14px; display:block; }
+  .pin-carte input{
+    width:100%; padding:13px; border:1.5px solid rgba(26,26,26,.16); border-radius:10px;
+    font-size:1.2rem; text-align:center; letter-spacing:.3em; margin-bottom:12px;
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; width:100%;
+    font-weight:600; font-size:.88rem; letter-spacing:.04em; text-transform:uppercase;
+    padding:13px 24px; border-radius:50px; cursor:pointer; border:none;
+    background:var(--rouge-vif); color:#fff;
+  }
+  .msg-erreur{ color:var(--rouge-vif); font-size:.88rem; margin-top:10px; }
+
+  /* Layout tableau de bord */
+  #ecranDashboard{ display:none; }
+  .layout{ display:flex; min-height:100vh; }
+  .sidebar{
+    width:220px; flex:none; background:#fff; border-right:1px solid rgba(26,26,26,.08);
+    padding:26px 16px; display:flex; flex-direction:column; gap:4px;
+  }
+  .sidebar .marque{ display:flex; align-items:center; gap:10px; padding:0 8px 24px; }
+  .sidebar .marque img{ width:34px; height:34px; }
+  .sidebar .marque span{ font-family:var(--serif); font-weight:700; font-size:1.15rem; }
+  .onglet{
+    display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:10px;
+    cursor:pointer; font-size:.92rem; font-weight:500; color:var(--charbon-doux);
+    border:none; background:none; text-align:left; width:100%;
+  }
+  .onglet:hover{ background:var(--creme); }
+  .onglet.actif{ background:var(--rouge-vif); color:#fff; font-weight:600; }
+  .onglet .puce{
+    display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px;
+    border-radius:50%; background:rgba(199,0,57,.12); color:var(--rouge-vif); font-size:.72rem; font-weight:700;
+    padding:0 5px; margin-left:auto;
+  }
+  .onglet.actif .puce{ background:rgba(255,255,255,.25); color:#fff; }
+
+  .contenu{ flex:1; padding:32px; overflow-x:auto; }
+  .page{ display:none; }
+  .page.actif{ display:block; }
+  h1{ font-family:var(--serif); font-size:1.7rem; margin-bottom:20px; }
+  h2.section-titre{ font-family:var(--serif); font-size:1.25rem; margin:28px 0 14px; }
+
+  .stats{ display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
+  .stat-carte{ background:#fff; border-radius:10px; padding:16px 20px; flex:1; min-width:140px; }
+  .stat-carte .valeur{ font-family:var(--serif); font-size:1.9rem; font-weight:700; color:var(--rouge-vif); }
+  .stat-carte .label{ font-size:.78rem; color:var(--charbon-doux); text-transform:uppercase; letter-spacing:.06em; }
+
+  .barre-date{ display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+  .barre-date input{ padding:10px 12px; border:1.5px solid rgba(26,26,26,.16); border-radius:8px; font-size:.95rem; }
+  .barre-date button{ padding:10px 16px; border-radius:8px; border:1.5px solid rgba(26,26,26,.16); background:#fff; cursor:pointer; font-size:.85rem; }
+
+  table{ width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; }
+  th, td{ text-align:left; padding:12px 14px; font-size:.88rem; border-bottom:1px solid rgba(26,26,26,.08); white-space:nowrap; }
+  th{ background:#fff; color:var(--charbon-doux); font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; }
+  td.pret{ color:var(--vert); font-weight:700; }
+  .btn-mini{
+    background:none; border:1.5px solid rgba(199,0,57,.3); color:var(--rouge-vif);
+    font-size:.74rem; font-weight:600; padding:5px 11px; border-radius:50px; cursor:pointer;
+    text-transform:uppercase; letter-spacing:.03em; white-space:nowrap;
+  }
+  .btn-mini:hover{ background:var(--rouge-vif); color:#fff; }
+  .vide{ padding:30px; text-align:center; color:var(--charbon-doux); background:#fff; border-radius:10px; }
+</style>
+</head>
+<body>
+
+<div class="pin-ecran" id="ecranPin">
+  <div class="pin-carte">
+    <img src="assets/img/logo-red.png" alt="La Mezza Luna" />
+    <p style="margin-bottom:12px;color:var(--charbon-doux);">Code personnel</p>
+    <input type="password" inputmode="numeric" id="champPin" placeholder="••••" />
+    <button class="btn" id="btnValiderPin">Accéder au tableau de bord</button>
+    <div class="msg-erreur" id="msgErreurPin" style="display:none;"></div>
+  </div>
+</div>
+
+<div id="ecranDashboard">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="marque"><img src="assets/img/logo-red.png" alt="" /><span>La Mezza Luna</span></div>
+      <button class="onglet actif" data-page="pageReservations">📅 Réservations</button>
+      <button class="onglet" data-page="pageFidelite">🎟️ Fidélité</button>
+      <button class="onglet" data-page="pageCommandes">🍕 Commandes</button>
+    </div>
+
+    <div class="contenu">
+
+      <!-- ===== RESERVATIONS ===== -->
+      <div class="page actif" id="pageReservations">
+        <h1>Réservations</h1>
+        <div class="barre-date">
+          <input type="date" id="champDateResa" />
+          <button id="btnAujourdhuiResa">Aujourd'hui</button>
+        </div>
+        <div class="stats">
+          <div class="stat-carte"><div class="valeur" id="statResaDejeuner">0</div><div class="label">Couverts déjeuner</div></div>
+          <div class="stat-carte"><div class="valeur" id="statResaDiner">0</div><div class="label">Couverts dîner</div></div>
+          <div class="stat-carte"><div class="valeur" id="statResaTotal">0</div><div class="label">Réservations actives</div></div>
+        </div>
+        <div id="tableResaJour"></div>
+
+        <h2 class="section-titre">Réservations à venir</h2>
+        <div id="tableResaAVenir"></div>
+      </div>
+
+      <!-- ===== FIDELITE ===== -->
+      <div class="page" id="pageFidelite">
+        <h1>Fidélité</h1>
+        <div class="stats">
+          <div class="stat-carte"><div class="valeur" id="statFidTotal">0</div><div class="label">Clients inscrits</div></div>
+          <div class="stat-carte"><div class="valeur" id="statFidPrets">0</div><div class="label">Récompenses prêtes</div></div>
+          <div class="stat-carte"><div class="valeur" id="statFidDonnees">0</div><div class="label">Récompenses données</div></div>
+        </div>
+        <div id="tableFidelite"></div>
+      </div>
+
+      <!-- ===== COMMANDES ===== -->
+      <div class="page" id="pageCommandes">
+        <h1>Commandes (click &amp; collect)</h1>
+        <div class="stats">
+          <div class="stat-carte"><div class="valeur" id="statCmdTotal">0</div><div class="label">Commandes</div></div>
+          <div class="stat-carte"><div class="valeur" id="statCmdCA">0 €</div><div class="label">Chiffre d'affaires</div></div>
+        </div>
+        <div id="tableCommandes"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  var API_BASE = 'https://api.lamezzalunaclamart.com/api';
+  var PIN_STORAGE_KEY = 'fidelite-staff-pin';
+
+  document.getElementById('btnValiderPin').addEventListener('click', function () {
+    var pin = document.getElementById('champPin').value.trim();
+    if (!pin) return;
+    sessionStorage.setItem(PIN_STORAGE_KEY, pin);
+    ouvrirDashboard();
+  });
+
+  var pinDejaEnregistre = sessionStorage.getItem(PIN_STORAGE_KEY);
+  if (pinDejaEnregistre) { ouvrirDashboard(); }
+
+  function ouvrirDashboard() {
+    document.getElementById('ecranPin').style.display = 'none';
+    document.getElementById('ecranDashboard').style.display = 'block';
+    chargerReservationsJour();
+    chargerFidelite();
+    chargerCommandes();
+  }
+
+  function surErreurPin(res) {
+    sessionStorage.removeItem(PIN_STORAGE_KEY);
+    document.getElementById('ecranDashboard').style.display = 'none';
+    document.getElementById('ecranPin').style.display = 'flex';
+    document.getElementById('msgErreurPin').textContent = res.data && res.data.error ? res.data.error : 'Erreur';
+    document.getElementById('msgErreurPin').style.display = 'block';
+  }
+
+  // ---- Navigation onglets ----
+  document.querySelectorAll('.onglet').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.onglet').forEach(function (b) { b.classList.remove('actif'); });
+      document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('actif'); });
+      btn.classList.add('actif');
+      document.getElementById(btn.getAttribute('data-page')).classList.add('actif');
+    });
+  });
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ================= RESERVATIONS =================
+  var champDateResa = document.getElementById('champDateResa');
+  var aujourdHui = new Date().toISOString().slice(0, 10);
+  champDateResa.value = aujourdHui;
+
+  document.getElementById('btnAujourdhuiResa').addEventListener('click', function () {
+    champDateResa.value = aujourdHui;
+    chargerReservationsJour();
+  });
+  champDateResa.addEventListener('change', chargerReservationsJour);
+
+  function chargerReservationsJour() {
+    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+    fetch(API_BASE + '/reservation?action=liste&date=' + champDateResa.value + '&pin=' + encodeURIComponent(pin))
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) { surErreurPin(res); return; }
+        afficherReservationsJour(res.data.reservations);
+        chargerReservationsAVenir();
+      });
+  }
+
+  function chargerReservationsAVenir() {
+    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+    fetch(API_BASE + '/reservation?action=aVenir&pin=' + encodeURIComponent(pin))
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) return;
+        afficherReservationsAVenir(res.data.reservations);
+      });
+  }
+
+  function afficherReservationsJour(reservations) {
+    var actives = reservations.filter(function (r) { return r.statut !== 'annulee'; });
+    var couvertsDejeuner = actives.filter(function (r) { return r.service === 'dejeuner'; }).reduce(function (s, r) { return s + r.couverts; }, 0);
+    var couvertsDiner = actives.filter(function (r) { return r.service === 'diner'; }).reduce(function (s, r) { return s + r.couverts; }, 0);
+    document.getElementById('statResaDejeuner').textContent = couvertsDejeuner;
+    document.getElementById('statResaDiner').textContent = couvertsDiner;
+    document.getElementById('statResaTotal').textContent = actives.length;
+
+    var container = document.getElementById('tableResaJour');
+    if (reservations.length === 0) {
+      container.innerHTML = '<div class="vide">Aucune réservation ce jour-là.</div>';
+      return;
+    }
+    var lignes = reservations.map(function (r) {
+      var nomService = r.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
+      var annulee = r.statut === 'annulee';
+      return '<tr' + (annulee ? ' style="opacity:.4;text-decoration:line-through;"' : '') + '>' +
+        '<td>' + r.heure + '</td><td>' + nomService + '</td><td>' + escapeHtml(r.nom) + '</td>' +
+        '<td>' + escapeHtml(r.telephone) + '</td><td>' + r.couverts + '</td><td>' + escapeHtml(r.note || '—') + '</td>' +
+        '<td>' + (annulee ? 'Annulée' : '<button class="btn-mini" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '" data-action="annuler-resa">Annuler</button>') + '</td>' +
+        '</tr>';
+    }).join('');
+    container.innerHTML = '<table><thead><tr><th>Heure</th><th>Service</th><th>Nom</th><th>Téléphone</th><th>Couverts</th><th>Note</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
+    brancherBoutonsAnnulerResa(container);
+  }
+
+  function afficherReservationsAVenir(reservations) {
+    var container = document.getElementById('tableResaAVenir');
+    if (reservations.length === 0) {
+      container.innerHTML = '<div class="vide">Aucune réservation à venir.</div>';
+      return;
+    }
+    var lignes = reservations.map(function (r) {
+      var nomService = r.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
+      var dateAffichee = new Date(r.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      return '<tr>' +
+        '<td>' + dateAffichee + '</td><td>' + r.heure + '</td><td>' + nomService + '</td><td>' + escapeHtml(r.nom) + '</td>' +
+        '<td>' + escapeHtml(r.telephone) + '</td><td>' + r.couverts + '</td><td>' + escapeHtml(r.note || '—') + '</td>' +
+        '<td><button class="btn-mini" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '" data-action="annuler-resa">Annuler</button></td>' +
+        '</tr>';
+    }).join('');
+    container.innerHTML = '<table><thead><tr><th>Date</th><th>Heure</th><th>Service</th><th>Nom</th><th>Téléphone</th><th>Couverts</th><th>Note</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
+    brancherBoutonsAnnulerResa(container);
+  }
+
+  function brancherBoutonsAnnulerResa(container) {
+    container.querySelectorAll('[data-action="annuler-resa"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-id');
+        var nom = btn.getAttribute('data-nom');
+        if (!confirm('Annuler la réservation de ' + nom + ' ?')) return;
+        var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+        fetch(API_BASE + '/reservation?action=annuler', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': pin },
+          body: JSON.stringify({ id: id }),
+        })
+          .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+          .then(function (res) {
+            if (!res.ok) { alert(res.data && res.data.error ? res.data.error : 'Erreur'); return; }
+            chargerReservationsJour();
+          });
+      });
+    });
+  }
+
+  // ================= FIDELITE =================
+  function chargerFidelite() {
+    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+    fetch(API_BASE + '/fidelite-liste?pin=' + encodeURIComponent(pin))
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) { surErreurPin(res); return; }
+        afficherFidelite(res.data.clients);
+      });
+  }
+
+  function afficherFidelite(clients) {
+    var prets = clients.filter(function (c) { return c.tampons >= 8; }).length;
+    var donnees = clients.reduce(function (s, c) { return s + (c.recompenses || 0); }, 0);
+    document.getElementById('statFidTotal').textContent = clients.length;
+    document.getElementById('statFidPrets').textContent = prets;
+    document.getElementById('statFidDonnees').textContent = donnees;
+
+    var container = document.getElementById('tableFidelite');
+    if (clients.length === 0) {
+      container.innerHTML = '<div class="vide">Aucun client inscrit pour l\'instant.</div>';
+      return;
+    }
+    var lignes = clients.map(function (c) {
+      var pret = c.tampons >= 8;
+      var date = new Date(c.dateInscription).toLocaleDateString('fr-FR');
+      return '<tr>' +
+        '<td>' + escapeHtml(c.nom) + '</td><td>' + escapeHtml(c.telephone) + '</td><td>' + escapeHtml(c.email || '—') + '</td>' +
+        '<td class="' + (pret ? 'pret' : '') + '">' + c.tampons + ' / 8' + (pret ? ' — prêt' : '') + '</td>' +
+        '<td>' + (c.recompenses || 0) + '</td><td>' + date + '</td>' +
+        '<td><button class="btn-mini" data-id="' + c.id + '" data-nom="' + escapeHtml(c.nom) + '" data-action="supprimer-fid">Supprimer</button></td>' +
+        '</tr>';
+    }).join('');
+    container.innerHTML = '<table><thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Tampons</th><th>Récompenses</th><th>Inscrit le</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
+
+    container.querySelectorAll('[data-action="supprimer-fid"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-id');
+        var nom = btn.getAttribute('data-nom');
+        if (!confirm('Supprimer définitivement la carte de ' + nom + ' ?')) return;
+        var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+        fetch(API_BASE + '/fidelite-supprimer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': pin },
+          body: JSON.stringify({ id: id }),
+        })
+          .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+          .then(function (res) {
+            if (!res.ok) { alert(res.data && res.data.error ? res.data.error : 'Erreur'); return; }
+            chargerFidelite();
+          });
+      });
+    });
+  }
+
+  // ================= COMMANDES =================
+  function chargerCommandes() {
+    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+    fetch(API_BASE + '/commande?action=liste&pin=' + encodeURIComponent(pin))
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) { surErreurPin(res); return; }
+        afficherCommandes(res.data.commandes);
+      });
+  }
+
+  function afficherCommandes(commandes) {
+    var total = commandes.reduce(function (s, c) { return s + c.montant; }, 0);
+    document.getElementById('statCmdTotal').textContent = commandes.length;
+    document.getElementById('statCmdCA').textContent = total.toFixed(2).replace('.', ',') + ' €';
+
+    var container = document.getElementById('tableCommandes');
+    if (commandes.length === 0) {
+      container.innerHTML = '<div class="vide">Aucune commande pour l\'instant.</div>';
+      return;
+    }
+    var lignes = commandes.map(function (c) {
+      var date = new Date(c.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      var detail = (c.lignes || []).map(function (l) { return l.quantite + '× ' + l.description; }).join(', ');
+      return '<tr>' +
+        '<td>' + date + '</td><td>' + escapeHtml(c.nom) + '</td><td>' + escapeHtml(c.telephone) + '</td>' +
+        '<td>' + c.montant.toFixed(2).replace('.', ',') + ' €</td>' +
+        '<td>' + escapeHtml(c.jourRetrait || '—') + ' ' + escapeHtml(c.heureRetrait || '') + '</td>' +
+        '<td style="white-space:normal;max-width:320px;">' + escapeHtml(detail) + '</td>' +
+        '</tr>';
+    }).join('');
+    container.innerHTML = '<table><thead><tr><th>Date</th><th>Nom</th><th>Téléphone</th><th>Montant</th><th>Retrait</th><th>Détail</th></tr></thead><tbody>' + lignes + '</tbody></table>';
+  }
+</script>
+
+</body>
+</html>
