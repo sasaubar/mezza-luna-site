@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Annuler ma réservation | La Mezza Luna Clamart</title>
+<link rel="icon" href="assets/img/logo-red.png" type="image/png" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --rouge-vif:#C70039;
+    --rouge-profond:#900C27;
+    --creme:#F1F8FD;
+    --charbon:#1A1A1A;
+    --charbon-doux:#3a352e;
+    --vert:#417050;
+    --serif:'Cormorant Garamond', Georgia, serif;
+    --sans:'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius:14px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family:var(--sans); color:var(--charbon); background:var(--creme); line-height:1.6;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .carte{
+    background:#fff; border-radius:var(--radius); max-width:420px; width:100%;
+    padding:34px 32px; box-shadow:0 20px 50px rgba(0,0,0,.12); text-align:center;
+  }
+  .lune-logo{ width:56px; height:56px; object-fit:contain; margin:0 auto 14px; display:block; }
+  .eyebrow{ font-weight:600; font-size:.74rem; letter-spacing:.24em; text-transform:uppercase; color:var(--rouge-vif); display:block; margin-bottom:8px; }
+  h1{ font-family:var(--serif); font-weight:700; font-size:1.6rem; line-height:1.15; margin-bottom:16px; color:var(--charbon); }
+  .details{ background:var(--creme); border-radius:10px; padding:16px 20px; text-align:left; font-size:.94rem; margin-bottom:22px; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; width:100%;
+    font-weight:600; font-size:.92rem; letter-spacing:.04em; text-transform:uppercase;
+    padding:15px 30px; border-radius:50px; cursor:pointer; border:none;
+    background:var(--rouge-vif); color:#fff; box-shadow:0 6px 18px rgba(199,0,57,.25);
+    transition:background .18s ease;
+  }
+  .btn:hover{ background:var(--rouge-profond); }
+  .btn:disabled{ opacity:.6; cursor:default; }
+  .chargement, .erreur, .succes{ font-size:.95rem; color:var(--charbon-doux); }
+  .erreur{ color:var(--rouge-vif); }
+  .succes{ color:var(--vert); font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="carte">
+  <img class="lune-logo" src="assets/img/logo-red.png" alt="La Mezza Luna" />
+  <span class="eyebrow">Ma réservation</span>
+  <div id="contenu">
+    <p class="chargement">Chargement...</p>
+  </div>
+</div>
+
+<script>
+  var API_BASE = 'https://api.lamezzalunaclamart.com/api';
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  var contenu = document.getElementById('contenu');
+
+  if (!id) {
+    contenu.innerHTML = '<p class="erreur">Lien invalide.</p>';
+  } else {
+    chargerDetail();
+  }
+
+  function chargerDetail() {
+    fetch(API_BASE + '/reservation?action=detail&id=' + encodeURIComponent(id))
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) { throw new Error(res.data && res.data.error ? res.data.error : 'Réservation introuvable'); }
+        afficherDetail(res.data);
+      })
+      .catch(function (err) {
+        contenu.innerHTML = '<p class="erreur">' + (err.message || 'Réservation introuvable') + '</p>';
+      });
+  }
+
+  function afficherDetail(reservation) {
+    var nomService = reservation.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
+    var dateAffichee = new Date(reservation.date + 'T12:00:00').toLocaleDateString('fr-FR', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    });
+
+    var details =
+      '<div class="details">' +
+      '<strong>' + dateAffichee + '</strong><br>' +
+      nomService + ', à ' + reservation.heure + '<br>' +
+      reservation.couverts + ' couvert' + (reservation.couverts > 1 ? 's' : '') +
+      '</div>';
+
+    if (reservation.statut === 'annulee') {
+      contenu.innerHTML = '<h1>Réservation déjà annulée</h1>' + details +
+        '<p class="succes">Cette réservation a déjà été annulée.</p>';
+      return;
+    }
+
+    contenu.innerHTML = '<h1>Bonjour ' + escapeHtml(reservation.nom) + '</h1>' + details +
+      '<button class="btn" id="btnAnnuler">Annuler ma réservation</button>';
+
+    document.getElementById('btnAnnuler').addEventListener('click', function () {
+      if (!confirm('Confirmer l\'annulation de cette réservation ?')) return;
+      annuler();
+    });
+  }
+
+  function annuler() {
+    var btn = document.getElementById('btnAnnuler');
+    btn.disabled = true;
+    btn.textContent = 'Annulation en cours...';
+
+    fetch(API_BASE + '/reservation?action=annulerClient', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id }),
+    })
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) { throw new Error(res.data && res.data.error ? res.data.error : 'Erreur'); }
+        contenu.innerHTML = '<h1>Réservation annulée</h1><p class="succes">C\'est fait, votre réservation a bien été annulée. À bientôt chez La Mezza Luna !</p>';
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = 'Annuler ma réservation';
+        alert(err.message || 'Une erreur est survenue, réessayez.');
+      });
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>

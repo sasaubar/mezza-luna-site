@@ -53,6 +53,8 @@
   }
   .btn-annuler:hover{ background:var(--rouge-vif); color:#fff; }
   .vide{ padding:30px; text-align:center; color:var(--charbon-doux); background:#fff; border-radius:10px; }
+
+  .section-titre{ font-family:var(--serif); font-size:1.3rem; margin:32px 0 14px; }
 </style>
 </head>
 <body>
@@ -77,6 +79,9 @@
       <div class="stat-carte"><div class="valeur" id="statTotal">0</div><div class="label">Réservations actives</div></div>
     </div>
     <div id="tableContainer"></div>
+
+    <h2 class="section-titre">Réservations à venir</h2>
+    <div id="tableContainerAVenir"></div>
   </div>
 </div>
 
@@ -116,7 +121,54 @@
           return;
         }
         afficherListe(res.data.reservations);
+        chargerAVenir();
       });
+  }
+
+  function chargerAVenir() {
+    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+    fetch(API_BASE + '/reservation?action=aVenir&pin=' + encodeURIComponent(pin))
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) return;
+        afficherListeAVenir(res.data.reservations);
+      });
+  }
+
+  function afficherListeAVenir(reservations) {
+    var container = document.getElementById('tableContainerAVenir');
+    if (reservations.length === 0) {
+      container.innerHTML = '<div class="vide">Aucune réservation à venir.</div>';
+      return;
+    }
+
+    var lignes = reservations.map(function (r) {
+      var nomService = r.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
+      var dateAffichee = new Date(r.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      return '<tr>' +
+        '<td>' + dateAffichee + '</td>' +
+        '<td>' + r.heure + '</td>' +
+        '<td>' + nomService + '</td>' +
+        '<td>' + escapeHtml(r.nom) + '</td>' +
+        '<td>' + escapeHtml(r.telephone) + '</td>' +
+        '<td>' + r.couverts + '</td>' +
+        '<td>' + escapeHtml(r.note || '—') + '</td>' +
+        '<td><button class="btn-annuler" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '">Annuler</button></td>' +
+        '</tr>';
+    }).join('');
+
+    container.innerHTML = '<table><thead><tr>' +
+      '<th>Date</th><th>Heure</th><th>Service</th><th>Nom</th><th>Téléphone</th><th>Couverts</th><th>Note</th><th></th>' +
+      '</tr></thead><tbody>' + lignes + '</tbody></table>';
+
+    container.querySelectorAll('.btn-annuler').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-id');
+        var nom = btn.getAttribute('data-nom');
+        if (!confirm('Annuler la réservation de ' + nom + ' ?')) return;
+        annulerReservation(id);
+      });
+    });
   }
 
   function afficherListe(reservations) {
