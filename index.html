@@ -1611,6 +1611,18 @@
     //   ctaTexte: 'Réserver ma table',
     //   ctaLien: '#reservation'
     // },
+    {
+      id: 'fermeture-ete-2026',
+      debut: '2026-07-15T00:00:00',
+      fin: '2026-08-17T00:00:00',
+      image: 'assets/img/facade.jpg',
+      eyebrow: 'Fermeture estivale',
+      titre: "Nous fermons pour l'été",
+      texte: "Toute l'équipe part se ressourcer avant de revenir vous accueillir en pleine forme !",
+      infosHtml: "Fermé du samedi 25 juillet au dimanche 16 août<br>Réouverture le <strong>lundi 17 août 2026</strong>",
+      ctaTexte: 'Nous suivre sur Instagram',
+      ctaLien: 'https://instagram.com/mezzalunaclamart'
+    },
   ];
 
   (function(){
@@ -1633,6 +1645,7 @@
     document.getElementById('eventPopupInfos').innerHTML = popup.infosHtml;
     cta.textContent = popup.ctaTexte;
     cta.href = popup.ctaLien;
+    if(popup.ctaLien.indexOf('http') === 0){ cta.target = '_blank'; cta.rel = 'noopener'; }
 
     function close(){ overlay.classList.remove('open'); sessionStorage.setItem(STORAGE_KEY, '1'); }
     if(!sessionStorage.getItem(STORAGE_KEY)){
