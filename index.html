@@ -715,6 +715,46 @@
   /* Décalage ancres pour nav fixe */
   section[id], div[id].form-section{ scroll-margin-top:96px; }
 
+  /* ===================================================================
+     POPUP ANNONCE (programmable, voir tableau POPUPS dans le script)
+     =================================================================== */
+  .event-popup-overlay{
+    position:fixed; inset:0; background:rgba(20,16,10,.62); z-index:999;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s ease;
+  }
+  .event-popup-overlay.open{ opacity:1; visibility:visible; }
+  .event-popup{
+    position:relative; background:var(--creme); border-radius:var(--radius);
+    max-width:440px; width:100%; text-align:center; overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.35);
+    transform:translateY(16px) scale(.97); transition:transform .3s ease;
+  }
+  .event-popup-overlay.open .event-popup{ transform:translateY(0) scale(1); }
+  .event-popup .event-popup-body{ padding:26px 32px 32px; }
+  .event-popup .event-popup-img{ width:100%; height:170px; object-fit:cover; display:block; }
+  .event-popup .event-popup-close{
+    position:absolute; top:12px; right:14px; background:rgba(0,0,0,.45); border:none;
+    width:32px; height:32px; border-radius:50%; line-height:1; color:#fff; cursor:pointer;
+    font-size:1.3rem; display:flex; align-items:center; justify-content:center; z-index:1;
+  }
+  .event-popup .eyebrow{ display:block; margin:18px 0 8px; }
+  .event-popup h3{
+    font-family:var(--serif); font-weight:700; font-size:1.7rem; line-height:1.15;
+    margin:0 0 14px; color:var(--charbon);
+  }
+  .event-popup p{ font-size:.98rem; color:var(--charbon-doux); line-height:1.6; margin:0 0 6px; }
+  .event-popup .event-popup-infos{
+    margin:16px 0 22px; padding:14px; background:#fff; border-radius:10px;
+    font-size:.92rem; color:var(--charbon-doux);
+  }
+  .event-popup .event-popup-infos strong{ color:var(--rouge-vif); }
+  .event-popup .btn{ width:100%; justify-content:center; }
+  @media (max-width:480px){
+    .event-popup .event-popup-body{ padding:22px 22px 26px; }
+    .event-popup h3{ font-size:1.4rem; }
+  }
+
 </style>
 </head>
 <body>
@@ -1531,6 +1571,78 @@
       if(e.key === 'Escape') close();
       if(e.key === 'ArrowLeft') prev();
       if(e.key === 'ArrowRight') next();
+    });
+  })();
+</script>
+
+<!-- ===================================================================
+     POPUPS PROGRAMMÉES
+     Ajoutez un objet dans ce tableau pour chaque annonce. La popup
+     s'affiche automatiquement entre "debut" et "fin" (une fois par
+     visite), et se désactive toute seule après la date de fin — pas
+     besoin de revenir modifier le site pour la retirer.
+     Format des dates : 'AAAA-MM-JJTHH:MM:SS'
+     =================================================================== -->
+<div class="event-popup-overlay" id="eventPopupOverlay">
+  <div class="event-popup" role="dialog" aria-modal="true" aria-labelledby="eventPopupTitle">
+    <button type="button" class="event-popup-close" id="eventPopupClose" aria-label="Fermer">&times;</button>
+    <img class="event-popup-img" id="eventPopupImg" src="" alt="" />
+    <div class="event-popup-body">
+      <span class="eyebrow" id="eventPopupEyebrow"></span>
+      <h3 id="eventPopupTitle"></h3>
+      <p id="eventPopupTexte"></p>
+      <div class="event-popup-infos" id="eventPopupInfos"></div>
+      <a href="#" class="btn btn-primary" id="eventPopupCta"></a>
+    </div>
+  </div>
+</div>
+<script>
+  var POPUPS = [
+    // Exemple (désactivé, gardé comme modèle) :
+    // {
+    //   id: 'demi-finale-14-juillet',
+    //   debut: '2026-07-10T00:00:00',
+    //   fin: '2026-07-15T00:00:00',
+    //   image: 'assets/img/diffusionmatch.jpg',
+    //   eyebrow: 'Ouverture exceptionnelle',
+    //   titre: "On ouvre pour la demi-finale !",
+    //   texte: "Venez vivre la demi-finale de l'Équipe de France avec nous, ambiance garantie sur grand écran.",
+    //   infosHtml: "Mardi 14 juillet &mdash; Ouverture à <strong>19h</strong><br>Coup d'envoi à <strong>21h</strong> &mdash; Service jusqu'à <strong>1h du matin</strong>",
+    //   ctaTexte: 'Réserver ma table',
+    //   ctaLien: '#reservation'
+    // },
+  ];
+
+  (function(){
+    var maintenant = new Date();
+    var popup = POPUPS.find(function(p){
+      return maintenant >= new Date(p.debut) && maintenant <= new Date(p.fin);
+    });
+    if(!popup) return;
+
+    var overlay = document.getElementById('eventPopupOverlay');
+    var closeBtn = document.getElementById('eventPopupClose');
+    var cta = document.getElementById('eventPopupCta');
+    var STORAGE_KEY = 'popup-' + popup.id;
+
+    document.getElementById('eventPopupImg').src = popup.image;
+    document.getElementById('eventPopupImg').alt = popup.titre;
+    document.getElementById('eventPopupEyebrow').textContent = popup.eyebrow;
+    document.getElementById('eventPopupTitle').textContent = popup.titre;
+    document.getElementById('eventPopupTexte').textContent = popup.texte;
+    document.getElementById('eventPopupInfos').innerHTML = popup.infosHtml;
+    cta.textContent = popup.ctaTexte;
+    cta.href = popup.ctaLien;
+
+    function close(){ overlay.classList.remove('open'); sessionStorage.setItem(STORAGE_KEY, '1'); }
+    if(!sessionStorage.getItem(STORAGE_KEY)){
+      setTimeout(function(){ overlay.classList.add('open'); }, 800);
+    }
+    closeBtn.addEventListener('click', close);
+    cta.addEventListener('click', close);
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && overlay.classList.contains('open')) close();
     });
   })();
 </script>
