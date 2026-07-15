@@ -104,15 +104,15 @@
   <div class="layout">
     <div class="sidebar">
       <div class="marque"><img src="assets/img/logo-red.png" alt="" /><span>La Mezza Luna</span></div>
-      <button class="onglet actif" data-page="pageReservations">📅 Réservations</button>
+      <button class="onglet actif" data-page="pageCommandes">🍕 Commandes<span class="puce" id="badgeCommandes" style="display:none;"></span></button>
+      <button class="onglet" data-page="pageReservations">📅 Réservations</button>
       <button class="onglet" data-page="pageFidelite">🎟️ Fidélité</button>
-      <button class="onglet" data-page="pageCommandes">🍕 Commandes<span class="puce" id="badgeCommandes" style="display:none;"></span></button>
     </div>
 
     <div class="contenu">
 
       <!-- ===== RESERVATIONS ===== -->
-      <div class="page actif" id="pageReservations">
+      <div class="page" id="pageReservations">
         <h1>Réservations</h1>
         <div class="barre-date">
           <input type="date" id="champDateResa" />
@@ -141,7 +141,7 @@
       </div>
 
       <!-- ===== COMMANDES ===== -->
-      <div class="page" id="pageCommandes">
+      <div class="page actif" id="pageCommandes">
         <h1>Commandes (click &amp; collect)</h1>
         <div class="stats">
           <div class="stat-carte"><div class="valeur" id="statCmdTotal">0</div><div class="label">Commandes</div></div>
