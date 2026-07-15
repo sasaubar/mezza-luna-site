@@ -204,6 +204,7 @@
         var badgeResa = document.getElementById('badgeReservations');
         badgeResa.style.display = 'none';
         badgeResa.textContent = '';
+        demarrerSurbrillanceReservations();
       }
     });
   });
@@ -237,7 +238,9 @@
   }
 
   var idsReservationsConnus = null;
-  var horodatageNouvellesResa = {}; // id -> moment de détection, pour la surbrillance 1 min
+  var idsNouvellesEnAttente = []; // détectées mais pas encore vues (le chrono n'a pas démarré)
+  var horodatageNouvellesResa = {}; // id -> moment où l'onglet a été ouvert, pour la surbrillance 1 min
+  var dernieresReservationsAVenir = [];
 
   function chargerReservationsAVenir() {
     var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
@@ -256,18 +259,31 @@
 
         if (nouveauxIds.length > 0) {
           jouerSonNotification('reservation');
-          nouveauxIds.forEach(function (id) { horodatageNouvellesResa[id] = Date.now(); });
-          var badge = document.getElementById('badgeReservations');
+          nouveauxIds.forEach(function (id) {
+            if (idsNouvellesEnAttente.indexOf(id) === -1) { idsNouvellesEnAttente.push(id); }
+          });
           var pageReservationsActive = document.getElementById('pageReservations').classList.contains('actif');
-          if (!pageReservationsActive) {
-            badge.textContent = '+' + nouveauxIds.length;
+          if (pageReservationsActive) {
+            // Déjà sur l'onglet : le chrono démarre tout de suite, pas besoin d'attendre un clic.
+            demarrerSurbrillanceReservations();
+          } else {
+            var badge = document.getElementById('badgeReservations');
+            badge.textContent = '+' + idsNouvellesEnAttente.length;
             badge.style.display = 'inline-flex';
           }
         }
 
         idsReservationsConnus = idsActuels;
+        dernieresReservationsAVenir = res.data.reservations;
         afficherReservationsAVenir(res.data.reservations);
       });
+  }
+
+  function demarrerSurbrillanceReservations() {
+    if (idsNouvellesEnAttente.length === 0) return;
+    idsNouvellesEnAttente.forEach(function (id) { horodatageNouvellesResa[id] = Date.now(); });
+    idsNouvellesEnAttente = [];
+    afficherReservationsAVenir(dernieresReservationsAVenir);
   }
 
   function afficherReservationsJour(reservations) {
