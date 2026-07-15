@@ -86,6 +86,13 @@
   }
   .btn-mini:hover{ background:var(--rouge-vif); color:#fff; }
   .vide{ padding:30px; text-align:center; color:var(--charbon-doux); background:#fff; border-radius:10px; }
+
+  .ligne-nouvelle{ background:#FFF3CD !important; animation:pulseNouvelle 1.6s ease-in-out infinite; }
+  @keyframes pulseNouvelle{ 0%,100%{ background:#FFF3CD; } 50%{ background:#FFE29A; } }
+  .etiquette-nouveau{
+    display:inline-block; background:var(--rouge-vif); color:#fff; font-size:.66rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.04em; padding:2px 7px; border-radius:50px; margin-left:6px;
+  }
 </style>
 </head>
 <body>
@@ -229,7 +236,8 @@
       });
   }
 
-  var dernierNombreReservations = null;
+  var idsReservationsConnus = null;
+  var horodatageNouvellesResa = {}; // id -> moment de détection, pour la surbrillance 1 min
 
   function chargerReservationsAVenir() {
     var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
@@ -237,17 +245,27 @@
       .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
       .then(function (res) {
         if (!res.ok) return;
-        var nombre = res.data.reservations.length;
-        if (dernierNombreReservations !== null && nombre > dernierNombreReservations) {
+        var idsActuels = res.data.reservations.map(function (r) { return r.id; });
+        var nouveauxIds = [];
+
+        if (idsReservationsConnus !== null) {
+          idsActuels.forEach(function (id) {
+            if (idsReservationsConnus.indexOf(id) === -1) { nouveauxIds.push(id); }
+          });
+        }
+
+        if (nouveauxIds.length > 0) {
           jouerSonNotification('reservation');
+          nouveauxIds.forEach(function (id) { horodatageNouvellesResa[id] = Date.now(); });
           var badge = document.getElementById('badgeReservations');
           var pageReservationsActive = document.getElementById('pageReservations').classList.contains('actif');
           if (!pageReservationsActive) {
-            badge.textContent = '+' + (nombre - dernierNombreReservations);
+            badge.textContent = '+' + nouveauxIds.length;
             badge.style.display = 'inline-flex';
           }
         }
-        dernierNombreReservations = nombre;
+
+        idsReservationsConnus = idsActuels;
         afficherReservationsAVenir(res.data.reservations);
       });
   }
@@ -287,14 +305,25 @@
     var lignes = reservations.map(function (r) {
       var nomService = r.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
       var dateAffichee = new Date(r.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-      return '<tr>' +
-        '<td>' + dateAffichee + '</td><td>' + r.heure + '</td><td>' + nomService + '</td><td>' + escapeHtml(r.nom) + '</td>' +
+      var horodatage = horodatageNouvellesResa[r.id];
+      var estNouvelle = horodatage && (Date.now() - horodatage < 60000);
+      return '<tr' + (estNouvelle ? ' class="ligne-nouvelle"' : '') + '>' +
+        '<td>' + dateAffichee + '</td><td>' + r.heure + '</td><td>' + nomService + '</td><td>' + escapeHtml(r.nom) + (estNouvelle ? ' <span class="etiquette-nouveau">Nouveau</span>' : '') + '</td>' +
         '<td>' + escapeHtml(r.telephone) + '</td><td>' + r.couverts + '</td><td>' + escapeHtml(r.note || '—') + '</td>' +
         '<td><button class="btn-mini" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '" data-action="annuler-resa">Annuler</button></td>' +
         '</tr>';
     }).join('');
     container.innerHTML = '<table><thead><tr><th>Date</th><th>Heure</th><th>Service</th><th>Nom</th><th>Téléphone</th><th>Couverts</th><th>Note</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
     brancherBoutonsAnnulerResa(container);
+
+    // Si des surbrillances sont actives, on programme un rafraîchissement dès qu'elles expirent (1 min).
+    var enAttente = reservations.some(function (r) {
+      var h = horodatageNouvellesResa[r.id];
+      return h && (Date.now() - h < 60000);
+    });
+    if (enAttente) {
+      setTimeout(function () { afficherReservationsAVenir(reservations); }, 2000);
+    }
   }
 
   function brancherBoutonsAnnulerResa(container) {
