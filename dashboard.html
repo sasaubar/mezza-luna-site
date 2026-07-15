@@ -106,7 +106,7 @@
       <div class="marque"><img src="assets/img/logo-red.png" alt="" /><span>La Mezza Luna</span></div>
       <button class="onglet actif" data-page="pageReservations">📅 Réservations</button>
       <button class="onglet" data-page="pageFidelite">🎟️ Fidélité</button>
-      <button class="onglet" data-page="pageCommandes">🍕 Commandes</button>
+      <button class="onglet" data-page="pageCommandes">🍕 Commandes<span class="puce" id="badgeCommandes" style="display:none;"></span></button>
     </div>
 
     <div class="contenu">
@@ -165,9 +165,6 @@
     ouvrirDashboard();
   });
 
-  var pinDejaEnregistre = sessionStorage.getItem(PIN_STORAGE_KEY);
-  if (pinDejaEnregistre) { ouvrirDashboard(); }
-
   function ouvrirDashboard() {
     document.getElementById('ecranPin').style.display = 'none';
     document.getElementById('ecranDashboard').style.display = 'block';
@@ -191,6 +188,11 @@
       document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('actif'); });
       btn.classList.add('actif');
       document.getElementById(btn.getAttribute('data-page')).classList.add('actif');
+      if (btn.getAttribute('data-page') === 'pageCommandes') {
+        var badge = document.getElementById('badgeCommandes');
+        badge.style.display = 'none';
+        badge.textContent = '';
+      }
     });
   });
 
@@ -354,12 +356,43 @@
   }
 
   // ================= COMMANDES =================
+  var dernierNombreCommandes = null;
+
+  function jouerSonNotification() {
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [880, 1180].forEach(function (frequence, i) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = frequence;
+        var debut = ctx.currentTime + i * 0.18;
+        gain.gain.setValueAtTime(0.18, debut);
+        gain.gain.exponentialRampToValueAtTime(0.001, debut + 0.3);
+        osc.start(debut);
+        osc.stop(debut + 0.3);
+      });
+    } catch (e) { /* audio non disponible, tant pis */ }
+  }
+
   function chargerCommandes() {
     var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
     fetch(API_BASE + '/commande?action=liste&pin=' + encodeURIComponent(pin))
       .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
       .then(function (res) {
         if (!res.ok) { surErreurPin(res); return; }
+        var nombre = res.data.commandes.length;
+        if (dernierNombreCommandes !== null && nombre > dernierNombreCommandes) {
+          jouerSonNotification();
+          var badge = document.getElementById('badgeCommandes');
+          var pageCommandesActive = document.getElementById('pageCommandes').classList.contains('actif');
+          if (!pageCommandesActive) {
+            badge.textContent = '+' + (nombre - dernierNombreCommandes);
+            badge.style.display = 'inline-flex';
+          }
+        }
+        dernierNombreCommandes = nombre;
         afficherCommandes(res.data.commandes);
       });
   }
@@ -386,6 +419,19 @@
     }).join('');
     container.innerHTML = '<table><thead><tr><th>Date</th><th>Nom</th><th>Téléphone</th><th>Montant</th><th>Retrait</th><th>Détail</th></tr></thead><tbody>' + lignes + '</tbody></table>';
   }
+
+  // Actualisation automatique : toutes les 25 secondes, on revérifie les commandes
+  // (avec son si une nouvelle arrive) et les réservations à venir.
+  setInterval(function () {
+    if (document.getElementById('ecranDashboard').style.display === 'none') return;
+    chargerCommandes();
+    chargerReservationsAVenir();
+  }, 25000);
+
+  // Connexion automatique si le code personnel est déjà mémorisé pour cette session.
+  // Placé en tout dernier, une fois que tout le reste du script ci-dessus est prêt.
+  var pinDejaEnregistre = sessionStorage.getItem(PIN_STORAGE_KEY);
+  if (pinDejaEnregistre) { ouvrirDashboard(); }
 </script>
 
 </body>
