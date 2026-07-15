@@ -134,6 +134,10 @@
 
         <h2 class="section-titre">Réservations à venir</h2>
         <div id="tableResaAVenir"></div>
+        <p style="margin-top:14px;">
+          <button class="btn-mini" id="btnReparerIndex">Réparer les données (une seule fois)</button>
+          <span id="msgReparation" style="font-size:.8rem;color:var(--charbon-doux);margin-left:8px;"></span>
+        </p>
       </div>
 
       <!-- ===== FIDELITE ===== -->
@@ -488,6 +492,24 @@
     }).join('');
     container.innerHTML = '<table><thead><tr><th>Date</th><th>Nom</th><th>Téléphone</th><th>Montant</th><th>Retrait</th><th>Détail</th></tr></thead><tbody>' + lignes + '</tbody></table>';
   }
+
+  document.getElementById('btnReparerIndex').addEventListener('click', function () {
+    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
+    var msg = document.getElementById('msgReparation');
+    msg.textContent = 'Réparation en cours...';
+    fetch(API_BASE + '/reservation?action=reparerIndex', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': pin },
+      body: '{}',
+    })
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) { msg.textContent = res.data && res.data.error ? res.data.error : 'Erreur'; return; }
+        msg.textContent = res.data.idsRepares + ' réservation(s) réparée(s) sur ' + res.data.joursScannes + ' jour(s).';
+        chargerReservationsAVenir();
+      })
+      .catch(function () { msg.textContent = 'Erreur réseau.'; });
+  });
 
   // Actualisation automatique : toutes les 25 secondes, on revérifie les commandes
   // (avec son si une nouvelle arrive) et les réservations à venir.
