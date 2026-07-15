@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Réserver une table | La Mezza Luna Clamart</title>
+<meta name="description" content="Réservez votre table au restaurant La Mezza Luna à Clamart, en ligne et sans frais." />
+<link rel="canonical" href="https://lamezzalunaclamart.com/reservation.html" />
+<link rel="icon" href="assets/img/logo-red.png" type="image/png" />
+<meta name="robots" content="noindex, follow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --rouge-vif:#C70039;
+    --rouge-profond:#900C27;
+    --or:#F6C667;
+    --creme:#F1F8FD;
+    --charbon:#1A1A1A;
+    --charbon-doux:#3a352e;
+    --vert:#417050;
+    --serif:'Cormorant Garamond', Georgia, serif;
+    --sans:'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius:14px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family:var(--sans); color:var(--charbon); background:var(--creme); line-height:1.6;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .carte{
+    background:#fff; border-radius:var(--radius); max-width:460px; width:100%;
+    padding:36px 32px; box-shadow:0 20px 50px rgba(0,0,0,.12); text-align:center;
+  }
+  .lune-logo{ width:56px; height:56px; object-fit:contain; margin:0 auto 14px; display:block; }
+  .eyebrow{ font-weight:600; font-size:.74rem; letter-spacing:.24em; text-transform:uppercase; color:var(--rouge-vif); display:block; margin-bottom:8px; }
+  h1{ font-family:var(--serif); font-weight:700; font-size:1.8rem; line-height:1.15; margin-bottom:6px; color:var(--charbon); }
+  p.lead{ font-size:.95rem; color:var(--charbon-doux); margin-bottom:26px; }
+
+  .champ{ margin-bottom:16px; text-align:left; }
+  .champ label{ display:block; font-size:.82rem; font-weight:600; color:var(--charbon-doux); margin-bottom:6px; }
+  .champ input, .champ select, .champ textarea{
+    width:100%; padding:13px 14px; border:1.5px solid rgba(26,26,26,.16); border-radius:10px;
+    font-family:var(--sans); font-size:1rem; color:var(--charbon); background:#fff;
+  }
+  .champ input:focus, .champ select:focus, .champ textarea:focus{ outline:none; border-color:var(--rouge-vif); }
+  .champ textarea{ resize:vertical; min-height:60px; }
+
+  .services{ display:flex; gap:10px; margin-bottom:16px; }
+  .service-btn{
+    flex:1; padding:12px 8px; border:1.5px solid rgba(26,26,26,.16); border-radius:10px;
+    text-align:center; cursor:pointer; font-size:.86rem; font-weight:600; color:var(--charbon-doux);
+    transition:all .15s ease; background:#fff;
+  }
+  .service-btn.actif{ border-color:var(--rouge-vif); background:#FFF5F5; color:var(--rouge-vif); }
+  .service-btn.complet{ opacity:.45; cursor:not-allowed; }
+  .service-btn .restant{ display:block; font-size:.74rem; margin-top:2px; font-weight:400; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; width:100%;
+    font-weight:600; font-size:.92rem; letter-spacing:.04em; text-transform:uppercase;
+    padding:15px 30px; border-radius:50px; cursor:pointer; border:none;
+    background:var(--rouge-vif); color:#fff; box-shadow:0 6px 18px rgba(199,0,57,.25);
+    margin-top:6px; transition:background .18s ease, transform .18s ease;
+  }
+  .btn:hover{ background:var(--rouge-profond); transform:translateY(-2px); }
+  .btn:disabled{ opacity:.6; cursor:default; transform:none; }
+  .msg-erreur{ color:var(--rouge-vif); font-size:.88rem; margin-top:10px; display:none; }
+  .msg-info{ font-size:.84rem; color:var(--charbon-doux); margin-bottom:14px; text-align:left; }
+
+  .confirmation{ display:none; }
+  .confirmation .icone{ font-size:2.6rem; margin-bottom:10px; }
+  .confirmation h1{ margin-bottom:14px; }
+  .confirmation .details{ background:var(--creme); border-radius:10px; padding:16px 20px; text-align:left; font-size:.94rem; margin-bottom:16px; }
+</style>
+</head>
+<body>
+
+<div class="carte">
+  <div id="ecranFormulaire">
+    <img class="lune-logo" src="assets/img/logo-red.png" alt="La Mezza Luna" />
+    <span class="eyebrow">Réservation en ligne</span>
+    <h1>Réserver une table</h1>
+    <p class="lead">Gratuit, sans engagement. Confirmation immédiate par email.</p>
+
+    <form id="formResa">
+      <div class="champ">
+        <label for="date">Date</label>
+        <input type="date" id="date" required />
+      </div>
+
+      <div class="msg-info" id="msgFerme" style="display:none;color:var(--rouge-vif);">Le restaurant est fermé à cette date.</div>
+
+      <div class="services" id="blocServices" style="display:none;">
+        <div class="service-btn" data-service="dejeuner">
+          Déjeuner
+          <span class="restant" id="restantDejeuner"></span>
+        </div>
+        <div class="service-btn" data-service="diner">
+          Dîner
+          <span class="restant" id="restantDiner"></span>
+        </div>
+      </div>
+
+      <div class="champ" id="champHeure" style="display:none;">
+        <label for="heure">Heure</label>
+        <select id="heure" required></select>
+      </div>
+
+      <div class="champ">
+        <label for="couverts">Nombre de couverts</label>
+        <input type="number" id="couverts" min="1" max="20" value="2" required />
+      </div>
+      <div class="champ">
+        <label for="nom">Prénom / Nom</label>
+        <input type="text" id="nom" autocomplete="name" required />
+      </div>
+      <div class="champ">
+        <label for="telephone">Téléphone</label>
+        <input type="tel" id="telephone" autocomplete="tel" placeholder="06 XX XX XX XX" required />
+      </div>
+      <div class="champ">
+        <label for="email">Email</label>
+        <input type="email" id="email" autocomplete="email" placeholder="vous@exemple.fr" required />
+      </div>
+      <div class="champ">
+        <label for="note">Précisions (allergie, occasion...) — facultatif</label>
+        <textarea id="note" maxlength="300"></textarea>
+      </div>
+
+      <button type="submit" class="btn" id="btnValider" disabled>Choisissez d'abord un service</button>
+      <div class="msg-erreur" id="msgErreur"></div>
+    </form>
+  </div>
+
+  <div class="confirmation" id="ecranConfirmation">
+    <div class="icone">✅</div>
+    <h1>Réservation confirmée !</h1>
+    <div class="details" id="detailsConfirmation"></div>
+    <p style="font-size:.88rem;color:var(--charbon-doux);">Un email de confirmation vient de vous être envoyé. Un empêchement ? Appelez-nous au 01 46 31 33 31.</p>
+  </div>
+</div>
+
+<script>
+  var API_BASE = 'https://api.lamezzalunaclamart.com/api';
+  var HEURES = {
+    dejeuner: ['12:00', '12:30', '13:00', '13:30', '14:00'],
+    diner: ['19:00', '19:30', '20:00', '20:30', '21:00', '21:30'],
+  };
+
+  var champDate = document.getElementById('date');
+  var blocServices = document.getElementById('blocServices');
+  var msgFerme = document.getElementById('msgFerme');
+  var champHeure = document.getElementById('champHeure');
+  var selectHeure = document.getElementById('heure');
+  var btnValider = document.getElementById('btnValider');
+  var serviceChoisi = null;
+
+  var aujourdHui = new Date().toISOString().slice(0, 10);
+  champDate.min = aujourdHui;
+
+  champDate.addEventListener('change', function () {
+    serviceChoisi = null;
+    champHeure.style.display = 'none';
+    btnValider.disabled = true;
+    btnValider.textContent = "Choisissez d'abord un service";
+    document.querySelectorAll('.service-btn').forEach(function (b) { b.classList.remove('actif', 'complet'); });
+
+    if (!champDate.value) return;
+
+    Promise.all(['dejeuner', 'diner'].map(function (service) {
+      return fetch(API_BASE + '/reservation?action=disponibilite&date=' + champDate.value + '&service=' + service)
+        .then(function (r) { return r.json(); })
+        .then(function (data) { return { service: service, data: data }; });
+    })).then(function (resultats) {
+      var auMoinsUnOuvert = resultats.some(function (r) { return r.data.ouvert; });
+      msgFerme.style.display = auMoinsUnOuvert ? 'none' : 'block';
+      blocServices.style.display = auMoinsUnOuvert ? 'flex' : 'none';
+
+      resultats.forEach(function (r) {
+        var btn = document.querySelector('.service-btn[data-service="' + r.service + '"]');
+        var restantEl = document.getElementById('restant' + r.service.charAt(0).toUpperCase() + r.service.slice(1));
+        if (!r.data.ouvert) {
+          btn.style.display = 'none';
+          return;
+        }
+        btn.style.display = 'block';
+        if (r.data.restant <= 0) {
+          btn.classList.add('complet');
+          restantEl.textContent = 'Complet';
+        } else {
+          btn.classList.remove('complet');
+          restantEl.textContent = r.data.restant + ' places restantes';
+        }
+      });
+    });
+  });
+
+  document.querySelectorAll('.service-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.classList.contains('complet')) return;
+      document.querySelectorAll('.service-btn').forEach(function (b) { b.classList.remove('actif'); });
+      btn.classList.add('actif');
+      serviceChoisi = btn.getAttribute('data-service');
+
+      selectHeure.innerHTML = HEURES[serviceChoisi].map(function (h) {
+        return '<option value="' + h + '">' + h + '</option>';
+      }).join('');
+      champHeure.style.display = 'block';
+      btnValider.disabled = false;
+      btnValider.textContent = 'Confirmer ma réservation';
+    });
+  });
+
+  document.getElementById('formResa').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var msgErreur = document.getElementById('msgErreur');
+    msgErreur.style.display = 'none';
+
+    btnValider.disabled = true;
+    btnValider.textContent = 'Envoi en cours...';
+
+    var payload = {
+      nom: document.getElementById('nom').value.trim(),
+      telephone: document.getElementById('telephone').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      date: champDate.value,
+      service: serviceChoisi,
+      heure: selectHeure.value,
+      couverts: document.getElementById('couverts').value,
+      note: document.getElementById('note').value.trim(),
+    };
+
+    fetch(API_BASE + '/reservation?action=creer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        if (!res.ok) { throw new Error(res.data && res.data.error ? res.data.error : 'Erreur'); }
+        afficherConfirmation(payload);
+      })
+      .catch(function (err) {
+        msgErreur.textContent = err.message || 'Une erreur est survenue, réessayez.';
+        msgErreur.style.display = 'block';
+        btnValider.disabled = false;
+        btnValider.textContent = 'Confirmer ma réservation';
+      });
+  });
+
+  function afficherConfirmation(payload) {
+    document.getElementById('ecranFormulaire').style.display = 'none';
+    var confirmation = document.getElementById('ecranConfirmation');
+    confirmation.style.display = 'block';
+    var nomService = payload.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
+    var dateAffichee = new Date(payload.date + 'T12:00:00').toLocaleDateString('fr-FR', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    });
+    document.getElementById('detailsConfirmation').innerHTML =
+      '<strong>' + dateAffichee + '</strong><br>' +
+      nomService + ', à ' + payload.heure + '<br>' +
+      payload.couverts + ' couvert' + (payload.couverts > 1 ? 's' : '');
+  }
+</script>
+
+</body>
+</html>
