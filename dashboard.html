@@ -98,6 +98,46 @@
     display:inline-block; background:var(--rouge-vif); color:#fff; font-size:.66rem; font-weight:700;
     text-transform:uppercase; letter-spacing:.04em; padding:2px 7px; border-radius:50px; margin-left:6px;
   }
+
+  /* Cartes commande : le détail (ce que le client a commandé) doit rester lisible en priorité */
+  .carte-commande{
+    background:#fff; border-radius:12px; padding:16px 18px; margin-bottom:12px;
+    border-left:4px solid var(--rouge-vif); box-shadow:0 1px 3px rgba(26,26,26,.06);
+  }
+  .carte-commande.a-recuperer{ border-left-color:var(--vert); background:#F5FBF7; }
+  .carte-commande.terminee{ opacity:.6; border-left-color:rgba(26,26,26,.15); }
+  .carte-commande.nouvelle{ animation:pulseCarte 1.6s ease-in-out infinite; }
+  @keyframes pulseCarte{ 0%,100%{ box-shadow:0 1px 3px rgba(26,26,26,.06); } 50%{ box-shadow:0 0 0 3px rgba(246,198,103,.6); } }
+  .carte-commande-tete{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .carte-commande-nom{ font-family:var(--serif); font-size:1.2rem; font-weight:700; }
+  .carte-commande-tel{ font-size:.82rem; color:var(--charbon-doux); margin-left:6px; }
+  .carte-commande-montant{ font-family:var(--serif); font-size:1.2rem; font-weight:700; color:var(--rouge-vif); white-space:nowrap; }
+  .carte-commande-detail{
+    font-size:1rem; line-height:1.6; margin-bottom:12px; color:var(--charbon);
+    background:var(--creme); border-radius:8px; padding:10px 12px;
+  }
+  .carte-commande-pied{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; font-size:.8rem; color:var(--charbon-doux); }
+  .carte-commande-pied .retrait{ font-weight:600; }
+  .carte-commande-pied .actions{ display:flex; align-items:center; gap:8px; margin-left:auto; }
+
+  /* Mobile : sidebar devient une barre horizontale, le contenu reste stable et lisible */
+  @media (max-width:768px){
+    .layout{ flex-direction:column; }
+    .sidebar{
+      width:100%; flex-direction:row; align-items:center; padding:10px 12px; gap:6px;
+      overflow-x:auto; -webkit-overflow-scrolling:touch;
+      border-right:none; border-bottom:1px solid rgba(26,26,26,.08);
+      position:sticky; top:0; z-index:10;
+    }
+    .sidebar .marque{ display:none; }
+    .onglet{ flex:none; padding:10px 14px; font-size:.9rem; white-space:nowrap; }
+    .contenu{ padding:18px 14px; overflow-x:hidden; }
+    h1{ font-size:1.4rem; }
+    .stats{ gap:8px; }
+    .stat-carte{ min-width:100px; padding:12px 14px; }
+    .stat-carte .valeur{ font-size:1.4rem; }
+    th, td{ padding:10px; font-size:.82rem; }
+  }
 </style>
 </head>
 <body>
@@ -159,10 +199,15 @@
       <!-- ===== COMMANDES ===== -->
       <div class="page actif" id="pageCommandes">
         <h1>Commandes (click &amp; collect)</h1>
+        <p id="dateAujourdhuiCommandes" style="color:var(--charbon-doux);font-size:.92rem;margin:-14px 0 18px;"></p>
+        <div class="barre-date">
+          <input type="date" id="champDateCommandes" />
+          <button id="btnAujourdhuiCommandes">Aujourd'hui</button>
+        </div>
         <div class="stats">
           <div class="stat-carte"><div class="valeur" id="statCmdEnCours">0</div><div class="label">En cours</div></div>
-          <div class="stat-carte"><div class="valeur" id="statCmdTotal">0</div><div class="label">Commandes (total)</div></div>
-          <div class="stat-carte"><div class="valeur" id="statCmdCA">0 €</div><div class="label">Chiffre d'affaires</div></div>
+          <div class="stat-carte"><div class="valeur" id="statCmdTotal">0</div><div class="label">Commandes ce jour-là</div></div>
+          <div class="stat-carte"><div class="valeur" id="statCmdCA">0 €</div><div class="label">Chiffre d'affaires ce jour-là</div></div>
         </div>
         <div id="tableCommandes"></div>
 
@@ -433,6 +478,17 @@
 
   // ================= COMMANDES =================
   var dernierNombreCommandes = null;
+  var toutesLesCommandes = [];
+  var champDateCommandes = document.getElementById('champDateCommandes');
+  var aujourdHuiCommandes = new Date().toISOString().slice(0, 10);
+  champDateCommandes.value = aujourdHuiCommandes;
+  document.getElementById('dateAujourdhuiCommandes').textContent =
+    'Nous sommes le ' + new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('btnAujourdhuiCommandes').addEventListener('click', function () {
+    champDateCommandes.value = aujourdHuiCommandes;
+    afficherCommandes(toutesLesCommandes);
+  });
+  champDateCommandes.addEventListener('change', function () { afficherCommandes(toutesLesCommandes); });
 
   var MOTIFS_SON = {
     commande: [880, 1180],        // deux notes montantes, aigu, style "caisse"
@@ -475,20 +531,18 @@
           }
         }
         dernierNombreCommandes = nombre;
-        afficherCommandes(res.data.commandes);
+        toutesLesCommandes = res.data.commandes;
+        afficherCommandes(toutesLesCommandes);
       });
   }
 
-  function ligneCommandeBase(c) {
-    var date = new Date(c.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    var detail = (c.lignes || []).map(function (l) { return l.quantite + '× ' + l.description; }).join(', ');
-    return '<td>' + date + '</td><td>' + escapeHtml(c.nom) + '</td><td>' + escapeHtml(c.telephone) + '</td>' +
-      '<td>' + c.montant.toFixed(2).replace('.', ',') + ' €</td>' +
-      '<td>' + escapeHtml(c.jourRetrait || '—') + ' ' + escapeHtml(c.heureRetrait || '') + '</td>' +
-      '<td style="white-space:normal;max-width:320px;">' + escapeHtml(detail) + '</td>';
+  function detailCommande(c) {
+    return (c.lignes || []).map(function (l) { return l.quantite + '× ' + l.description; }).join(', ');
   }
 
-  function afficherCommandes(commandes) {
+  function afficherCommandes(toutesCommandes) {
+    var jourChoisi = champDateCommandes.value || aujourdHuiCommandes;
+    var commandes = toutesCommandes.filter(function (c) { return (c.dateCreation || '').slice(0, 10) === jourChoisi; });
     var enCours = commandes.filter(function (c) { return c.statut !== 'terminee'; });
     var terminees = commandes.filter(function (c) { return c.statut === 'terminee'; });
 
@@ -501,19 +555,32 @@
     if (enCours.length === 0) {
       container.innerHTML = '<div class="vide">Aucune commande en cours.</div>';
     } else {
-      var lignes = enCours.map(function (c) {
+      container.innerHTML = enCours.map(function (c) {
+        var date = new Date(c.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
         var actions;
+        var classeStatut = '';
         if (c.statut === 'a_recuperer') {
+          classeStatut = ' a-recuperer';
           var echeance = new Date(c.dateARecuperer).getTime() + 20 * 60000;
-          actions = '<span class="decompte" data-echeance="' + echeance + '"></span> ' +
+          actions = '<span class="decompte" data-echeance="' + echeance + '"></span>' +
             '<button class="btn-mini btn-terminer" data-id="' + c.id + '" data-statut="terminee">Terminé</button>';
         } else {
           actions = '<button class="btn-mini" data-id="' + c.id + '" data-statut="a_recuperer">À récupérer</button>';
         }
-        return '<tr' + (c.statut === 'a_recuperer' ? ' class="ligne-a-recuperer"' : '') + '>' +
-          ligneCommandeBase(c) + '<td>' + actions + '</td></tr>';
+        return '<div class="carte-commande' + classeStatut + '">' +
+          '<div class="carte-commande-tete">' +
+            '<div><span class="carte-commande-nom">' + escapeHtml(c.nom) + '</span>' +
+              '<span class="carte-commande-tel">' + escapeHtml(c.telephone) + '</span></div>' +
+            '<div class="carte-commande-montant">' + c.montant.toFixed(2).replace('.', ',') + ' €</div>' +
+          '</div>' +
+          '<div class="carte-commande-detail">' + escapeHtml(detailCommande(c)) + '</div>' +
+          '<div class="carte-commande-pied">' +
+            '<span class="retrait">Retrait : ' + escapeHtml(c.jourRetrait || '—') + ' ' + escapeHtml(c.heureRetrait || '') + '</span>' +
+            '<span>Commandé le ' + date + '</span>' +
+            '<div class="actions">' + actions + '</div>' +
+          '</div>' +
+        '</div>';
       }).join('');
-      container.innerHTML = '<table><thead><tr><th>Date</th><th>Nom</th><th>Téléphone</th><th>Montant</th><th>Retrait</th><th>Détail</th><th>Statut</th></tr></thead><tbody>' + lignes + '</tbody></table>';
 
       container.querySelectorAll('[data-statut]').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -527,10 +594,21 @@
     if (terminees.length === 0) {
       containerTerminees.innerHTML = '<div class="vide">Aucune commande terminée pour l\'instant.</div>';
     } else {
-      var lignesTerminees = terminees.map(function (c) {
-        return '<tr style="opacity:.65;">' + ligneCommandeBase(c) + '</tr>';
+      containerTerminees.innerHTML = terminees.map(function (c) {
+        var date = new Date(c.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        return '<div class="carte-commande terminee">' +
+          '<div class="carte-commande-tete">' +
+            '<div><span class="carte-commande-nom">' + escapeHtml(c.nom) + '</span>' +
+              '<span class="carte-commande-tel">' + escapeHtml(c.telephone) + '</span></div>' +
+            '<div class="carte-commande-montant">' + c.montant.toFixed(2).replace('.', ',') + ' €</div>' +
+          '</div>' +
+          '<div class="carte-commande-detail">' + escapeHtml(detailCommande(c)) + '</div>' +
+          '<div class="carte-commande-pied">' +
+            '<span class="retrait">Retrait : ' + escapeHtml(c.jourRetrait || '—') + ' ' + escapeHtml(c.heureRetrait || '') + '</span>' +
+            '<span>Commandé le ' + date + '</span>' +
+          '</div>' +
+        '</div>';
       }).join('');
-      containerTerminees.innerHTML = '<table><thead><tr><th>Date</th><th>Nom</th><th>Téléphone</th><th>Montant</th><th>Retrait</th><th>Détail</th></tr></thead><tbody>' + lignesTerminees + '</tbody></table>';
     }
   }
 
