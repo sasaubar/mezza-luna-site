@@ -120,17 +120,25 @@
   .carte-commande-pied .retrait{ font-weight:600; }
   .carte-commande-pied .actions{ display:flex; align-items:center; gap:8px; margin-left:auto; }
 
-  /* Mobile : sidebar devient une barre horizontale, le contenu reste stable et lisible */
+  /* Les tableaux ne rétrécissent pas leurs colonnes (white-space:nowrap) : on laisse
+     chaque bloc de tableau défiler horizontalement plutôt que de couper son contenu. */
+  [id^="table"]{ overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px; }
+
+  /* Mobile : sidebar devient un menu déroulant (un seul onglet visible + flèche),
+     le contenu reste stable et lisible */
   @media (max-width:768px){
     .layout{ flex-direction:column; }
     .sidebar{
-      width:100%; flex-direction:row; align-items:center; padding:10px 12px; gap:6px;
-      overflow-x:auto; -webkit-overflow-scrolling:touch;
+      width:100%; flex-direction:column; align-items:stretch; padding:10px 12px; gap:6px;
       border-right:none; border-bottom:1px solid rgba(26,26,26,.08);
-      position:sticky; top:0; z-index:10;
+      position:sticky; top:0; z-index:10; background:#fff;
     }
     .sidebar .marque{ display:none; }
-    .onglet{ flex:none; padding:10px 14px; font-size:.9rem; white-space:nowrap; }
+    .onglet{ flex:none; padding:12px 14px; font-size:.95rem; white-space:nowrap; }
+    .onglet:not(.actif){ display:none; }
+    .sidebar.ouvert .onglet:not(.actif){ display:flex; }
+    .onglet.actif::after{ content:'▾'; margin-left:auto; font-size:.85rem; transition:transform .2s; }
+    .sidebar.ouvert .onglet.actif::after{ transform:rotate(180deg); }
     .contenu{ padding:18px 14px; overflow-x:hidden; }
     h1{ font-size:1.4rem; }
     .stats{ gap:8px; }
@@ -247,12 +255,21 @@
   }
 
   // ---- Navigation onglets ----
+  var sidebarEl = document.querySelector('.sidebar');
   document.querySelectorAll('.onglet').forEach(function (btn) {
     btn.addEventListener('click', function () {
+      var estMobile = window.matchMedia('(max-width:768px)').matches;
+      // Sur mobile, seul l'onglet actif est visible tant que le menu est fermé :
+      // cliquer dessus ouvre/ferme la liste déroulante au lieu de rien faire.
+      if (estMobile && btn.classList.contains('actif')) {
+        sidebarEl.classList.toggle('ouvert');
+        return;
+      }
       document.querySelectorAll('.onglet').forEach(function (b) { b.classList.remove('actif'); });
       document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('actif'); });
       btn.classList.add('actif');
       document.getElementById(btn.getAttribute('data-page')).classList.add('actif');
+      sidebarEl.classList.remove('ouvert');
       if (btn.getAttribute('data-page') === 'pageCommandes') {
         var badge = document.getElementById('badgeCommandes');
         badge.style.display = 'none';
