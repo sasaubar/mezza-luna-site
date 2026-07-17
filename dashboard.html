@@ -461,7 +461,10 @@
       container.innerHTML = '<div class="vide">Aucun client inscrit pour l\'instant.</div>';
       return;
     }
-    var lignes = clients.map(function (c) {
+    var clientsTries = clients.slice().sort(function (a, b) {
+      return new Date(b.dateInscription) - new Date(a.dateInscription);
+    });
+    var lignes = clientsTries.map(function (c) {
       var pret = c.tampons >= 8;
       var date = new Date(c.dateInscription).toLocaleDateString('fr-FR');
       return '<tr>' +
