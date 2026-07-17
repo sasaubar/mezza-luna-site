@@ -529,9 +529,25 @@
     reservation: [660, 990, 660], // trois notes, plus grave, style "carillon"
   };
 
+  // Sur mobile (Safari iOS notamment), un AudioContext créé sans interaction utilisateur
+  // reste "suspended" et ne joue aucun son. On garde donc un seul contexte, débloqué dès
+  // le premier clic sur la page (validation du PIN), puis réutilisé et relancé (resume)
+  // à chaque notification même quand elle est déclenchée par le rafraîchissement automatique.
+  var contexteAudio = null;
+  function obtenirContexteAudio() {
+    if (!contexteAudio) {
+      contexteAudio = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (contexteAudio.state === 'suspended') {
+      contexteAudio.resume();
+    }
+    return contexteAudio;
+  }
+  document.addEventListener('click', obtenirContexteAudio, { once: true });
+
   function jouerSonNotification(type) {
     try {
-      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var ctx = obtenirContexteAudio();
       var notes = MOTIFS_SON[type] || MOTIFS_SON.commande;
       notes.forEach(function (frequence, i) {
         var osc = ctx.createOscillator();
