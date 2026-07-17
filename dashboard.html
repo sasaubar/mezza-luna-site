@@ -120,10 +120,6 @@
   .carte-commande-pied .retrait{ font-weight:600; }
   .carte-commande-pied .actions{ display:flex; align-items:center; gap:8px; margin-left:auto; }
 
-  /* Les tableaux ne rétrécissent pas leurs colonnes (white-space:nowrap) : on laisse
-     chaque bloc de tableau défiler horizontalement plutôt que de couper son contenu. */
-  [id^="table"]{ overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px; }
-
   /* Mobile : sidebar devient un menu déroulant (un seul onglet visible + flèche),
      le contenu reste stable et lisible */
   @media (max-width:768px){
@@ -144,7 +140,25 @@
     .stats{ gap:8px; }
     .stat-carte{ min-width:100px; padding:12px 14px; }
     .stat-carte .valeur{ font-size:1.4rem; }
-    th, td{ padding:10px; font-size:.82rem; }
+
+    /* Tableaux Réservations / Fidélité : trop de colonnes pour un écran mobile,
+       donc chaque ligne devient une carte verticale (étiquette + valeur) plutôt
+       que de couper ou faire défiler horizontalement. */
+    table{ width:100%; border-spacing:0; }
+    thead{ display:none; }
+    tbody, tr{ display:block; width:100%; }
+    tr{ background:#fff; border-radius:10px; margin-bottom:10px; padding:4px 0; box-shadow:0 1px 3px rgba(26,26,26,.06); }
+    td{
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      padding:9px 14px; font-size:.86rem; white-space:normal; text-align:right; border-bottom:1px solid rgba(26,26,26,.06);
+    }
+    tr td:last-child{ border-bottom:none; }
+    td[data-label]::before{
+      content:attr(data-label); font-size:.7rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:.04em; color:var(--charbon-doux); text-align:left; flex:none;
+    }
+    td[data-label=""]::before{ display:none; }
+    td[data-label=""]{ justify-content:flex-end; }
   }
 </style>
 </head>
@@ -378,9 +392,9 @@
       var nomService = r.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
       var annulee = r.statut === 'annulee';
       return '<tr' + (annulee ? ' style="opacity:.4;text-decoration:line-through;"' : '') + '>' +
-        '<td>' + r.heure + '</td><td>' + nomService + '</td><td>' + escapeHtml(r.nom) + '</td>' +
-        '<td>' + escapeHtml(r.telephone) + '</td><td>' + r.couverts + '</td><td>' + escapeHtml(r.note || '—') + '</td>' +
-        '<td>' + (annulee ? 'Annulée' : '<button class="btn-mini" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '" data-action="annuler-resa">Annuler</button>') + '</td>' +
+        '<td data-label="Heure">' + r.heure + '</td><td data-label="Service">' + nomService + '</td><td data-label="Nom">' + escapeHtml(r.nom) + '</td>' +
+        '<td data-label="Téléphone">' + escapeHtml(r.telephone) + '</td><td data-label="Couverts">' + r.couverts + '</td><td data-label="Note">' + escapeHtml(r.note || '—') + '</td>' +
+        '<td data-label="">' + (annulee ? 'Annulée' : '<button class="btn-mini" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '" data-action="annuler-resa">Annuler</button>') + '</td>' +
         '</tr>';
     }).join('');
     container.innerHTML = '<table><thead><tr><th>Heure</th><th>Service</th><th>Nom</th><th>Téléphone</th><th>Couverts</th><th>Note</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
@@ -399,9 +413,9 @@
       var horodatage = horodatageNouvellesResa[r.id];
       var estNouvelle = horodatage && (Date.now() - horodatage < 60000);
       return '<tr' + (estNouvelle ? ' class="ligne-nouvelle"' : '') + '>' +
-        '<td>' + dateAffichee + '</td><td>' + r.heure + '</td><td>' + nomService + '</td><td>' + escapeHtml(r.nom) + (estNouvelle ? ' <span class="etiquette-nouveau">Nouveau</span>' : '') + '</td>' +
-        '<td>' + escapeHtml(r.telephone) + '</td><td>' + r.couverts + '</td><td>' + escapeHtml(r.note || '—') + '</td>' +
-        '<td><button class="btn-mini" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '" data-action="annuler-resa">Annuler</button></td>' +
+        '<td data-label="Date">' + dateAffichee + '</td><td data-label="Heure">' + r.heure + '</td><td data-label="Service">' + nomService + '</td><td data-label="Nom">' + escapeHtml(r.nom) + (estNouvelle ? ' <span class="etiquette-nouveau">Nouveau</span>' : '') + '</td>' +
+        '<td data-label="Téléphone">' + escapeHtml(r.telephone) + '</td><td data-label="Couverts">' + r.couverts + '</td><td data-label="Note">' + escapeHtml(r.note || '—') + '</td>' +
+        '<td data-label=""><button class="btn-mini" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '" data-action="annuler-resa">Annuler</button></td>' +
         '</tr>';
     }).join('');
     container.innerHTML = '<table><thead><tr><th>Date</th><th>Heure</th><th>Service</th><th>Nom</th><th>Téléphone</th><th>Couverts</th><th>Note</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
@@ -468,10 +482,10 @@
       var pret = c.tampons >= 8;
       var date = new Date(c.dateInscription).toLocaleDateString('fr-FR');
       return '<tr>' +
-        '<td>' + escapeHtml(c.nom) + '</td><td>' + escapeHtml(c.telephone) + '</td><td>' + escapeHtml(c.email || '—') + '</td>' +
-        '<td class="' + (pret ? 'pret' : '') + '">' + c.tampons + ' / 8' + (pret ? ' — prêt' : '') + '</td>' +
-        '<td>' + (c.recompenses || 0) + '</td><td>' + date + '</td>' +
-        '<td><button class="btn-mini" data-id="' + c.id + '" data-nom="' + escapeHtml(c.nom) + '" data-action="supprimer-fid">Supprimer</button></td>' +
+        '<td data-label="Nom">' + escapeHtml(c.nom) + '</td><td data-label="Téléphone">' + escapeHtml(c.telephone) + '</td><td data-label="Email">' + escapeHtml(c.email || '—') + '</td>' +
+        '<td data-label="Tampons" class="' + (pret ? 'pret' : '') + '">' + c.tampons + ' / 8' + (pret ? ' — prêt' : '') + '</td>' +
+        '<td data-label="Récompenses">' + (c.recompenses || 0) + '</td><td data-label="Inscrit le">' + date + '</td>' +
+        '<td data-label=""><button class="btn-mini" data-id="' + c.id + '" data-nom="' + escapeHtml(c.nom) + '" data-action="supprimer-fid">Supprimer</button></td>' +
         '</tr>';
     }).join('');
     container.innerHTML = '<table><thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Tampons</th><th>Récompenses</th><th>Inscrit le</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
