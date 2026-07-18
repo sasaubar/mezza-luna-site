@@ -80,9 +80,7 @@
 }
 </script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/fonts/fonts.css" />
 <style>
   /* ===================================================================
      LA MEZZA LUNA — Site complet
@@ -216,6 +214,14 @@
   .hero h1 em{ font-style:italic; color:var(--or); }
   .hero p.lead{ font-size:clamp(.9rem,1.8vw,1.05rem); font-weight:300; max-width:520px; color:rgba(255,255,255,.92); }
   .hero .actions{ display:flex; gap:14px; flex-wrap:wrap; margin-top:34px; }
+  .hero-canaux{ display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; }
+  .hero-canaux a{
+    display:inline-flex; align-items:center; gap:7px; background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.32); color:#fff; font-size:.8rem; font-weight:600;
+    letter-spacing:.02em; padding:9px 16px; border-radius:50px; backdrop-filter:blur(6px);
+    transition:background .2s, border-color .2s;
+  }
+  .hero-canaux a:hover{ background:rgba(255,255,255,.26); border-color:rgba(255,255,255,.5); text-decoration:none; }
   .hero .meta{ display:flex; gap:22px; flex-wrap:wrap; margin-top:38px; font-size:.82rem; color:rgba(255,255,255,.82); }
   .hero .meta span{ display:inline-flex; align-items:center; gap:8px; }
   .hero .meta b{ color:var(--or); font-weight:600; }
@@ -637,6 +643,8 @@
     .hero p.lead{ font-size:.9rem; line-height:1.65; margin-bottom:8px; }
     .hero .actions{ margin-top:22px; gap:10px; }
     .hero .actions .btn{ font-size:.78rem; padding:11px 18px; min-height:42px; }
+    .hero-canaux{ margin-top:14px; gap:8px; }
+    .hero-canaux a{ font-size:.74rem; padding:7px 13px; }
     .nav-cta .btn{ font-size:.76rem; padding:9px 14px; min-height:38px; }
     .hero .meta{ margin-top:22px; gap:14px; font-size:.78rem; }
     .hero-inner{ padding-top:130px; padding-bottom:54px; }
@@ -781,7 +789,7 @@
 <header class="site">
   <div class="wrap nav">
     <a href="#" class="brand" aria-label="La Mezza Luna — accueil">
-      <img class="lune-logo" src="assets/img/logo-red.png" alt="La Mezza Luna" />
+      <img height="441" width="440" class="lune-logo" src="assets/img/logo-red.png" alt="La Mezza Luna" />
       <span class="nom">La Mezza Luna<small>Clamart</small></span>
     </a>
 
@@ -803,10 +811,10 @@
      ================================================================ -->
 <section class="hero" style="padding:0;">
   <div class="hero-media">
-    <img class="media-fill" src="assets/img/salle2.jpg" alt="La salle du restaurant La Mezza Luna à Clamart" />
+    <img fetchpriority="high" height="1080" width="1440" class="media-fill" src="assets/img/salle2.jpg" alt="La salle du restaurant La Mezza Luna à Clamart" />
   </div>
   <div class="lune-watermark" aria-hidden="true">
-    <img src="assets/img/logo-cream.png" alt="" />
+    <img height="441" width="440" src="assets/img/logo-cream.png" alt="" />
   </div>
 
 <div class="wrap hero-inner">
@@ -816,6 +824,11 @@
     <div class="actions">
       <a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener" class="btn btn-primary">Réserver une table</a>
       <a href="/privatisation/" class="btn btn-ghost-light">Organiser un événement</a>
+    </div>
+    <div class="hero-canaux">
+      <a href="https://www.google.com/maps/reserve/v/dine/c/YYiXXWPKHZY" target="_blank" rel="noopener">🍽️ Sur place</a>
+      <a href="carte.html#commander">🛵 Livraison</a>
+      <a href="carte.html#commander">🥡 Pizza à emporter</a>
     </div>
     <div class="meta">
       <span><b>★ 4,5/5</b> sur Google</span>
@@ -847,8 +860,8 @@
       </div>
     </div>
     <div class="histoire-media reveal">
-      <div class="img-main"><img src="assets/img/gwen-et-stephane.jpg" alt="Gwen et Stéphane, vos hôtes à La Mezza Luna" /></div>
-      <div class="img-small"><img src="assets/img/equipe1.jpg" alt="L'équipe de La Mezza Luna" style="object-position:left center;" /></div>
+      <div class="img-main"><img loading="lazy" height="1000" width="1000" src="assets/img/gwen-et-stephane.jpg" alt="Gwen et Stéphane, vos hôtes à La Mezza Luna" /></div>
+      <div class="img-small"><img loading="lazy" height="904" width="1600" src="assets/img/equipe1.jpg" alt="L'équipe de La Mezza Luna" style="object-position:left center;" /></div>
     </div>
   </div>
 </section>
@@ -912,7 +925,7 @@
     </div>
     <div class="grid-plats">
       <article class="plat reveal">
-        <div class="plat-img"><img src="assets/img/tartare-de-saumon.jpg" alt="Tartare de saumon" /></div>
+        <div class="plat-img"><img loading="lazy" height="1013" width="1000" src="assets/img/tartare-de-saumon.jpg" alt="Tartare de saumon" /></div>
         <div class="plat-body">
           <span class="tag chef">Suggestion du chef</span>
           <div class="plat-top"><h3>Tartare de saumon</h3><span class="prix">18&nbsp;€</span></div>
@@ -920,7 +933,7 @@
         </div>
       </article>
       <article class="plat reveal">
-        <div class="plat-img"><img src="assets/img/coppa-formaggio.jpg" alt="Coppa e Formaggio" /></div>
+        <div class="plat-img"><img loading="lazy" height="792" width="1000" src="assets/img/coppa-formaggio.jpg" alt="Coppa e Formaggio" /></div>
         <div class="plat-body">
           <span class="tag">Pizza napolitaine</span>
           <div class="plat-top"><h3>Coppa e Formaggio</h3><span class="prix">16,50&nbsp;€</span></div>
@@ -928,7 +941,7 @@
         </div>
       </article>
       <article class="plat reveal">
-        <div class="plat-img"><img src="assets/img/tiramisu2.jpg" alt="Tiramisu maison" /></div>
+        <div class="plat-img"><img loading="lazy" height="2133" width="1600" src="assets/img/tiramisu2.jpg" alt="Tiramisu maison" /></div>
         <div class="plat-body">
           <span class="tag">Dolce</span>
           <div class="plat-top"><h3>Tiramisu maison</h3><span class="prix"></span></div>
@@ -954,7 +967,7 @@
      ================================================================ -->
 <section class="ardoise">
   <div class="lune-watermark-bg" aria-hidden="true">
-    <img src="assets/img/logo-cream.png" alt="" />
+    <img height="441" width="440" src="assets/img/logo-cream.png" alt="" />
   </div>
   <div class="wrap ardoise-inner">
     <div class="reveal">
@@ -1015,7 +1028,7 @@
     <div class="section-head reveal" style="max-width:100%;">
       <div class="evenements-split">
         <div class="evenements-img reveal">
-          <img src="assets/img/table.jpg" alt="Grande tablée privée à La Mezza Luna" />
+          <img loading="lazy" height="2674" width="1300" src="assets/img/table.jpg" alt="Grande tablée privée à La Mezza Luna" />
         </div>
         <div class="evenements-txt reveal">
           <span class="eyebrow" style="color:var(--or);">Événements &amp; privatisation</span>
@@ -1201,67 +1214,67 @@
     </div>
     <div class="galerie-masonry" id="galerieMasonry">
       <div class="galerie-item" data-index="0">
-        <img src="assets/img/galerie/salle-lumineuse.jpg" alt="La salle du restaurant La Mezza Luna à Clamart" loading="lazy" />
+        <img height="1080" width="1440" src="assets/img/galerie/salle-lumineuse.jpg" alt="La salle du restaurant La Mezza Luna à Clamart" loading="lazy" />
         <div class="galerie-caption"><span>La salle</span></div>
       </div>
       <div class="galerie-item" data-index="1">
-        <img src="assets/img/galerie/pizza-roquette.jpg" alt="Pizza maison roquette La Mezza Luna" loading="lazy" />
+        <img height="1351" width="1080" src="assets/img/galerie/pizza-roquette.jpg" alt="Pizza maison roquette La Mezza Luna" loading="lazy" />
         <div class="galerie-caption"><span>Coppa e Formaggio</span></div>
       </div>
       <div class="galerie-item" data-index="2">
-        <img src="assets/img/galerie/charcuterie.jpg" alt="Grande planche de charcuterie italienne" loading="lazy" />
+        <img height="2133" width="1600" src="assets/img/galerie/charcuterie.jpg" alt="Grande planche de charcuterie italienne" loading="lazy" />
         <div class="galerie-caption"><span>Planche de charcuterie</span></div>
       </div>
       <div class="galerie-item" data-index="3">
-        <img src="assets/img/galerie/bar.jpg" alt="Bar et ambiance du restaurant La Mezza Luna" loading="lazy" />
+        <img height="1080" width="1440" src="assets/img/galerie/bar.jpg" alt="Bar et ambiance du restaurant La Mezza Luna" loading="lazy" />
         <div class="galerie-caption"><span>L'ambiance</span></div>
       </div>
       <div class="galerie-item" data-index="4">
-        <img src="assets/img/galerie/irish-coffee.jpg" alt="Irish Coffee maison La Mezza Luna" loading="lazy" />
+        <img height="2133" width="1600" src="assets/img/galerie/irish-coffee.jpg" alt="Irish Coffee maison La Mezza Luna" loading="lazy" />
         <div class="galerie-caption"><span>Irish Coffee</span></div>
       </div>
       <div class="galerie-item" data-index="5">
-        <img src="assets/img/galerie/pizza-champignons.jpg" alt="Pizza 4 Saisons maison La Mezza Luna Clamart" loading="lazy" />
+        <img height="2133" width="1600" src="assets/img/galerie/pizza-champignons.jpg" alt="Pizza 4 Saisons maison La Mezza Luna Clamart" loading="lazy" />
         <div class="galerie-caption"><span>Pizza maison</span></div>
       </div>
       <div class="galerie-item" data-index="6">
-        <img src="assets/img/galerie/salade-nordique.jpg" alt="Salade nordique saumon La Mezza Luna" loading="lazy" />
+        <img height="728" width="738" src="assets/img/galerie/salade-nordique.jpg" alt="Salade nordique saumon La Mezza Luna" loading="lazy" />
         <div class="galerie-caption"><span>La Nordique</span></div>
       </div>
       <div class="galerie-item" data-index="7">
-        <img src="assets/img/galerie/table-dressée.jpg" alt="Table dressée restaurant La Mezza Luna Clamart" loading="lazy" />
+        <img height="1440" width="1152" src="assets/img/galerie/table-dressée.jpg" alt="Table dressée restaurant La Mezza Luna Clamart" loading="lazy" />
         <div class="galerie-caption"><span>Prêt pour vous recevoir</span></div>
       </div>
       <div class="galerie-item" data-index="8">
-        <img src="assets/img/galerie/pizza-ambiance.jpg" alt="Pizza roquette en salle La Mezza Luna" loading="lazy" />
+        <img height="2133" width="1600" src="assets/img/galerie/pizza-ambiance.jpg" alt="Pizza roquette en salle La Mezza Luna" loading="lazy" />
         <div class="galerie-caption"><span>Fait maison</span></div>
       </div>
       <div class="galerie-item" data-index="9">
-        <img src="assets/img/galerie/V2/cafe-gourmand.jpg" alt="Café gourmand La Mezza Luna Clamart" loading="lazy" />
+        <img height="2134" width="1600" src="assets/img/galerie/V2/cafe-gourmand.jpg" alt="Café gourmand La Mezza Luna Clamart" loading="lazy" />
         <div class="galerie-caption"><span>Café gourmand</span></div>
       </div>
       <div class="galerie-item" data-index="10">
-        <img src="assets/img/galerie/V2/calamars-arancini.JPG" alt="Calamars et arancini La Mezza Luna" loading="lazy" />
+        <img height="2133" width="1600" src="assets/img/galerie/V2/calamars-arancini.JPG" alt="Calamars et arancini La Mezza Luna" loading="lazy" />
         <div class="galerie-caption"><span>Calamars & arancini</span></div>
       </div>
       <div class="galerie-item" data-index="11">
-        <img src="assets/img/galerie/V2/cocktails.jpg" alt="Cocktails La Mezza Luna Clamart" loading="lazy" />
+        <img height="1087" width="1600" src="assets/img/galerie/V2/cocktails.jpg" alt="Cocktails La Mezza Luna Clamart" loading="lazy" />
         <div class="galerie-caption"><span>Nos cocktails</span></div>
       </div>
       <div class="galerie-item" data-index="12">
-        <img src="assets/img/galerie/V2/salade-de-poulpe.JPG" alt="Salade de poulpe La Mezza Luna" loading="lazy" />
+        <img height="2133" width="1600" src="assets/img/galerie/V2/salade-de-poulpe.JPG" alt="Salade de poulpe La Mezza Luna" loading="lazy" />
         <div class="galerie-caption"><span>Salade de poulpe</span></div>
       </div>
       <div class="galerie-item" data-index="13">
-        <img src="assets/img/galerie/V2/tagliatelles-aux-2-saumons.JPG" alt="Tagliatelles aux deux saumons La Mezza Luna" loading="lazy" />
+        <img height="2133" width="1600" src="assets/img/galerie/V2/tagliatelles-aux-2-saumons.JPG" alt="Tagliatelles aux deux saumons La Mezza Luna" loading="lazy" />
         <div class="galerie-caption"><span>Tagliatelles aux 2 saumons</span></div>
       </div>
       <div class="galerie-item" data-index="14">
-        <img src="assets/img/galerie/V2/tiramisu-mezza-luna.JPG" alt="Tiramisu maison La Mezza Luna Clamart" loading="lazy" />
+        <img height="2133" width="1600" src="assets/img/galerie/V2/tiramisu-mezza-luna.JPG" alt="Tiramisu maison La Mezza Luna Clamart" loading="lazy" />
         <div class="galerie-caption"><span>Tiramisu maison</span></div>
       </div>
       <div class="galerie-item" data-index="15">
-        <img src="assets/img/galerie/V2/une-selection-de-nos-vins.jpg" alt="Sélection de vins La Mezza Luna" loading="lazy" />
+        <img height="1467" width="1100" src="assets/img/galerie/V2/une-selection-de-nos-vins.jpg" alt="Sélection de vins La Mezza Luna" loading="lazy" />
         <div class="galerie-caption"><span>Notre sélection de vins</span></div>
       </div>
     </div>
@@ -1270,7 +1283,7 @@
 
 <!-- Bandeau cookies -->
 <div id="cookieBanner" role="region" aria-label="Gestion des cookies">
-  <p>Ce site utilise des cookies fonctionnels (mémorisation de vos préférences) et charge des polices via Google Fonts. Aucun cookie publicitaire ni traceur. <a href="/mentions-legales/#3-politique-de-cookies">En savoir plus</a></p>
+  <p>Ce site utilise uniquement des cookies fonctionnels (mémorisation de vos préférences). Aucun cookie publicitaire ni traceur. <a href="/mentions-legales/#3-politique-de-cookies">En savoir plus</a></p>
   <div class="cookie-btns">
     <button id="cookieRefuse">Refuser</button>
     <button id="cookieAccept">Accepter</button>
@@ -1328,7 +1341,7 @@
       <a href="https://maps.google.com/?q=18+rue+de+Versailles+92140+Clamart" target="_blank" rel="noopener" class="btn btn-ghost-light" style="margin-top:30px;">Itinéraire Google Maps</a>
     </div>
     <a class="map reveal" href="https://maps.google.com/?cid=2425424572278775231" target="_blank" rel="noopener" aria-label="Voir le restaurant sur Google Maps">
-      <img src="assets/img/exterieurnuit.jpg" alt="Façade du restaurant La Mezza Luna à Clamart" />
+      <img loading="lazy" height="1200" width="1600" src="assets/img/exterieurnuit.jpg" alt="Façade du restaurant La Mezza Luna à Clamart" />
     </a>
   </div>
 </section>
@@ -1348,7 +1361,7 @@
     <div class="foot-grid">
       <div>
         <div class="brand">
-          <img class="lune-logo" src="assets/img/logo-cream.png" alt="" style="width:48px;height:48px;object-fit:contain;" />
+          <img height="441" width="440" class="lune-logo" src="assets/img/logo-cream.png" alt="" style="width:48px;height:48px;object-fit:contain;" />
           <span class="nom serif" style="font-size:1.35rem;">La Mezza Luna</span>
         </div>
         <p class="foot-about">L'Italie à Clamart, faite maison, servie avec le cœur. Restaurant franco-italien familial, tenu par Stéphane &amp; Gwen depuis 2013.</p>
@@ -1371,6 +1384,7 @@
           <li><a href="carte.html">La carte complète</a></li>
           <li><a href="/pizzeria/">La pizzeria</a></li>
           <li><a href="#infos">Infos pratiques</a></li>
+          <li><a href="/faq/">Questions fréquentes</a></li>
           <li><a href="https://usellweb.co/fr/landingpage/la-mezza-luna" target="_blank" rel="noopener">Commander en ligne ↗</a></li>
         </ul>
       </div>
@@ -1406,7 +1420,7 @@
 
   <!-- Décoration fond -->
   <div class="drawer-deco" aria-hidden="true">
-    <div class="drawer-deco-logo"><img src="assets/img/logo-cream.png" alt="" /></div>
+    <div class="drawer-deco-logo"><img height="441" width="440" src="assets/img/logo-cream.png" alt="" /></div>
     <div class="drawer-deco-name">La Mezza Luna</div>
   </div>
 
