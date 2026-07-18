@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Page introuvable | La Mezza Luna Clamart</title>
+<meta name="description" content="Cette page n'existe pas ou plus. Retrouvez la carte, les infos et les coordonnées de La Mezza Luna, restaurant franco-italien à Clamart (92)." />
+<meta name="robots" content="noindex, follow" />
+<link rel="canonical" href="https://lamezzalunaclamart.com/" />
+<link rel="icon" href="/assets/img/logo-red.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --rouge-vif:#C70039; --rouge-profond:#900C27;
+    --or:#F6C667; --or-fonce:#d9a838;
+    --bleu-clair:#F1F8FD; --charbon:#1A1A1A; --charbon-doux:#3a352e;
+    --serif:'Cormorant Garamond', Georgia, serif;
+    --sans:'Montserrat', -apple-system, sans-serif;
+    --max:800px; --pad-x:clamp(20px,5vw,48px);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{ font-family:var(--sans); color:var(--charbon); background:#fff; line-height:1.75; -webkit-font-smoothing:antialiased; min-height:100vh; display:flex; flex-direction:column; }
+  a{ color:var(--rouge-vif); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  .wrap{ width:100%; max-width:var(--max); margin:0 auto; padding-left:var(--pad-x); padding-right:var(--pad-x); }
+  .btn{ display:inline-flex; align-items:center; gap:.5em; font-family:var(--sans); font-weight:600; font-size:.88rem; letter-spacing:.04em; text-transform:uppercase; padding:13px 26px; border-radius:50px; cursor:pointer; border:1.5px solid transparent; transition:background .18s, color .18s; }
+  .btn-primary{ background:var(--rouge-vif); color:#fff; }
+  .btn-primary:hover{ background:var(--rouge-profond); text-decoration:none; }
+  .btn-outline{ border-color:var(--rouge-vif); color:var(--rouge-vif); }
+  .btn-outline:hover{ background:var(--rouge-vif); color:#fff; text-decoration:none; }
+
+  /* Header */
+  header.site{ position:fixed; top:0; left:0; right:0; width:100%; z-index:100; background:rgba(255,255,255,.96); backdrop-filter:blur(14px); border-bottom:2px solid var(--rouge-vif); box-shadow:0 2px 24px rgba(0,0,0,.09); }
+  .nav{ display:flex; align-items:center; justify-content:space-between; gap:24px; padding:14px 0 18px; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand img{ width:44px; height:44px; object-fit:contain; background:rgba(255,255,255,.96); border-radius:50%; padding:3px; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+  .brand .nom{ font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--charbon); line-height:1.1; }
+  .brand .nom small{ display:block; font-family:var(--sans); font-size:.6rem; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--rouge-vif); }
+
+  /* Contenu 404 */
+  main.erreur{ flex:1; display:flex; align-items:center; background:var(--bleu-clair); padding:clamp(120px,16vw,150px) 0 clamp(60px,8vw,90px); text-align:center; }
+  .erreur .code{ font-family:var(--serif); font-size:clamp(4rem,14vw,7rem); font-weight:700; color:var(--rouge-vif); line-height:1; }
+  .erreur h1{ font-family:var(--serif); font-size:clamp(1.6rem,4vw,2.4rem); font-weight:700; color:var(--charbon); margin-top:8px; }
+  .erreur p{ font-size:1rem; color:var(--charbon-doux); max-width:480px; margin:16px auto 32px; }
+  .erreur .actions{ display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; }
+
+  /* Footer */
+  footer.site{ background:var(--charbon); color:rgba(255,255,255,.55); padding:28px 0; text-align:center; font-size:.78rem; }
+  footer.site a{ color:rgba(255,255,255,.7); }
+  footer.site a:hover{ color:#fff; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <nav class="nav">
+      <a href="/" class="brand">
+        <img src="/assets/img/logo-red.png" alt="Logo La Mezza Luna" />
+        <span class="nom">La Mezza Luna<small>Clamart</small></span>
+      </a>
+      <a href="/" class="btn btn-primary">Retour au site</a>
+    </nav>
+  </div>
+</header>
+
+<main class="erreur">
+  <div class="wrap">
+    <div class="code">404</div>
+    <h1>Cette page n'existe pas (ou plus)</h1>
+    <p>Le lien que vous avez suivi est peut-être ancien ou mal orthographié. Pas de souci : voici comment retrouver votre chemin jusqu'à nous.</p>
+    <div class="actions">
+      <a href="/carte.html" class="btn btn-primary">Voir la carte</a>
+      <a href="tel:+33146313331" class="btn btn-outline">01 46 31 33 31</a>
+      <a href="/" class="btn btn-outline">Accueil</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p>© 2026 La Mezza Luna · 18 rue de Versailles, 92140 Clamart · <a href="tel:+33146313331">01 46 31 33 31</a> · <a href="/mentions-legales/">Mentions légales</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
