@@ -93,6 +93,8 @@
 
   .stats{ display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
   .stat-carte{ background:#fff; border-radius:12px; padding:14px 16px; flex:1; min-width:110px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  [data-aller-vers]{ cursor:pointer; }
+  [data-aller-vers]:active{ opacity:.75; }
   .stat-carte .valeur{ font-family:var(--serif); font-size:1.65rem; font-weight:700; color:var(--rouge-vif); }
   .stat-carte .label{ font-size:.7rem; color:var(--charbon-doux); text-transform:uppercase; letter-spacing:.05em; margin-top:2px; overflow-wrap:break-word; word-break:break-word; }
 
@@ -270,14 +272,14 @@
       <div class="vue active" id="vue-accueil">
         <div class="section-titre">Aujourd'hui en un coup d'œil</div>
         <div class="stats">
-          <div class="stat-carte stat-rouge"><div class="valeur" id="accCouverts">–</div><div class="label">Couverts prévus</div></div>
-          <div class="stat-carte stat-or"><div class="valeur" id="accCa">–</div><div class="label">CA click &amp; collect</div></div>
-          <div class="stat-carte stat-vert"><div class="valeur" id="accPrets">–</div><div class="label">Récompenses prêtes</div></div>
+          <div class="stat-carte stat-rouge" data-aller-vers="resas"><div class="valeur" id="accCouverts">–</div><div class="label">Couverts prévus</div></div>
+          <div class="stat-carte stat-or" data-aller-vers="commandes"><div class="valeur" id="accCa">–</div><div class="label">CA click &amp; collect</div></div>
+          <div class="stat-carte stat-vert" data-aller-vers="fidelite"><div class="valeur" id="accPrets">–</div><div class="label">Récompenses prêtes</div></div>
         </div>
 
         <div class="section-titre">Click &amp; collect</div>
         <div class="section-soustitre">Répartition des commandes du jour</div>
-        <div class="carte">
+        <div class="carte" data-aller-vers="commandes">
           <div id="accDonutBloc" class="chargement">Chargement…</div>
         </div>
 
@@ -595,18 +597,22 @@
 
   /* ---------- Navigation par onglets ---------- */
   var ongletActif = 'accueil';
+  function ouvrirOnglet(cible){
+    ongletActif = cible;
+    document.querySelectorAll('.tab-item').forEach(function(b){ b.classList.remove('active'); });
+    var btnCible = document.querySelector('.tab-item[data-tab="' + cible + '"]');
+    if(btnCible) btnCible.classList.add('active');
+    document.querySelectorAll('.vue').forEach(function(v){ v.classList.remove('active'); });
+    document.getElementById('vue-' + cible).classList.add('active');
+    document.getElementById('titrePage').textContent = titresOnglets[cible];
+    chargerVueActive();
+    effacerBadgeNotif(cible);
+  }
   document.querySelectorAll('.tab-item').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var cible = btn.getAttribute('data-tab');
-      ongletActif = cible;
-      document.querySelectorAll('.tab-item').forEach(function(b){ b.classList.remove('active'); });
-      btn.classList.add('active');
-      document.querySelectorAll('.vue').forEach(function(v){ v.classList.remove('active'); });
-      document.getElementById('vue-' + cible).classList.add('active');
-      document.getElementById('titrePage').textContent = titresOnglets[cible];
-      chargerVueActive();
-      effacerBadgeNotif(cible);
-    });
+    btn.addEventListener('click', function(){ ouvrirOnglet(btn.getAttribute('data-tab')); });
+  });
+  document.querySelectorAll('[data-aller-vers]').forEach(function(el){
+    el.addEventListener('click', function(){ ouvrirOnglet(el.getAttribute('data-aller-vers')); });
   });
 
   function effacerBadgeNotif(cible){
@@ -1149,14 +1155,27 @@
     el.style.display = valeur > 0 ? 'flex' : 'none';
   }
 
+  // "aVenir" ne renvoie que les réservations à partir de demain (le serveur exclut
+  // volontairement aujourd'hui de cette liste) : on la combine avec la liste du jour
+  // pour ne rater aucune nouvelle réservation, y compris pour aujourd'hui même.
+  function recupererIdsReservationsActives(){
+    return Promise.all([
+      apiGetPin('/reservation?action=liste', { date: todayISO() }).catch(function(){ return { reservations: [] }; }),
+      apiGetPin('/reservation?action=aVenir').catch(function(){ return { reservations: [] }; }),
+    ]).then(function(resultats){
+      var toutes = (resultats[0].reservations || []).concat(resultats[1].reservations || []);
+      return toutes.filter(function(r){ return r.statut !== 'annulee'; }).map(function(r){ return r.id; });
+    });
+  }
+
   function initialiserVeilleNotifications(){
     // Premier relevé silencieux, pour ne pas jouer un son sur tout l'existant à la connexion.
     apiGetPin('/commande', { action: 'liste' }).then(function(data){
       dernierNombreCommandes = (data.commandes || []).length;
     }).catch(function(){});
-    apiGetPin('/reservation?action=aVenir').then(function(data){
-      idsReservationsConnus = (data.reservations || []).map(function(r){ return r.id; });
-    }).catch(function(){});
+    recupererIdsReservationsActives().then(function(ids){
+      idsReservationsConnus = ids;
+    });
 
     setInterval(verifierNouveautes, 25000);
   }
@@ -1179,8 +1198,7 @@
       dernierNombreCommandes = nombre;
     }).catch(function(){});
 
-    apiGetPin('/reservation?action=aVenir').then(function(data){
-      var idsActuels = (data.reservations || []).map(function(r){ return r.id; });
+    recupererIdsReservationsActives().then(function(idsActuels){
       var nouveaux = idsReservationsConnus === null ? [] : idsActuels.filter(function(id){ return idsReservationsConnus.indexOf(id) === -1; });
       if(nouveaux.length > 0){
         jouerSonNotification('reservation');
