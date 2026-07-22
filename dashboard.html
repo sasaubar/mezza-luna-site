@@ -31,15 +31,15 @@
     display:flex; flex-direction:column; position:relative; box-shadow:0 0 40px rgba(0,0,0,.15);
   }
 
-  /* ---------- Écran code personnel ---------- */
-  #ecranPin{
+  /* ---------- Écran de connexion ---------- */
+  #ecranConnexion{
     flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
     padding:32px; background:linear-gradient(160deg, var(--rouge-profond), var(--rouge-vif));
     min-height:100vh;
   }
-  #ecranPin img{ width:64px; height:64px; object-fit:contain; margin-bottom:14px; }
-  #ecranPin .eyebrow{ color:#fff; opacity:.85; font-size:.72rem; letter-spacing:.25em; text-transform:uppercase; margin-bottom:4px; }
-  #ecranPin h1{ font-family:var(--serif); color:#fff; font-size:1.6rem; margin-bottom:26px; }
+  #ecranConnexion img{ width:64px; height:64px; object-fit:contain; margin-bottom:14px; }
+  #ecranConnexion .eyebrow{ color:#fff; opacity:.85; font-size:.72rem; letter-spacing:.25em; text-transform:uppercase; margin-bottom:4px; }
+  #ecranConnexion h1{ font-family:var(--serif); color:#fff; font-size:1.6rem; margin-bottom:26px; }
   .carte-pin{ background:#fff; border-radius:var(--radius); padding:28px; width:100%; max-width:320px; text-align:center; }
   .carte-pin p{ color:var(--charbon-doux); margin-bottom:12px; font-size:.9rem; }
   .carte-pin input{
@@ -235,16 +235,18 @@
 
 <div id="app">
 
-  <!-- Écran code personnel -->
-  <div id="ecranPin">
+  <!-- Écran de connexion -->
+  <div id="ecranConnexion">
     <img src="https://lamezzalunaclamart.com/assets/img/logo-cream.png" alt="La Mezza Luna" />
     <div class="eyebrow">La Mezza Luna</div>
     <h1>Dashboard</h1>
     <div class="carte-pin">
-      <p>Code personnel</p>
-      <input type="password" inputmode="numeric" id="champPin" placeholder="••••" />
-      <button class="btn" id="btnValiderPin">Entrer</button>
-      <div class="msg-erreur" id="msgErreurPin" style="display:none;"></div>
+      <p>Identifiant</p>
+      <input type="text" id="champIdentifiant" autocomplete="username" style="letter-spacing:normal;text-align:left;" />
+      <p style="margin-top:10px;">Mot de passe</p>
+      <input type="password" id="champMotDePasse" autocomplete="current-password" style="letter-spacing:normal;text-align:left;" />
+      <button class="btn" id="btnConnexion" style="margin-top:4px;">Entrer</button>
+      <div class="msg-erreur" id="msgErreurConnexion" style="display:none;"></div>
     </div>
   </div>
 
@@ -259,9 +261,14 @@
             <h1 id="titrePage">Tableau de bord</h1>
           </div>
         </div>
-        <button class="btn-icon" id="btnDeconnexion" title="Déconnexion" aria-label="Déconnexion">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        </button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-icon" id="btnComptes" title="Comptes" aria-label="Gestion des comptes" style="display:none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </button>
+          <button class="btn-icon" id="btnDeconnexion" title="Déconnexion" aria-label="Déconnexion">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
       </div>
       <div class="topbar-sous" id="sousTitre">Espace pro</div>
     </div>
@@ -449,11 +456,30 @@
     </div>
   </div>
 
+  <!-- Feuille : gestion des comptes (admin) -->
+  <div class="overlay" id="overlayComptes">
+    <div class="feuille">
+      <div class="feuille-entete"><h2>Comptes</h2><button class="feuille-fermer" data-fermer="overlayComptes">×</button></div>
+      <div id="comptesListe" class="chargement">Chargement…</div>
+
+      <div class="section-titre">Nouveau compte</div>
+      <div id="formCompteMsg" class="msg-erreur" style="display:none;"></div>
+      <div class="champ"><label>Identifiant</label><input type="text" id="fCompteId" /></div>
+      <div class="champ"><label>Mot de passe (6 caractères minimum)</label><input type="text" id="fCompteMdp" /></div>
+      <div class="champ"><label>Rôle</label>
+        <select id="fCompteRole"><option value="staff">Équipe</option><option value="admin">Admin</option></select>
+      </div>
+      <button class="btn btn-vert" id="btnCreerCompte">Créer le compte</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
   var API_BASE = 'https://api.lamezzalunaclamart.com/api';
-  var PIN_KEY = 'fidelite-staff-pin';
+  var ID_KEY = 'staff-identifiant';
+  var MDP_KEY = 'staff-motdepasse';
+  var ROLE_KEY = 'staff-role';
   var REWARD_STAMPS = 8;
 
   /* ---------- Notifications sonores ---------- */
@@ -515,15 +541,18 @@
     return new Date().toISOString().slice(0, 10);
   }
 
-  function getPin(){ return sessionStorage.getItem(PIN_KEY) || ''; }
+  function getIdentifiants(){
+    return { identifiant: sessionStorage.getItem(ID_KEY) || '', motDePasse: sessionStorage.getItem(MDP_KEY) || '' };
+  }
+  function getRole(){ return sessionStorage.getItem(ROLE_KEY) || ''; }
 
-  // Endpoints GET protégés par code : le pin voyage en query (obligatoire pour
-  // fidelite-liste / fidelite-recherche qui ne lisent pas l'en-tête).
+  // Endpoints GET protégés par compte : identifiant + mot de passe en en-têtes.
   function apiGetPin(chemin, params){
     params = params || {};
-    params.pin = getPin();
     var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
-    return fetch(API_BASE + chemin + (chemin.indexOf('?') === -1 ? '?' : '&') + qs)
+    var url = API_BASE + chemin + (qs ? (chemin.indexOf('?') === -1 ? '?' : '&') + qs : '');
+    var creds = getIdentifiants();
+    return fetch(url, { headers: { 'X-Staff-Id': creds.identifiant, 'X-Staff-Password': creds.motDePasse } })
       .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
       .then(function(res){
         if(!res.ok){ gererErreurPin(res); throw new Error(res.data && res.data.error ? res.data.error : 'Erreur'); }
@@ -531,11 +560,12 @@
       });
   }
 
-  // Endpoints POST protégés par code : en-tête X-Staff-Pin.
+  // Endpoints POST protégés par compte : identifiant + mot de passe en en-têtes.
   function apiPostPin(chemin, body){
+    var creds = getIdentifiants();
     return fetch(API_BASE + chemin, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': getPin() },
+      headers: { 'Content-Type': 'application/json', 'X-Staff-Id': creds.identifiant, 'X-Staff-Password': creds.motDePasse },
       body: JSON.stringify(body || {}),
     })
       .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
@@ -545,7 +575,7 @@
       });
   }
 
-  // Endpoint public (pas de code requis).
+  // Endpoint public (pas de compte requis).
   function apiPublic(chemin, options){
     return fetch(API_BASE + chemin, options)
       .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
@@ -556,44 +586,67 @@
   }
 
   function gererErreurPin(res){
-    if(res.data && res.data.error === 'Code personnel invalide'){
-      sessionStorage.removeItem(PIN_KEY);
-      alert('Code personnel incorrect, merci de le ressaisir.');
+    if(res.data && (res.data.error === 'Identifiant ou mot de passe invalide' || res.data.error === 'Réservé aux comptes admin')){
+      sessionStorage.removeItem(ID_KEY);
+      sessionStorage.removeItem(MDP_KEY);
+      sessionStorage.removeItem(ROLE_KEY);
+      alert('Identifiant ou mot de passe incorrect, merci de vous reconnecter.');
       location.reload();
     }
   }
 
   /* ---------- Connexion ---------- */
-  document.getElementById('btnValiderPin').addEventListener('click', function(){
-    var pin = document.getElementById('champPin').value.trim();
-    if(!pin) return;
-    sessionStorage.setItem(PIN_KEY, pin);
-    demarrerApp();
-  });
-  document.getElementById('champPin').addEventListener('keydown', function(e){
-    if(e.key === 'Enter'){ document.getElementById('btnValiderPin').click(); }
-  });
-  document.getElementById('btnDeconnexion').addEventListener('click', function(){
-    sessionStorage.removeItem(PIN_KEY);
-    location.reload();
-  });
-
-  function demarrerApp(){
-    // On vérifie le code sur la liste fidélité : si elle répond, le code est bon.
-    apiGetPin('/fidelite-liste')
-      .then(function(){
-        document.getElementById('ecranPin').style.display = 'none';
+  function connecter(identifiant, motDePasse, depuisFormulaire){
+    fetch(API_BASE + '/auth?action=connexion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifiant: identifiant, motDePasse: motDePasse }),
+    })
+      .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+      .then(function(res){
+        if(!res.ok){ throw new Error(res.data && res.data.error ? res.data.error : 'Erreur'); }
+        sessionStorage.setItem(ID_KEY, identifiant);
+        sessionStorage.setItem(MDP_KEY, motDePasse);
+        sessionStorage.setItem(ROLE_KEY, res.data.role);
+        document.getElementById('ecranConnexion').style.display = 'none';
         document.getElementById('appPrincipal').style.display = 'flex';
+        document.getElementById('btnComptes').style.display = res.data.role === 'admin' ? 'flex' : 'none';
         chargerVueActive();
         initialiserVeilleNotifications();
       })
       .catch(function(err){
-        document.getElementById('msgErreurPin').textContent = err.message || 'Code incorrect';
-        document.getElementById('msgErreurPin').style.display = 'block';
+        if(depuisFormulaire){
+          document.getElementById('msgErreurConnexion').textContent = err.message || 'Identifiant ou mot de passe invalide';
+          document.getElementById('msgErreurConnexion').style.display = 'block';
+        } else {
+          sessionStorage.removeItem(ID_KEY);
+          sessionStorage.removeItem(MDP_KEY);
+          sessionStorage.removeItem(ROLE_KEY);
+        }
       });
   }
 
-  if(getPin()){ demarrerApp(); }
+  document.getElementById('btnConnexion').addEventListener('click', function(){
+    var identifiant = document.getElementById('champIdentifiant').value.trim();
+    var motDePasse = document.getElementById('champMotDePasse').value;
+    if(!identifiant || !motDePasse) return;
+    document.getElementById('msgErreurConnexion').style.display = 'none';
+    connecter(identifiant, motDePasse, true);
+  });
+  document.getElementById('champMotDePasse').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ document.getElementById('btnConnexion').click(); }
+  });
+  document.getElementById('btnDeconnexion').addEventListener('click', function(){
+    sessionStorage.removeItem(ID_KEY);
+    sessionStorage.removeItem(MDP_KEY);
+    sessionStorage.removeItem(ROLE_KEY);
+    location.reload();
+  });
+
+  var identifiantsEnregistres = getIdentifiants();
+  if(identifiantsEnregistres.identifiant && identifiantsEnregistres.motDePasse){
+    connecter(identifiantsEnregistres.identifiant, identifiantsEnregistres.motDePasse, false);
+  }
 
   /* ---------- Navigation par onglets ---------- */
   var ongletActif = 'accueil';
@@ -1026,7 +1079,7 @@
   document.getElementById('btnChercherTel').addEventListener('click', function(){
     var tel = document.getElementById('champTelephoneScan').value.trim();
     if(!tel) return;
-    apiGetPin('/fidelite-recherche', { telephone: tel }).then(function(data){
+    apiGetPin('/fidelite-carte', { action: 'recherche', telephone: tel }).then(function(data){
       idScanne = data.id;
       if(html5QrCode) html5QrCode.pause(true);
       afficherResultatScan(data);
@@ -1142,6 +1195,56 @@
   }
 
   /* =========================================================
+     COMPTES (admin)
+     ========================================================= */
+  document.getElementById('btnComptes').addEventListener('click', function(){
+    ouvrirFeuille('overlayComptes');
+    chargerComptes();
+  });
+
+  function chargerComptes(){
+    var conteneur = document.getElementById('comptesListe');
+    conteneur.innerHTML = '<div class="chargement">Chargement…</div>';
+    apiGetPin('/auth', { action: 'liste' }).then(function(data){
+      var comptes = (data.utilisateurs || []).filter(function(u){ return u.actif; });
+      if(comptes.length === 0){
+        conteneur.innerHTML = '<div class="vide">Aucun compte actif.</div>';
+        return;
+      }
+      conteneur.innerHTML = comptes.map(function(u){
+        return '<div class="commande-carte" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
+          '<div><div class="commande-nom">' + escapeHtml(u.identifiant) + '</div><div class="commande-heure">' + (u.role === 'admin' ? 'Admin' : 'Équipe') + '</div></div>' +
+          '<button class="btn-mini" data-id="' + escapeHtml(u.identifiant) + '">Désactiver</button>' +
+          '</div>';
+      }).join('');
+      conteneur.querySelectorAll('.btn-mini').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if(!confirm('Désactiver le compte "' + btn.getAttribute('data-id') + '" ?')) return;
+          apiPostPin('/auth?action=desactiver', { identifiant: btn.getAttribute('data-id') }).then(chargerComptes);
+        });
+      });
+    });
+  }
+
+  document.getElementById('btnCreerCompte').addEventListener('click', function(){
+    var body = {
+      identifiant: document.getElementById('fCompteId').value.trim(),
+      motDePasse: document.getElementById('fCompteMdp').value,
+      role: document.getElementById('fCompteRole').value,
+    };
+    var msg = document.getElementById('formCompteMsg');
+    msg.style.display = 'none';
+    apiPostPin('/auth?action=creer', body).then(function(){
+      document.getElementById('fCompteId').value = '';
+      document.getElementById('fCompteMdp').value = '';
+      chargerComptes();
+    }).catch(function(err){
+      msg.textContent = err.message || 'Erreur lors de la création';
+      msg.style.display = 'block';
+    });
+  });
+
+  /* =========================================================
      VEILLE : détection des nouveautés + son, même hors de l'onglet concerné
      ========================================================= */
   var dernierNombreCommandes = null;
@@ -1181,7 +1284,7 @@
   }
 
   function verifierNouveautes(){
-    if(!getPin()) return;
+    if(!getIdentifiants().identifiant) return;
     if(document.getElementById('appPrincipal').style.display !== 'flex') return;
 
     apiGetPin('/commande', { action: 'liste' }).then(function(data){
