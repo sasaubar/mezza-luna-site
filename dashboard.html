@@ -164,11 +164,17 @@
   .tab-item{
     flex:1; background:none; border:none; cursor:pointer; padding:9px 4px 10px; display:flex;
     flex-direction:column; align-items:center; gap:3px; color:var(--charbon-doux); font-family:var(--sans);
+    position:relative;
   }
   .tab-item svg{ width:21px; height:21px; }
   .tab-item span{ font-size:.66rem; font-weight:600; }
   .tab-item.active{ color:var(--rouge-vif); }
   .tab-item.active svg{ color:var(--rouge-vif); }
+  .badge-notif{
+    display:none; position:absolute; top:3px; left:50%; margin-left:2px; min-width:16px; height:16px;
+    background:var(--rouge-vif); color:#fff; border-radius:50%; font-size:.62rem; font-weight:700;
+    align-items:center; justify-content:center; padding:0 3px; line-height:1;
+  }
 
   /* ---------- Overlays / modales ---------- */
   .overlay{
@@ -310,6 +316,7 @@
         <span>Accueil</span>
       </button>
       <button class="tab-item" data-tab="resas">
+        <span class="badge-notif" id="badgeResas">0</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
         <span>Résas</span>
       </button>
@@ -318,6 +325,7 @@
         <span>Fidélité</span>
       </button>
       <button class="tab-item" data-tab="commandes">
+        <span class="badge-notif" id="badgeCommandes">0</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2l1.5 5M18 2l-1.5 5M4 7h16l-1.4 11.2A2 2 0 0 1 16.6 20H7.4a2 2 0 0 1-2-1.8L4 7z"/></svg>
         <span>Commandes</span>
       </button>
@@ -552,8 +560,14 @@
       document.getElementById('vue-' + cible).classList.add('active');
       document.getElementById('titrePage').textContent = titresOnglets[cible];
       chargerVueActive();
+      effacerBadgeNotif(cible);
     });
   });
+
+  function effacerBadgeNotif(cible){
+    if(cible === 'resas'){ pendingResas = 0; document.getElementById('badgeResas').style.display = 'none'; }
+    if(cible === 'commandes'){ pendingCommandes = 0; document.getElementById('badgeCommandes').style.display = 'none'; }
+  }
 
   function chargerVueActive(){
     if(ongletActif === 'accueil') chargerAccueil();
@@ -673,12 +687,14 @@
         return '<tr>' +
           '<td' + (annulee ? ' class="annulee"' : '') + '>' + r.heure + '</td>' +
           '<td' + (annulee ? ' class="annulee"' : '') + '>' + escapeHtml(r.nom) + '</td>' +
+          '<td' + (annulee ? ' class="annulee"' : '') + '>' + escapeHtml(r.telephone) + '</td>' +
           '<td' + (annulee ? ' class="annulee"' : '') + '>' + r.couverts + '</td>' +
           '<td' + (annulee ? ' class="annulee"' : '') + '>' + (r.service === 'dejeuner' ? 'Déj.' : 'Dîner') + '</td>' +
+          '<td' + (annulee ? ' class="annulee"' : '') + '>' + escapeHtml(r.note || '—') + '</td>' +
           '<td>' + (annulee ? '' : '<button class="btn-mini" data-id="' + r.id + '">Annuler</button>') + '</td>' +
           '</tr>';
       }).join('');
-      conteneur.innerHTML = '<table><thead><tr><th>Heure</th><th>Nom</th><th>Couv.</th><th>Service</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
+      conteneur.innerHTML = '<table><thead><tr><th>Heure</th><th>Nom</th><th>Tél.</th><th>Couv.</th><th>Service</th><th>Note</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
 
       conteneur.querySelectorAll('.btn-mini').forEach(function(btn){
         btn.addEventListener('click', function(){
@@ -748,6 +764,7 @@
         return '<tr>' +
           '<td>' + escapeHtml(c.nom) + '</td>' +
           '<td>' + escapeHtml(c.telephone) + '</td>' +
+          '<td>' + escapeHtml(c.email || '—') + '</td>' +
           '<td class="' + (pret ? 'pret' : '') + '">' + c.tampons + ' / ' + REWARD_STAMPS + (pret ? ' — prêt' : '') + '</td>' +
           '<td><div class="cellule-actions">' +
             (pret ? '<button class="btn-mini-vert" data-id="' + c.id + '" data-nom="' + escapeHtml(c.nom) + '">Échanger</button>' : '') +
@@ -755,7 +772,7 @@
           '</div></td>' +
           '</tr>';
       }).join('');
-      conteneur.innerHTML = '<table><thead><tr><th>Nom</th><th>Tél.</th><th>Tampons</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
+      conteneur.innerHTML = '<table><thead><tr><th>Nom</th><th>Tél.</th><th>Email</th><th>Tampons</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
 
       conteneur.querySelectorAll('.btn-mini').forEach(function(btn){
         btn.addEventListener('click', function(){
@@ -966,6 +983,14 @@
      ========================================================= */
   var dernierNombreCommandes = null;
   var idsReservationsConnus = null;
+  var pendingCommandes = 0;
+  var pendingResas = 0;
+
+  function afficherBadgeNotif(id, valeur){
+    var el = document.getElementById(id);
+    el.textContent = valeur;
+    el.style.display = valeur > 0 ? 'flex' : 'none';
+  }
 
   function initialiserVeilleNotifications(){
     // Premier relevé silencieux, pour ne pas jouer un son sur tout l'existant à la connexion.
@@ -987,7 +1012,12 @@
       var nombre = (data.commandes || []).length;
       if(dernierNombreCommandes !== null && nombre > dernierNombreCommandes){
         jouerSonNotification('commande');
-        if(ongletActif === 'commandes' || ongletActif === 'accueil') chargerVueActive();
+        if(ongletActif === 'commandes' || ongletActif === 'accueil'){
+          chargerVueActive();
+        } else {
+          pendingCommandes += nombre - dernierNombreCommandes;
+          afficherBadgeNotif('badgeCommandes', pendingCommandes);
+        }
       }
       dernierNombreCommandes = nombre;
     }).catch(function(){});
@@ -997,7 +1027,12 @@
       var nouveaux = idsReservationsConnus === null ? [] : idsActuels.filter(function(id){ return idsReservationsConnus.indexOf(id) === -1; });
       if(nouveaux.length > 0){
         jouerSonNotification('reservation');
-        if(ongletActif === 'resas' || ongletActif === 'accueil') chargerVueActive();
+        if(ongletActif === 'resas' || ongletActif === 'accueil'){
+          chargerVueActive();
+        } else {
+          pendingResas += nouveaux.length;
+          afficherBadgeNotif('badgeResas', pendingResas);
+        }
       }
       idsReservationsConnus = idsActuels;
     }).catch(function(){});
