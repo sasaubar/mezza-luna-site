@@ -2,527 +2,406 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tableau de bord | La Mezza Luna</title>
-<link rel="icon" href="assets/img/logo-red.png" type="image/png" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>Dashboard | La Mezza Luna</title>
+<link rel="icon" href="https://lamezzalunaclamart.com/assets/img/logo-red.png" type="image/png" />
 <meta name="robots" content="noindex, nofollow" />
-<link rel="stylesheet" href="/assets/fonts/fonts.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
   :root{
-    --rouge-vif:#C70039; --rouge-profond:#900C27; --vert:#417050; --or:#F6C667;
-    --charbon:#1A1A1A; --charbon-doux:#3a352e; --creme:#F1F8FD;
-    --serif:'Cormorant Garamond', Georgia, serif; --sans:'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    --rouge-vif:#C70039; --rouge-profond:#900C27; --or:#F6C667; --creme:#F1F8FD;
+    --vert:#417050; --charbon:#1A1A1A; --charbon-doux:#3a352e;
+    --serif:'Cormorant Garamond', Georgia, serif;
+    --sans:'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
     --radius:14px;
   }
-  *{ box-sizing:border-box; margin:0; padding:0; }
-  body{ font-family:var(--sans); color:var(--charbon); background:var(--creme); line-height:1.6; }
-
-  /* Ecran PIN */
-  .pin-ecran{
-    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html, body{ height:100%; }
+  body{
+    font-family:var(--sans); color:var(--charbon); background:#ddd; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
   }
-  .pin-carte{ background:#fff; border-radius:var(--radius); padding:32px; max-width:340px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.1); }
-  .pin-carte img{ width:48px; height:48px; margin:0 auto 14px; display:block; }
-  .pin-carte input{
+
+  /* Cadre "app" centré, format mobile */
+  #app{
+    max-width:480px; min-height:100vh; margin:0 auto; background:var(--creme);
+    display:flex; flex-direction:column; position:relative; box-shadow:0 0 40px rgba(0,0,0,.15);
+  }
+
+  /* ---------- Écran code personnel ---------- */
+  #ecranPin{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:32px; background:linear-gradient(160deg, var(--rouge-profond), var(--rouge-vif));
+    min-height:100vh;
+  }
+  #ecranPin img{ width:64px; height:64px; object-fit:contain; margin-bottom:14px; }
+  #ecranPin .eyebrow{ color:#fff; opacity:.85; font-size:.72rem; letter-spacing:.25em; text-transform:uppercase; margin-bottom:4px; }
+  #ecranPin h1{ font-family:var(--serif); color:#fff; font-size:1.6rem; margin-bottom:26px; }
+  .carte-pin{ background:#fff; border-radius:var(--radius); padding:28px; width:100%; max-width:320px; text-align:center; }
+  .carte-pin p{ color:var(--charbon-doux); margin-bottom:12px; font-size:.9rem; }
+  .carte-pin input{
     width:100%; padding:13px; border:1.5px solid rgba(26,26,26,.16); border-radius:10px;
-    font-size:1.2rem; text-align:center; letter-spacing:.3em; margin-bottom:12px;
+    font-size:1.3rem; text-align:center; letter-spacing:.35em; margin-bottom:14px;
   }
+  .msg-erreur{ color:var(--rouge-vif); font-size:.85rem; margin-top:10px; }
+
   .btn{
-    display:inline-flex; align-items:center; justify-content:center; width:100%;
-    font-weight:600; font-size:.88rem; letter-spacing:.04em; text-transform:uppercase;
-    padding:13px 24px; border-radius:50px; cursor:pointer; border:none;
-    background:var(--rouge-vif); color:#fff;
+    display:inline-flex; align-items:center; justify-content:center; gap:6px; width:100%;
+    font-family:var(--sans); font-weight:600; font-size:.86rem; letter-spacing:.03em; text-transform:uppercase;
+    padding:13px 22px; border-radius:50px; cursor:pointer; border:none;
+    background:var(--rouge-vif); color:#fff; transition:background .15s ease;
   }
-  .msg-erreur{ color:var(--rouge-vif); font-size:.88rem; margin-top:10px; }
+  .btn:hover{ background:var(--rouge-profond); }
+  .btn-vert{ background:var(--vert); }
+  .btn-vert:hover{ background:#345a3f; }
+  .btn-ghost{ background:#fff; color:var(--charbon); border:1.5px solid rgba(26,26,26,.15); }
+  .btn-ghost:hover{ background:#f5f5f5; }
+  .btn-petit{ width:auto; padding:9px 16px; font-size:.74rem; }
 
-  /* Layout tableau de bord */
-  #ecranDashboard{ display:none; }
-  .layout{ display:flex; min-height:100vh; }
-  .sidebar{
-    width:280px; flex:none; background:#fff; border-right:1px solid rgba(26,26,26,.08);
-    padding:32px 20px; display:flex; flex-direction:column; gap:6px;
+  /* ---------- App principale ---------- */
+  #appPrincipal{ display:none; flex-direction:column; min-height:100vh; }
+
+  .topbar{
+    background:linear-gradient(135deg, var(--rouge-profond), var(--rouge-vif));
+    color:#fff; padding:18px 20px 20px; position:relative;
   }
-  .sidebar .marque{ display:flex; align-items:center; gap:12px; padding:0 8px 30px; }
-  .sidebar .marque img{ width:42px; height:42px; }
-  .sidebar .marque span{ font-family:var(--serif); font-weight:700; font-size:1.4rem; }
-  .onglet{
-    display:flex; align-items:center; gap:12px; padding:16px 18px; border-radius:12px;
-    cursor:pointer; font-size:1.05rem; font-weight:500; color:var(--charbon-doux);
-    border:none; background:none; text-align:left; width:100%;
+  .topbar-ligne{ display:flex; align-items:center; justify-content:space-between; }
+  .topbar-marque{ display:flex; align-items:center; gap:12px; }
+  .topbar-marque img{ width:42px; height:42px; object-fit:contain; border-radius:50%; background:rgba(255,255,255,.15); padding:6px; }
+  .topbar-eyebrow{ font-size:.66rem; letter-spacing:.22em; text-transform:uppercase; opacity:.8; }
+  .topbar h1{ font-family:var(--serif); font-size:1.45rem; font-weight:700; }
+  .btn-icon{
+    width:38px; height:38px; border-radius:50%; border:none; background:rgba(255,255,255,.18); color:#fff;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;
   }
-  .onglet:hover{ background:var(--creme); }
-  .onglet.actif{ background:var(--rouge-vif); color:#fff; font-weight:600; }
-  .onglet .puce{
-    display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px;
-    border-radius:50%; background:rgba(199,0,57,.12); color:var(--rouge-vif); font-size:.72rem; font-weight:700;
-    padding:0 5px; margin-left:auto;
-  }
-  .onglet.actif .puce{ background:rgba(255,255,255,.25); color:#fff; }
+  .btn-icon:hover{ background:rgba(255,255,255,.3); }
+  .topbar-sous{ margin-top:10px; font-size:.86rem; opacity:.9; }
 
-  .contenu{ flex:1; padding:32px; overflow-x:auto; }
-  .page{ display:none; }
-  .page.actif{ display:block; }
-  h1{ font-family:var(--serif); font-size:1.7rem; margin-bottom:20px; }
-  h2.section-titre{ font-family:var(--serif); font-size:1.25rem; margin:28px 0 14px; }
+  #contenu{ flex:1; padding:20px 18px 96px; overflow-y:auto; }
+  .vue{ display:none; }
+  .vue.active{ display:block; }
 
-  .stats{ display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
-  .stat-carte{ background:#fff; border-radius:10px; padding:16px 20px; flex:1; min-width:140px; }
-  .stat-carte .valeur{ font-family:var(--serif); font-size:1.9rem; font-weight:700; color:var(--rouge-vif); }
-  .stat-carte .label{ font-size:.78rem; color:var(--charbon-doux); text-transform:uppercase; letter-spacing:.06em; }
+  .section-titre{ font-family:var(--serif); font-size:1.15rem; font-weight:700; margin:26px 0 12px; }
+  .section-titre:first-child{ margin-top:0; }
+  .section-soustitre{ color:var(--charbon-doux); font-size:.86rem; margin-bottom:14px; }
 
-  .barre-date{ display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
-  .barre-date input{ padding:10px 12px; border:1.5px solid rgba(26,26,26,.16); border-radius:8px; font-size:.95rem; }
-  .barre-date button{ padding:10px 16px; border-radius:8px; border:1.5px solid rgba(26,26,26,.16); background:#fff; cursor:pointer; font-size:.85rem; }
+  .rangee-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .rangee-actions .btn{ width:auto; flex:1; min-width:120px; }
 
-  table{ width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; }
-  th, td{ text-align:left; padding:12px 14px; font-size:.88rem; border-bottom:1px solid rgba(26,26,26,.08); white-space:nowrap; }
-  th{ background:#fff; color:var(--charbon-doux); font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; }
+  .stats{ display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+  .stat-carte{ background:#fff; border-radius:12px; padding:14px 16px; flex:1; min-width:110px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .stat-carte .valeur{ font-family:var(--serif); font-size:1.65rem; font-weight:700; color:var(--rouge-vif); }
+  .stat-carte .label{ font-size:.7rem; color:var(--charbon-doux); text-transform:uppercase; letter-spacing:.05em; margin-top:2px; }
+
+  .stat-carte.stat-rouge{ background:var(--rouge-vif); }
+  .stat-carte.stat-rouge .valeur, .stat-carte.stat-rouge .label{ color:#fff; }
+  .stat-carte.stat-or{ background:var(--or); }
+  .stat-carte.stat-or .valeur, .stat-carte.stat-or .label{ color:var(--charbon); }
+  .stat-carte.stat-vert{ background:var(--vert); }
+  .stat-carte.stat-vert .valeur, .stat-carte.stat-vert .label{ color:#fff; }
+
+  .carte{ background:#fff; border-radius:12px; padding:16px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .vide{ padding:26px 16px; text-align:center; color:var(--charbon-doux); background:#fff; border-radius:12px; font-size:.9rem; }
+  .chargement{ padding:26px 16px; text-align:center; color:var(--charbon-doux); font-size:.9rem; }
+
+  table{ width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; font-size:.85rem; }
+  th, td{ text-align:left; padding:10px 12px; border-bottom:1px solid rgba(26,26,26,.07); }
+  th{ background:#fafcfe; color:var(--charbon-doux); font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; }
   td.pret{ color:var(--vert); font-weight:700; }
+  td.annulee{ color:#aaa; text-decoration:line-through; }
   .btn-mini{
     background:none; border:1.5px solid rgba(199,0,57,.3); color:var(--rouge-vif);
-    font-size:.74rem; font-weight:600; padding:5px 11px; border-radius:50px; cursor:pointer;
-    text-transform:uppercase; letter-spacing:.03em; white-space:nowrap;
+    font-size:.7rem; font-weight:600; padding:5px 10px; border-radius:50px; cursor:pointer;
+    text-transform:uppercase; letter-spacing:.02em; white-space:nowrap;
   }
   .btn-mini:hover{ background:var(--rouge-vif); color:#fff; }
-  .vide{ padding:30px; text-align:center; color:var(--charbon-doux); background:#fff; border-radius:10px; }
-
-  .ligne-a-recuperer{ background:#EAF6EE !important; }
-  .decompte{ font-variant-numeric:tabular-nums; margin-right:8px; color:var(--charbon-doux); }
-  .btn-terminer{ border-color:rgba(65,112,80,.4); color:var(--vert); }
-  .btn-terminer:hover{ background:var(--vert); color:#fff; }
-
-  .ligne-nouvelle{ background:#FFF3CD !important; animation:pulseNouvelle 1.6s ease-in-out infinite; }
-  @keyframes pulseNouvelle{ 0%,100%{ background:#FFF3CD; } 50%{ background:#FFE29A; } }
-  .etiquette-nouveau{
-    display:inline-block; background:var(--rouge-vif); color:#fff; font-size:.66rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:.04em; padding:2px 7px; border-radius:50px; margin-left:6px;
+  .btn-mini-vert{
+    background:none; border:1.5px solid rgba(65,112,80,.35); color:var(--vert);
+    font-size:.7rem; font-weight:600; padding:5px 10px; border-radius:50px; cursor:pointer;
+    text-transform:uppercase; letter-spacing:.02em; white-space:nowrap;
   }
+  .btn-mini-vert:hover{ background:var(--vert); color:#fff; }
+  .cellule-actions{ display:flex; gap:6px; flex-wrap:wrap; }
 
-  /* Cartes commande : le détail (ce que le client a commandé) doit rester lisible en priorité */
-  .carte-commande{
-    background:#fff; border-radius:12px; padding:16px 18px; margin-bottom:12px;
-    border-left:4px solid var(--rouge-vif); box-shadow:0 1px 3px rgba(26,26,26,.06);
-  }
-  .carte-commande.a-recuperer{ border-left-color:var(--vert); background:#F5FBF7; }
-  .carte-commande.terminee{ opacity:.6; border-left-color:rgba(26,26,26,.15); }
-  .carte-commande.nouvelle{ animation:pulseCarte 1.6s ease-in-out infinite; }
-  @keyframes pulseCarte{ 0%,100%{ box-shadow:0 1px 3px rgba(26,26,26,.06); } 50%{ box-shadow:0 0 0 3px rgba(246,198,103,.6); } }
-  .carte-commande-tete{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
-  .carte-commande-nom{ font-family:var(--serif); font-size:1.2rem; font-weight:700; }
-  .carte-commande-tel{ font-size:.82rem; color:var(--charbon-doux); margin-left:6px; }
-  .carte-commande-montant{ font-family:var(--serif); font-size:1.2rem; font-weight:700; color:var(--rouge-vif); white-space:nowrap; }
-  .carte-commande-detail{
-    font-size:1rem; line-height:1.6; margin-bottom:12px; color:var(--charbon);
-    background:var(--creme); border-radius:8px; padding:10px 12px;
-  }
-  .carte-commande-pied{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; font-size:.8rem; color:var(--charbon-doux); }
-  .carte-commande-pied .retrait{ font-weight:600; }
-  .carte-commande-pied .actions{ display:flex; align-items:center; gap:8px; margin-left:auto; }
+  .barre-date{ display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .barre-date input{ padding:9px 10px; border:1.5px solid rgba(26,26,26,.16); border-radius:8px; font-size:.88rem; flex:1; min-width:150px; }
+  .barre-date button{ padding:9px 14px; border-radius:8px; border:1.5px solid rgba(26,26,26,.16); background:#fff; cursor:pointer; font-size:.82rem; white-space:nowrap; }
 
-  /* Mobile : sidebar devient un menu déroulant (un seul onglet visible + flèche),
-     le contenu reste stable et lisible */
-  @media (max-width:768px){
-    .layout{ flex-direction:column; }
-    .sidebar{
-      width:100%; flex-direction:column; align-items:stretch; padding:10px 12px; gap:6px;
-      border-right:none; border-bottom:1px solid rgba(26,26,26,.08);
-      position:sticky; top:0; z-index:10; background:#fff;
-    }
-    .sidebar .marque{ display:none; }
-    .onglet{ flex:none; padding:12px 14px; font-size:.95rem; white-space:nowrap; }
-    .onglet:not(.actif){ display:none; }
-    .sidebar.ouvert .onglet:not(.actif){ display:flex; }
-    .onglet.actif::after{ content:'▾'; margin-left:auto; font-size:.85rem; transition:transform .2s; }
-    .sidebar.ouvert .onglet.actif::after{ transform:rotate(180deg); }
-    .contenu{ padding:18px 14px; overflow-x:hidden; }
-    h1{ font-size:1.4rem; }
-    .stats{ gap:8px; }
-    .stat-carte{ min-width:100px; padding:12px 14px; }
-    .stat-carte .valeur{ font-size:1.4rem; }
-
-    /* Tableaux Réservations / Fidélité : trop de colonnes pour un écran mobile,
-       donc chaque ligne devient une carte verticale (étiquette + valeur) plutôt
-       que de couper ou faire défiler horizontalement. */
-    table{ width:100%; border-spacing:0; }
-    thead{ display:none; }
-    tbody, tr{ display:block; width:100%; }
-    tr{ background:#fff; border-radius:10px; margin-bottom:10px; padding:4px 0; box-shadow:0 1px 3px rgba(26,26,26,.06); }
-    td{
-      display:flex; justify-content:space-between; align-items:center; gap:12px;
-      padding:9px 14px; font-size:.86rem; white-space:normal; text-align:right; border-bottom:1px solid rgba(26,26,26,.06);
-    }
-    tr td:last-child{ border-bottom:none; }
-    td[data-label]::before{
-      content:attr(data-label); font-size:.7rem; font-weight:700; text-transform:uppercase;
-      letter-spacing:.04em; color:var(--charbon-doux); text-align:left; flex:none;
-    }
-    td[data-label=""]::before{ display:none; }
-    td[data-label=""]{ justify-content:flex-end; }
+  /* Donut CSS */
+  .donut-bloc{ display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
+  .donut{
+    width:130px; height:130px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
   }
+  .donut-centre{ width:88px; height:88px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .donut-centre .n{ font-family:var(--serif); font-size:1.6rem; font-weight:700; color:var(--charbon); }
+  .donut-centre .l{ font-size:.62rem; color:var(--charbon-doux); text-transform:uppercase; letter-spacing:.04em; }
+  .legende{ flex:1; min-width:160px; display:flex; flex-direction:column; gap:8px; }
+  .legende-item{ display:flex; align-items:center; gap:8px; font-size:.84rem; }
+  .legende-item .puce{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .legende-item .compte{ margin-left:auto; font-weight:600; }
+
+  .commande-carte{ background:#fff; border-radius:12px; padding:14px 16px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .commande-entete{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px; }
+  .commande-nom{ font-weight:600; }
+  .commande-heure{ font-size:.78rem; color:var(--charbon-doux); }
+  .commande-montant{ font-family:var(--serif); font-weight:700; color:var(--rouge-vif); font-size:1.1rem; white-space:nowrap; }
+  .commande-lignes{ font-size:.8rem; color:var(--charbon-doux); margin-bottom:10px; }
+  .badge-statut{ display:inline-block; font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:3px 9px; border-radius:50px; margin-bottom:8px; }
+  .badge-nouvelle{ background:#FCEBE0; color:var(--rouge-vif); }
+  .badge-a_recuperer{ background:#FFF3D6; color:#8a6d1c; }
+  .badge-terminee{ background:#E4EFE6; color:var(--vert); }
+
+  /* ---------- Barre de navigation basse ---------- */
+  .tabbar{
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px;
+    background:#fff; border-top:1px solid rgba(26,26,26,.08); display:flex; z-index:20;
+    padding-bottom:env(safe-area-inset-bottom, 0);
+  }
+  .tab-item{
+    flex:1; background:none; border:none; cursor:pointer; padding:9px 4px 10px; display:flex;
+    flex-direction:column; align-items:center; gap:3px; color:var(--charbon-doux); font-family:var(--sans);
+  }
+  .tab-item svg{ width:21px; height:21px; }
+  .tab-item span{ font-size:.66rem; font-weight:600; }
+  .tab-item.active{ color:var(--rouge-vif); }
+  .tab-item.active svg{ color:var(--rouge-vif); }
+
+  /* ---------- Overlays / modales ---------- */
+  .overlay{
+    display:none; position:fixed; inset:0; background:rgba(26,26,26,.55); z-index:50;
+    align-items:flex-end; justify-content:center;
+  }
+  .overlay.active{ display:flex; }
+  .feuille{
+    background:var(--creme); width:100%; max-width:480px; border-radius:20px 20px 0 0;
+    padding:22px 20px calc(24px + env(safe-area-inset-bottom, 0)); max-height:88vh; overflow-y:auto;
+  }
+  .feuille-entete{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .feuille-entete h2{ font-family:var(--serif); font-size:1.25rem; }
+  .feuille-fermer{ background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--charbon-doux); line-height:1; padding:4px; }
+
+  .champ{ margin-bottom:14px; }
+  .champ label{ display:block; font-size:.78rem; color:var(--charbon-doux); margin-bottom:5px; font-weight:600; }
+  .champ input, .champ select, .champ textarea{
+    width:100%; padding:11px 12px; border:1.5px solid rgba(26,26,26,.16); border-radius:9px; font-size:.92rem;
+    font-family:var(--sans); background:#fff;
+  }
+  .champ-checkbox{ display:flex; align-items:flex-start; gap:8px; font-size:.82rem; color:var(--charbon-doux); }
+  .champ-checkbox input{ width:auto; margin-top:2px; }
+
+  /* Scanner */
+  #lecteur{ border-radius:12px; overflow:hidden; margin-bottom:12px; background:#111; }
+  .scan-statut{ text-align:center; font-size:.85rem; color:var(--charbon-doux); margin-bottom:14px; }
+  .resultat-scan{ display:none; text-align:center; }
+  .resultat-scan h3{ font-family:var(--serif); font-size:1.3rem; margin-bottom:4px; }
+  .resultat-scan .compte{ color:var(--charbon-doux); margin-bottom:14px; }
+  .resultat-scan .compte strong{ color:var(--rouge-vif); }
+  .resultat-scan .actions{ display:flex; flex-direction:column; gap:9px; }
 </style>
 </head>
 <body>
 
-<div class="pin-ecran" id="ecranPin">
-  <div class="pin-carte">
-    <img height="441" width="440" src="assets/img/logo-red.png" alt="La Mezza Luna" />
-    <p style="margin-bottom:12px;color:var(--charbon-doux);">Code personnel</p>
-    <input type="password" inputmode="numeric" id="champPin" placeholder="••••" />
-    <button class="btn" id="btnValiderPin">Accéder au tableau de bord</button>
-    <div class="msg-erreur" id="msgErreurPin" style="display:none;"></div>
-  </div>
-</div>
+<div id="app">
 
-<div id="ecranDashboard">
-  <div class="layout">
-    <div class="sidebar">
-      <div class="marque"><img height="441" width="440" src="assets/img/logo-red.png" alt="" /><span>La Mezza Luna</span></div>
-      <button class="onglet actif" data-page="pageCommandes">🍕 Commandes<span class="puce" id="badgeCommandes" style="display:none;"></span></button>
-      <button class="onglet" data-page="pageReservations">📅 Réservations<span class="puce" id="badgeReservations" style="display:none;"></span></button>
-      <button class="onglet" data-page="pageFidelite">🎟️ Fidélité</button>
+  <!-- Écran code personnel -->
+  <div id="ecranPin">
+    <img src="https://lamezzalunaclamart.com/assets/img/logo-cream.png" alt="La Mezza Luna" />
+    <div class="eyebrow">La Mezza Luna</div>
+    <h1>Dashboard</h1>
+    <div class="carte-pin">
+      <p>Code personnel</p>
+      <input type="password" inputmode="numeric" id="champPin" placeholder="••••" />
+      <button class="btn" id="btnValiderPin">Entrer</button>
+      <div class="msg-erreur" id="msgErreurPin" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- App principale -->
+  <div id="appPrincipal">
+    <div class="topbar">
+      <div class="topbar-ligne">
+        <div class="topbar-marque">
+          <img src="https://lamezzalunaclamart.com/assets/img/logo-cream.png" alt="" />
+          <div>
+            <div class="topbar-eyebrow">La Mezza Luna</div>
+            <h1 id="titrePage">Tableau de bord</h1>
+          </div>
+        </div>
+        <button class="btn-icon" id="btnDeconnexion" title="Déconnexion" aria-label="Déconnexion">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+      <div class="topbar-sous" id="sousTitre">Espace pro</div>
     </div>
 
-    <div class="contenu">
+    <div id="contenu">
 
-      <!-- ===== RESERVATIONS ===== -->
-      <div class="page" id="pageReservations">
-        <h1>Réservations</h1>
+      <!-- ACCUEIL -->
+      <div class="vue active" id="vue-accueil">
+        <div class="section-titre">Aujourd'hui en un coup d'œil</div>
+        <div class="stats">
+          <div class="stat-carte stat-rouge"><div class="valeur" id="accCouverts">–</div><div class="label">Couverts prévus</div></div>
+          <div class="stat-carte stat-or"><div class="valeur" id="accCa">–</div><div class="label">CA click&collect</div></div>
+          <div class="stat-carte stat-vert"><div class="valeur" id="accPrets">–</div><div class="label">Récompenses prêtes</div></div>
+        </div>
+
+        <div class="section-titre">Click &amp; collect</div>
+        <div class="section-soustitre">Répartition des commandes du jour</div>
+        <div class="carte">
+          <div id="accDonutBloc" class="chargement">Chargement…</div>
+        </div>
+      </div>
+
+      <!-- RESAS -->
+      <div class="vue" id="vue-resas">
+        <div class="rangee-actions">
+          <button class="btn" id="btnNouvelleResa">+ Nouvelle réservation</button>
+        </div>
         <div class="barre-date">
           <input type="date" id="champDateResa" />
-          <button id="btnAujourdhuiResa">Aujourd'hui</button>
+          <button id="btnResaAujourdhui">Aujourd'hui</button>
         </div>
         <div class="stats">
-          <div class="stat-carte"><div class="valeur" id="statResaDejeuner">0</div><div class="label">Couverts déjeuner</div></div>
-          <div class="stat-carte"><div class="valeur" id="statResaDiner">0</div><div class="label">Couverts dîner</div></div>
-          <div class="stat-carte"><div class="valeur" id="statResaTotal">0</div><div class="label">Réservations actives</div></div>
+          <div class="stat-carte"><div class="valeur" id="resaDejeuner">0</div><div class="label">Couverts déjeuner</div></div>
+          <div class="stat-carte"><div class="valeur" id="resaDiner">0</div><div class="label">Couverts dîner</div></div>
+          <div class="stat-carte"><div class="valeur" id="resaTotal">0</div><div class="label">Réservations actives</div></div>
         </div>
-        <div id="tableResaJour"></div>
-
-        <h2 class="section-titre">Réservations à venir</h2>
-        <div id="tableResaAVenir"></div>
-        <p style="margin-top:14px;">
-          <button class="btn-mini" id="btnReparerIndex">Réparer les données (une seule fois)</button>
-          <span id="msgReparation" style="font-size:.8rem;color:var(--charbon-doux);margin-left:8px;"></span>
-        </p>
+        <div id="resaListeContainer"><div class="chargement">Chargement…</div></div>
       </div>
 
-      <!-- ===== FIDELITE ===== -->
-      <div class="page" id="pageFidelite">
-        <h1>Fidélité</h1>
-        <div class="stats">
-          <div class="stat-carte"><div class="valeur" id="statFidTotal">0</div><div class="label">Clients inscrits</div></div>
-          <div class="stat-carte"><div class="valeur" id="statFidPrets">0</div><div class="label">Récompenses prêtes</div></div>
-          <div class="stat-carte"><div class="valeur" id="statFidDonnees">0</div><div class="label">Récompenses données</div></div>
+      <!-- FIDELITE -->
+      <div class="vue" id="vue-fidelite">
+        <div class="rangee-actions">
+          <button class="btn" id="btnOuvrirScanner">Scanner</button>
+          <button class="btn btn-ghost" id="btnRegle">Règle</button>
+          <button class="btn btn-vert" id="btnNouveauClient">+ Nouveau client</button>
         </div>
-        <div id="tableFidelite"></div>
+        <div class="stats">
+          <div class="stat-carte"><div class="valeur" id="fidTotal">0</div><div class="label">Clients inscrits</div></div>
+          <div class="stat-carte"><div class="valeur" id="fidPrets">0</div><div class="label">Récompenses prêtes</div></div>
+          <div class="stat-carte"><div class="valeur" id="fidDonnees">0</div><div class="label">Récompenses données</div></div>
+        </div>
+        <div class="section-titre">Clients</div>
+        <div id="fidListeContainer"><div class="chargement">Chargement…</div></div>
       </div>
 
-      <!-- ===== COMMANDES ===== -->
-      <div class="page actif" id="pageCommandes">
-        <h1>Commandes (click &amp; collect)</h1>
-        <p id="dateAujourdhuiCommandes" style="color:var(--charbon-doux);font-size:.92rem;margin:-14px 0 18px;"></p>
-        <div class="barre-date">
-          <input type="date" id="champDateCommandes" />
-          <button id="btnAujourdhuiCommandes">Aujourd'hui</button>
-        </div>
+      <!-- COMMANDES -->
+      <div class="vue" id="vue-commandes">
         <div class="stats">
-          <div class="stat-carte"><div class="valeur" id="statCmdEnCours">0</div><div class="label">En cours</div></div>
-          <div class="stat-carte"><div class="valeur" id="statCmdTotal">0</div><div class="label">Commandes ce jour-là</div></div>
-          <div class="stat-carte"><div class="valeur" id="statCmdCA">0 €</div><div class="label">Chiffre d'affaires ce jour-là</div></div>
+          <div class="stat-carte stat-rouge"><div class="valeur" id="cmdEnCours">0</div><div class="label">Commandes en cours</div></div>
+          <div class="stat-carte stat-or"><div class="valeur" id="cmdJour">0</div><div class="label">Commandes du jour</div></div>
+          <div class="stat-carte stat-vert"><div class="valeur" id="cmdCa">0 €</div><div class="label">Chiffre d'affaires</div></div>
         </div>
-        <div id="tableCommandes"></div>
-
-        <h2 class="section-titre">Commandes terminées</h2>
-        <div id="tableCommandesTerminees"></div>
+        <div class="section-titre">En cours</div>
+        <div id="cmdEnCoursContainer"><div class="chargement">Chargement…</div></div>
+        <div class="section-titre">Terminées aujourd'hui</div>
+        <div id="cmdTermineesContainer"><div class="vide">—</div></div>
       </div>
 
     </div>
+
+    <nav class="tabbar">
+      <button class="tab-item active" data-tab="accueil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        <span>Accueil</span>
+      </button>
+      <button class="tab-item" data-tab="resas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        <span>Résas</span>
+      </button>
+      <button class="tab-item" data-tab="fidelite">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6-4.4-4.2 6-.8z"/></svg>
+        <span>Fidélité</span>
+      </button>
+      <button class="tab-item" data-tab="commandes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2l1.5 5M18 2l-1.5 5M4 7h16l-1.4 11.2A2 2 0 0 1 16.6 20H7.4a2 2 0 0 1-2-1.8L4 7z"/></svg>
+        <span>Commandes</span>
+      </button>
+    </nav>
   </div>
+
+  <!-- Feuille : nouvelle réservation -->
+  <div class="overlay" id="overlayResa">
+    <div class="feuille">
+      <div class="feuille-entete"><h2>Nouvelle réservation</h2><button class="feuille-fermer" data-fermer="overlayResa">×</button></div>
+      <div id="formResaMsg" class="msg-erreur" style="display:none;"></div>
+      <div class="champ"><label>Nom</label><input type="text" id="fResaNom" /></div>
+      <div class="champ"><label>Téléphone</label><input type="tel" id="fResaTelephone" /></div>
+      <div class="champ"><label>Email</label><input type="email" id="fResaEmail" /></div>
+      <div class="champ"><label>Date</label><input type="date" id="fResaDate" /></div>
+      <div class="champ"><label>Service</label>
+        <select id="fResaService"><option value="dejeuner">Déjeuner</option><option value="diner">Dîner</option></select>
+      </div>
+      <div class="champ"><label>Heure</label><input type="time" id="fResaHeure" step="900" /></div>
+      <div class="champ"><label>Couverts</label><input type="number" id="fResaCouverts" min="1" max="12" value="2" /></div>
+      <div class="champ"><label>Note (optionnel)</label><textarea id="fResaNote" rows="2"></textarea></div>
+      <button class="btn" id="btnValiderResa">Enregistrer la réservation</button>
+    </div>
+  </div>
+
+  <!-- Feuille : nouveau client fidélité -->
+  <div class="overlay" id="overlayClient">
+    <div class="feuille">
+      <div class="feuille-entete"><h2>Nouveau client</h2><button class="feuille-fermer" data-fermer="overlayClient">×</button></div>
+      <div id="formClientMsg" class="msg-erreur" style="display:none;"></div>
+      <div class="champ"><label>Nom</label><input type="text" id="fClientNom" /></div>
+      <div class="champ"><label>Téléphone</label><input type="tel" id="fClientTelephone" /></div>
+      <div class="champ"><label>Email</label><input type="email" id="fClientEmail" /></div>
+      <div class="champ-checkbox" style="margin-bottom:16px;">
+        <input type="checkbox" id="fClientConsentement" />
+        <label for="fClientConsentement">Le client accepte de recevoir des emails (offres, actus)</label>
+      </div>
+      <button class="btn btn-vert" id="btnValiderClient">Créer la carte</button>
+    </div>
+  </div>
+
+  <!-- Feuille : règle de fidélité -->
+  <div class="overlay" id="overlayRegle">
+    <div class="feuille">
+      <div class="feuille-entete"><h2>Règle du programme</h2><button class="feuille-fermer" data-fermer="overlayRegle">×</button></div>
+      <p style="font-size:.95rem;color:var(--charbon-doux);">8 passages tamponnés = 1 dessert et 1 café offerts. Un tampon est ajouté par visite, l'échange se fait dès que la carte est complète.</p>
+    </div>
+  </div>
+
+  <!-- Feuille : scanner fidélité -->
+  <div class="overlay" id="overlayScanner">
+    <div class="feuille" style="background:#111;">
+      <div class="feuille-entete"><h2 style="color:#fff;">Scanner</h2><button class="feuille-fermer" style="color:#fff;" data-fermer="overlayScanner">×</button></div>
+      <div id="lecteur"></div>
+      <p class="scan-statut" style="color:#fff;opacity:.75;" id="scanStatut">Visez le QR code du client</p>
+      <p style="text-align:center;margin-bottom:14px;">
+        <a href="#" id="lienRecherche" style="color:#fff;font-size:.8rem;text-decoration:underline;opacity:.85;">Pas de QR ? Chercher par téléphone</a>
+      </p>
+      <div class="champ" id="blocRecherche" style="display:none;">
+        <input type="tel" id="champTelephoneScan" placeholder="06 XX XX XX XX" />
+        <button class="btn" style="margin-top:8px;" id="btnChercherTel">Chercher</button>
+      </div>
+      <div class="resultat-scan" id="resultatScan" style="background:#fff;border-radius:12px;padding:20px;">
+        <span class="badge-statut badge-terminee" id="badgePretScan" style="display:none;">Récompense disponible</span>
+        <h3 id="scanNom"></h3>
+        <div class="compte" id="scanCompte"></div>
+        <div class="msg-erreur" id="scanErreur" style="display:none;"></div>
+        <div class="actions">
+          <button class="btn" id="btnScanTampon">Ajouter un tampon</button>
+          <button class="btn btn-vert" id="btnScanEchanger" style="display:none;">Échanger la récompense</button>
+          <button class="btn btn-ghost" id="btnScanReprendre">Reprendre le scan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
   var API_BASE = 'https://api.lamezzalunaclamart.com/api';
-  var PIN_STORAGE_KEY = 'fidelite-staff-pin';
+  var PIN_KEY = 'fidelite-staff-pin';
+  var REWARD_STAMPS = 8;
 
-  document.getElementById('btnValiderPin').addEventListener('click', function () {
-    var pin = document.getElementById('champPin').value.trim();
-    if (!pin) return;
-    sessionStorage.setItem(PIN_STORAGE_KEY, pin);
-    ouvrirDashboard();
-  });
-
-  function ouvrirDashboard() {
-    document.getElementById('ecranPin').style.display = 'none';
-    document.getElementById('ecranDashboard').style.display = 'block';
-    chargerReservationsJour();
-    chargerFidelite();
-    chargerCommandes();
-  }
-
-  function surErreurPin(res) {
-    sessionStorage.removeItem(PIN_STORAGE_KEY);
-    document.getElementById('ecranDashboard').style.display = 'none';
-    document.getElementById('ecranPin').style.display = 'flex';
-    document.getElementById('msgErreurPin').textContent = res.data && res.data.error ? res.data.error : 'Erreur';
-    document.getElementById('msgErreurPin').style.display = 'block';
-  }
-
-  // ---- Navigation onglets ----
-  var sidebarEl = document.querySelector('.sidebar');
-  document.querySelectorAll('.onglet').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var estMobile = window.matchMedia('(max-width:768px)').matches;
-      // Sur mobile, seul l'onglet actif est visible tant que le menu est fermé :
-      // cliquer dessus ouvre/ferme la liste déroulante au lieu de rien faire.
-      if (estMobile && btn.classList.contains('actif')) {
-        sidebarEl.classList.toggle('ouvert');
-        return;
-      }
-      document.querySelectorAll('.onglet').forEach(function (b) { b.classList.remove('actif'); });
-      document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('actif'); });
-      btn.classList.add('actif');
-      document.getElementById(btn.getAttribute('data-page')).classList.add('actif');
-      sidebarEl.classList.remove('ouvert');
-      if (btn.getAttribute('data-page') === 'pageCommandes') {
-        var badge = document.getElementById('badgeCommandes');
-        badge.style.display = 'none';
-        badge.textContent = '';
-      }
-      if (btn.getAttribute('data-page') === 'pageReservations') {
-        var badgeResa = document.getElementById('badgeReservations');
-        badgeResa.style.display = 'none';
-        badgeResa.textContent = '';
-        demarrerSurbrillanceReservations();
-      }
-    });
-  });
-
-  function escapeHtml(str) {
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  // ================= RESERVATIONS =================
-  var champDateResa = document.getElementById('champDateResa');
-  var aujourdHui = new Date().toISOString().slice(0, 10);
-  champDateResa.value = aujourdHui;
-
-  document.getElementById('btnAujourdhuiResa').addEventListener('click', function () {
-    champDateResa.value = aujourdHui;
-    chargerReservationsJour();
-  });
-  champDateResa.addEventListener('change', chargerReservationsJour);
-
-  function chargerReservationsJour() {
-    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
-    fetch(API_BASE + '/reservation?action=liste&date=' + champDateResa.value + '&pin=' + encodeURIComponent(pin))
-      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
-      .then(function (res) {
-        if (!res.ok) { surErreurPin(res); return; }
-        afficherReservationsJour(res.data.reservations);
-        chargerReservationsAVenir();
-      });
-  }
-
-  var idsReservationsConnus = null;
-  var idsNouvellesEnAttente = []; // détectées mais pas encore vues (le chrono n'a pas démarré)
-  var horodatageNouvellesResa = {}; // id -> moment où l'onglet a été ouvert, pour la surbrillance 1 min
-  var dernieresReservationsAVenir = [];
-
-  function chargerReservationsAVenir() {
-    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
-    fetch(API_BASE + '/reservation?action=aVenir&pin=' + encodeURIComponent(pin))
-      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
-      .then(function (res) {
-        if (!res.ok) return;
-        var idsActuels = res.data.reservations.map(function (r) { return r.id; });
-        var nouveauxIds = [];
-
-        if (idsReservationsConnus !== null) {
-          idsActuels.forEach(function (id) {
-            if (idsReservationsConnus.indexOf(id) === -1) { nouveauxIds.push(id); }
-          });
-        }
-
-        if (nouveauxIds.length > 0) {
-          jouerSonNotification('reservation');
-          nouveauxIds.forEach(function (id) {
-            if (idsNouvellesEnAttente.indexOf(id) === -1) { idsNouvellesEnAttente.push(id); }
-          });
-          var pageReservationsActive = document.getElementById('pageReservations').classList.contains('actif');
-          if (pageReservationsActive) {
-            // Déjà sur l'onglet : le chrono démarre tout de suite, pas besoin d'attendre un clic.
-            demarrerSurbrillanceReservations();
-          } else {
-            var badge = document.getElementById('badgeReservations');
-            badge.textContent = '+' + idsNouvellesEnAttente.length;
-            badge.style.display = 'inline-flex';
-          }
-        }
-
-        idsReservationsConnus = idsActuels;
-        dernieresReservationsAVenir = res.data.reservations;
-        afficherReservationsAVenir(res.data.reservations);
-      });
-  }
-
-  function demarrerSurbrillanceReservations() {
-    if (idsNouvellesEnAttente.length === 0) return;
-    idsNouvellesEnAttente.forEach(function (id) { horodatageNouvellesResa[id] = Date.now(); });
-    idsNouvellesEnAttente = [];
-    afficherReservationsAVenir(dernieresReservationsAVenir);
-  }
-
-  function afficherReservationsJour(reservations) {
-    var actives = reservations.filter(function (r) { return r.statut !== 'annulee'; });
-    var couvertsDejeuner = actives.filter(function (r) { return r.service === 'dejeuner'; }).reduce(function (s, r) { return s + r.couverts; }, 0);
-    var couvertsDiner = actives.filter(function (r) { return r.service === 'diner'; }).reduce(function (s, r) { return s + r.couverts; }, 0);
-    document.getElementById('statResaDejeuner').textContent = couvertsDejeuner;
-    document.getElementById('statResaDiner').textContent = couvertsDiner;
-    document.getElementById('statResaTotal').textContent = actives.length;
-
-    var container = document.getElementById('tableResaJour');
-    if (reservations.length === 0) {
-      container.innerHTML = '<div class="vide">Aucune réservation ce jour-là.</div>';
-      return;
-    }
-    var lignes = reservations.map(function (r) {
-      var nomService = r.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
-      var annulee = r.statut === 'annulee';
-      return '<tr' + (annulee ? ' style="opacity:.4;text-decoration:line-through;"' : '') + '>' +
-        '<td data-label="Heure">' + r.heure + '</td><td data-label="Service">' + nomService + '</td><td data-label="Nom">' + escapeHtml(r.nom) + '</td>' +
-        '<td data-label="Téléphone">' + escapeHtml(r.telephone) + '</td><td data-label="Couverts">' + r.couverts + '</td><td data-label="Note">' + escapeHtml(r.note || '—') + '</td>' +
-        '<td data-label="">' + (annulee ? 'Annulée' : '<button class="btn-mini" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '" data-action="annuler-resa">Annuler</button>') + '</td>' +
-        '</tr>';
-    }).join('');
-    container.innerHTML = '<table><thead><tr><th>Heure</th><th>Service</th><th>Nom</th><th>Téléphone</th><th>Couverts</th><th>Note</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
-    brancherBoutonsAnnulerResa(container);
-  }
-
-  function afficherReservationsAVenir(reservations) {
-    var container = document.getElementById('tableResaAVenir');
-    if (reservations.length === 0) {
-      container.innerHTML = '<div class="vide">Aucune réservation à venir.</div>';
-      return;
-    }
-    var lignes = reservations.map(function (r) {
-      var nomService = r.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
-      var dateAffichee = new Date(r.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-      var horodatage = horodatageNouvellesResa[r.id];
-      var estNouvelle = horodatage && (Date.now() - horodatage < 60000);
-      return '<tr' + (estNouvelle ? ' class="ligne-nouvelle"' : '') + '>' +
-        '<td data-label="Date">' + dateAffichee + '</td><td data-label="Heure">' + r.heure + '</td><td data-label="Service">' + nomService + '</td><td data-label="Nom">' + escapeHtml(r.nom) + (estNouvelle ? ' <span class="etiquette-nouveau">Nouveau</span>' : '') + '</td>' +
-        '<td data-label="Téléphone">' + escapeHtml(r.telephone) + '</td><td data-label="Couverts">' + r.couverts + '</td><td data-label="Note">' + escapeHtml(r.note || '—') + '</td>' +
-        '<td data-label=""><button class="btn-mini" data-id="' + r.id + '" data-nom="' + escapeHtml(r.nom) + '" data-action="annuler-resa">Annuler</button></td>' +
-        '</tr>';
-    }).join('');
-    container.innerHTML = '<table><thead><tr><th>Date</th><th>Heure</th><th>Service</th><th>Nom</th><th>Téléphone</th><th>Couverts</th><th>Note</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
-    brancherBoutonsAnnulerResa(container);
-
-    // Si des surbrillances sont actives, on programme un rafraîchissement dès qu'elles expirent (1 min).
-    var enAttente = reservations.some(function (r) {
-      var h = horodatageNouvellesResa[r.id];
-      return h && (Date.now() - h < 60000);
-    });
-    if (enAttente) {
-      setTimeout(function () { afficherReservationsAVenir(reservations); }, 2000);
-    }
-  }
-
-  function brancherBoutonsAnnulerResa(container) {
-    container.querySelectorAll('[data-action="annuler-resa"]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var id = btn.getAttribute('data-id');
-        var nom = btn.getAttribute('data-nom');
-        if (!confirm('Annuler la réservation de ' + nom + ' ?')) return;
-        var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
-        fetch(API_BASE + '/reservation?action=annuler', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': pin },
-          body: JSON.stringify({ id: id }),
-        })
-          .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
-          .then(function (res) {
-            if (!res.ok) { alert(res.data && res.data.error ? res.data.error : 'Erreur'); return; }
-            chargerReservationsJour();
-          });
-      });
-    });
-  }
-
-  // ================= FIDELITE =================
-  function chargerFidelite() {
-    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
-    fetch(API_BASE + '/fidelite-liste?pin=' + encodeURIComponent(pin))
-      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
-      .then(function (res) {
-        if (!res.ok) { surErreurPin(res); return; }
-        afficherFidelite(res.data.clients);
-      });
-  }
-
-  function afficherFidelite(clients) {
-    var prets = clients.filter(function (c) { return c.tampons >= 8; }).length;
-    var donnees = clients.reduce(function (s, c) { return s + (c.recompenses || 0); }, 0);
-    document.getElementById('statFidTotal').textContent = clients.length;
-    document.getElementById('statFidPrets').textContent = prets;
-    document.getElementById('statFidDonnees').textContent = donnees;
-
-    var container = document.getElementById('tableFidelite');
-    if (clients.length === 0) {
-      container.innerHTML = '<div class="vide">Aucun client inscrit pour l\'instant.</div>';
-      return;
-    }
-    var clientsTries = clients.slice().sort(function (a, b) {
-      return new Date(b.dateInscription) - new Date(a.dateInscription);
-    });
-    var lignes = clientsTries.map(function (c) {
-      var pret = c.tampons >= 8;
-      var date = new Date(c.dateInscription).toLocaleDateString('fr-FR');
-      return '<tr>' +
-        '<td data-label="Nom">' + escapeHtml(c.nom) + '</td><td data-label="Téléphone">' + escapeHtml(c.telephone) + '</td><td data-label="Email">' + escapeHtml(c.email || '—') + '</td>' +
-        '<td data-label="Tampons" class="' + (pret ? 'pret' : '') + '">' + c.tampons + ' / 8' + (pret ? ' — prêt' : '') + '</td>' +
-        '<td data-label="Récompenses">' + (c.recompenses || 0) + '</td><td data-label="Inscrit le">' + date + '</td>' +
-        '<td data-label=""><button class="btn-mini" data-id="' + c.id + '" data-nom="' + escapeHtml(c.nom) + '" data-action="supprimer-fid">Supprimer</button></td>' +
-        '</tr>';
-    }).join('');
-    container.innerHTML = '<table><thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Tampons</th><th>Récompenses</th><th>Inscrit le</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
-
-    container.querySelectorAll('[data-action="supprimer-fid"]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var id = btn.getAttribute('data-id');
-        var nom = btn.getAttribute('data-nom');
-        if (!confirm('Supprimer définitivement la carte de ' + nom + ' ?')) return;
-        var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
-        fetch(API_BASE + '/fidelite-supprimer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': pin },
-          body: JSON.stringify({ id: id }),
-        })
-          .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
-          .then(function (res) {
-            if (!res.ok) { alert(res.data && res.data.error ? res.data.error : 'Erreur'); return; }
-            chargerFidelite();
-          });
-      });
-    });
-  }
-
-  // ================= COMMANDES =================
-  var dernierNombreCommandes = null;
-  var toutesLesCommandes = [];
-  var champDateCommandes = document.getElementById('champDateCommandes');
-  var aujourdHuiCommandes = new Date().toISOString().slice(0, 10);
-  champDateCommandes.value = aujourdHuiCommandes;
-  document.getElementById('dateAujourdhuiCommandes').textContent =
-    'Nous sommes le ' + new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  document.getElementById('btnAujourdhuiCommandes').addEventListener('click', function () {
-    champDateCommandes.value = aujourdHuiCommandes;
-    afficherCommandes(toutesLesCommandes);
-  });
-  champDateCommandes.addEventListener('change', function () { afficherCommandes(toutesLesCommandes); });
-
+  /* ---------- Notifications sonores ---------- */
   var MOTIFS_SON = {
     commande: [880, 1180],        // deux notes montantes, aigu, style "caisse"
     reservation: [660, 990, 660], // trois notes, plus grave, style "carillon"
@@ -530,25 +409,21 @@
 
   // Sur mobile (Safari iOS notamment), un AudioContext créé sans interaction utilisateur
   // reste "suspended" et ne joue aucun son. On garde donc un seul contexte, débloqué dès
-  // le premier clic sur la page (validation du PIN), puis réutilisé et relancé (resume)
-  // à chaque notification même quand elle est déclenchée par le rafraîchissement automatique.
+  // le premier clic sur la page, puis réutilisé et relancé (resume) à chaque notification
+  // même quand elle est déclenchée par le rafraîchissement automatique.
   var contexteAudio = null;
-  function obtenirContexteAudio() {
-    if (!contexteAudio) {
-      contexteAudio = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (contexteAudio.state === 'suspended') {
-      contexteAudio.resume();
-    }
+  function obtenirContexteAudio(){
+    if(!contexteAudio){ contexteAudio = new (window.AudioContext || window.webkitAudioContext)(); }
+    if(contexteAudio.state === 'suspended'){ contexteAudio.resume(); }
     return contexteAudio;
   }
   document.addEventListener('click', obtenirContexteAudio, { once: true });
 
-  function jouerSonNotification(type) {
+  function jouerSonNotification(type){
     try {
       var ctx = obtenirContexteAudio();
       var notes = MOTIFS_SON[type] || MOTIFS_SON.commande;
-      notes.forEach(function (frequence, i) {
+      notes.forEach(function(frequence, i){
         var osc = ctx.createOscillator();
         var gain = ctx.createGain();
         osc.connect(gain);
@@ -560,173 +435,573 @@
         osc.start(debut);
         osc.stop(debut + 0.3);
       });
-    } catch (e) { /* audio non disponible, tant pis */ }
+    } catch(e) { /* audio non disponible, tant pis */ }
   }
 
-  function chargerCommandes() {
-    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
-    fetch(API_BASE + '/commande?action=liste&pin=' + encodeURIComponent(pin))
-      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
-      .then(function (res) {
-        if (!res.ok) { surErreurPin(res); return; }
-        var nombre = res.data.commandes.length;
-        if (dernierNombreCommandes !== null && nombre > dernierNombreCommandes) {
-          jouerSonNotification('commande');
-          var badge = document.getElementById('badgeCommandes');
-          var pageCommandesActive = document.getElementById('pageCommandes').classList.contains('actif');
-          if (!pageCommandesActive) {
-            badge.textContent = '+' + (nombre - dernierNombreCommandes);
-            badge.style.display = 'inline-flex';
-          }
-        }
-        dernierNombreCommandes = nombre;
-        toutesLesCommandes = res.data.commandes;
-        afficherCommandes(toutesLesCommandes);
+  var titresOnglets = {
+    accueil: 'Tableau de bord',
+    resas: 'Réservations',
+    fidelite: 'Programme fidélité',
+    commandes: 'Commandes click&collect',
+  };
+
+  /* ---------- Utilitaires ---------- */
+  function escapeHtml(str){
+    var div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function formatEuros(n){
+    return (Number(n) || 0).toFixed(2).replace('.', ',') + ' €';
+  }
+
+  function todayISO(){
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function getPin(){ return sessionStorage.getItem(PIN_KEY) || ''; }
+
+  // Endpoints GET protégés par code : le pin voyage en query (obligatoire pour
+  // fidelite-liste / fidelite-recherche qui ne lisent pas l'en-tête).
+  function apiGetPin(chemin, params){
+    params = params || {};
+    params.pin = getPin();
+    var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+    return fetch(API_BASE + chemin + (chemin.indexOf('?') === -1 ? '?' : '&') + qs)
+      .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+      .then(function(res){
+        if(!res.ok){ gererErreurPin(res); throw new Error(res.data && res.data.error ? res.data.error : 'Erreur'); }
+        return res.data;
       });
   }
 
-  function detailCommande(c) {
-    return (c.lignes || []).map(function (l) { return l.quantite + '× ' + l.description; }).join(', ');
-  }
-
-  function afficherCommandes(toutesCommandes) {
-    var jourChoisi = champDateCommandes.value || aujourdHuiCommandes;
-    var commandes = toutesCommandes.filter(function (c) { return (c.dateCreation || '').slice(0, 10) === jourChoisi; });
-    var enCours = commandes.filter(function (c) { return c.statut !== 'terminee'; });
-    var terminees = commandes.filter(function (c) { return c.statut === 'terminee'; });
-
-    var total = commandes.reduce(function (s, c) { return s + c.montant; }, 0);
-    document.getElementById('statCmdEnCours').textContent = enCours.length;
-    document.getElementById('statCmdTotal').textContent = commandes.length;
-    document.getElementById('statCmdCA').textContent = total.toFixed(2).replace('.', ',') + ' €';
-
-    var container = document.getElementById('tableCommandes');
-    if (enCours.length === 0) {
-      container.innerHTML = '<div class="vide">Aucune commande en cours.</div>';
-    } else {
-      container.innerHTML = enCours.map(function (c) {
-        var date = new Date(c.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        var actions;
-        var classeStatut = '';
-        if (c.statut === 'a_recuperer') {
-          classeStatut = ' a-recuperer';
-          var echeance = new Date(c.dateARecuperer).getTime() + 20 * 60000;
-          actions = '<span class="decompte" data-echeance="' + echeance + '"></span>' +
-            '<button class="btn-mini btn-terminer" data-id="' + c.id + '" data-statut="terminee">Terminé</button>';
-        } else {
-          actions = '<button class="btn-mini" data-id="' + c.id + '" data-statut="a_recuperer">À récupérer</button>';
-        }
-        return '<div class="carte-commande' + classeStatut + '">' +
-          '<div class="carte-commande-tete">' +
-            '<div><span class="carte-commande-nom">' + escapeHtml(c.nom) + '</span>' +
-              '<span class="carte-commande-tel">' + escapeHtml(c.telephone) + '</span></div>' +
-            '<div class="carte-commande-montant">' + c.montant.toFixed(2).replace('.', ',') + ' €</div>' +
-          '</div>' +
-          '<div class="carte-commande-detail">' + escapeHtml(detailCommande(c)) + '</div>' +
-          '<div class="carte-commande-pied">' +
-            '<span class="retrait">Retrait : ' + escapeHtml(c.jourRetrait || '—') + ' ' + escapeHtml(c.heureRetrait || '') + '</span>' +
-            '<span>Commandé le ' + date + '</span>' +
-            '<div class="actions">' + actions + '</div>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-
-      container.querySelectorAll('[data-statut]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          changerStatutCommande(btn.getAttribute('data-id'), btn.getAttribute('data-statut'));
-        });
+  // Endpoints POST protégés par code : en-tête X-Staff-Pin.
+  function apiPostPin(chemin, body){
+    return fetch(API_BASE + chemin, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': getPin() },
+      body: JSON.stringify(body || {}),
+    })
+      .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+      .then(function(res){
+        if(!res.ok){ gererErreurPin(res); throw new Error(res.data && res.data.error ? res.data.error : 'Erreur'); }
+        return res.data;
       });
-      majDecomptes();
-    }
+  }
 
-    var containerTerminees = document.getElementById('tableCommandesTerminees');
-    if (terminees.length === 0) {
-      containerTerminees.innerHTML = '<div class="vide">Aucune commande terminée pour l\'instant.</div>';
-    } else {
-      containerTerminees.innerHTML = terminees.map(function (c) {
-        var date = new Date(c.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        return '<div class="carte-commande terminee">' +
-          '<div class="carte-commande-tete">' +
-            '<div><span class="carte-commande-nom">' + escapeHtml(c.nom) + '</span>' +
-              '<span class="carte-commande-tel">' + escapeHtml(c.telephone) + '</span></div>' +
-            '<div class="carte-commande-montant">' + c.montant.toFixed(2).replace('.', ',') + ' €</div>' +
-          '</div>' +
-          '<div class="carte-commande-detail">' + escapeHtml(detailCommande(c)) + '</div>' +
-          '<div class="carte-commande-pied">' +
-            '<span class="retrait">Retrait : ' + escapeHtml(c.jourRetrait || '—') + ' ' + escapeHtml(c.heureRetrait || '') + '</span>' +
-            '<span>Commandé le ' + date + '</span>' +
-          '</div>' +
-        '</div>';
-      }).join('');
+  // Endpoint public (pas de code requis).
+  function apiPublic(chemin, options){
+    return fetch(API_BASE + chemin, options)
+      .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+      .then(function(res){
+        if(!res.ok){ throw new Error(res.data && res.data.error ? res.data.error : 'Erreur'); }
+        return res.data;
+      });
+  }
+
+  function gererErreurPin(res){
+    if(res.data && res.data.error === 'Code personnel invalide'){
+      sessionStorage.removeItem(PIN_KEY);
+      alert('Code personnel incorrect, merci de le ressaisir.');
+      location.reload();
     }
   }
 
-  function changerStatutCommande(id, statut) {
-    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
-    fetch(API_BASE + '/commande?action=statut', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': pin },
-      body: JSON.stringify({ id: id, statut: statut }),
-    })
-      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
-      .then(function (res) {
-        if (!res.ok) { alert(res.data && res.data.error ? res.data.error : 'Erreur'); return; }
-        chargerCommandes();
-      })
-      .catch(function () { alert('Erreur réseau.'); });
-  }
-
-  // Met à jour chaque seconde les décomptes de 20 minutes des commandes "à récupérer".
-  function majDecomptes() {
-    document.querySelectorAll('.decompte').forEach(function (el) {
-      var restant = Number(el.getAttribute('data-echeance')) - Date.now();
-      if (restant <= 0) {
-        el.textContent = 'Prête !';
-        el.style.color = 'var(--vert)';
-        el.style.fontWeight = '700';
-      } else {
-        var min = Math.floor(restant / 60000);
-        var sec = Math.floor((restant % 60000) / 1000);
-        el.textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
-        el.style.fontWeight = '600';
-      }
-    });
-  }
-  setInterval(majDecomptes, 1000);
-
-  document.getElementById('btnReparerIndex').addEventListener('click', function () {
-    var pin = sessionStorage.getItem(PIN_STORAGE_KEY) || '';
-    var msg = document.getElementById('msgReparation');
-    msg.textContent = 'Réparation en cours...';
-    fetch(API_BASE + '/reservation?action=reparerIndex', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Staff-Pin': pin },
-      body: '{}',
-    })
-      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
-      .then(function (res) {
-        if (!res.ok) { msg.textContent = res.data && res.data.error ? res.data.error : 'Erreur'; return; }
-        msg.textContent = res.data.idsRepares + ' réservation(s) réparée(s) sur ' + res.data.joursScannes + ' jour(s).';
-        chargerReservationsAVenir();
-      })
-      .catch(function () { msg.textContent = 'Erreur réseau.'; });
+  /* ---------- Connexion ---------- */
+  document.getElementById('btnValiderPin').addEventListener('click', function(){
+    var pin = document.getElementById('champPin').value.trim();
+    if(!pin) return;
+    sessionStorage.setItem(PIN_KEY, pin);
+    demarrerApp();
+  });
+  document.getElementById('champPin').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ document.getElementById('btnValiderPin').click(); }
+  });
+  document.getElementById('btnDeconnexion').addEventListener('click', function(){
+    sessionStorage.removeItem(PIN_KEY);
+    location.reload();
   });
 
-  // Actualisation automatique : toutes les 25 secondes, on revérifie les commandes
-  // (avec son si une nouvelle arrive) et les réservations à venir.
-  setInterval(function () {
-    // Ne rien faire tant qu'on n'est pas connecté (sinon les appels échoueraient en
-    // affichant "Code personnel invalide" sur l'écran de saisie sans raison).
-    if (!sessionStorage.getItem(PIN_STORAGE_KEY)) return;
-    if (document.getElementById('ecranDashboard').style.display !== 'block') return;
-    chargerCommandes();
-    chargerReservationsAVenir();
-  }, 25000);
+  function demarrerApp(){
+    // On vérifie le code sur la liste fidélité : si elle répond, le code est bon.
+    apiGetPin('/fidelite-liste')
+      .then(function(){
+        document.getElementById('ecranPin').style.display = 'none';
+        document.getElementById('appPrincipal').style.display = 'flex';
+        chargerVueActive();
+        initialiserVeilleNotifications();
+      })
+      .catch(function(err){
+        document.getElementById('msgErreurPin').textContent = err.message || 'Code incorrect';
+        document.getElementById('msgErreurPin').style.display = 'block';
+      });
+  }
 
-  // Connexion automatique si le code personnel est déjà mémorisé pour cette session.
-  // Placé en tout dernier, une fois que tout le reste du script ci-dessus est prêt.
-  var pinDejaEnregistre = sessionStorage.getItem(PIN_STORAGE_KEY);
-  if (pinDejaEnregistre) { ouvrirDashboard(); }
+  if(getPin()){ demarrerApp(); }
+
+  /* ---------- Navigation par onglets ---------- */
+  var ongletActif = 'accueil';
+  document.querySelectorAll('.tab-item').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var cible = btn.getAttribute('data-tab');
+      ongletActif = cible;
+      document.querySelectorAll('.tab-item').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.vue').forEach(function(v){ v.classList.remove('active'); });
+      document.getElementById('vue-' + cible).classList.add('active');
+      document.getElementById('titrePage').textContent = titresOnglets[cible];
+      chargerVueActive();
+    });
+  });
+
+  function chargerVueActive(){
+    if(ongletActif === 'accueil') chargerAccueil();
+    if(ongletActif === 'resas') chargerResas();
+    if(ongletActif === 'fidelite') chargerFidelite();
+    if(ongletActif === 'commandes') chargerCommandes();
+  }
+
+  /* ---------- Feuilles (modales) ---------- */
+  document.querySelectorAll('[data-fermer]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.getElementById(btn.getAttribute('data-fermer')).classList.remove('active');
+    });
+  });
+  function ouvrirFeuille(id){ document.getElementById(id).classList.add('active'); }
+
+  /* =========================================================
+     ACCUEIL
+     ========================================================= */
+  var COULEURS_STATUT = { nouvelle: '#C70039', a_recuperer: '#F6C667', terminee: '#417050' };
+  var LABELS_STATUT = { nouvelle: 'Nouvelles', a_recuperer: 'À récupérer', terminee: 'Récupérées' };
+
+  function chargerAccueil(){
+    var aujourdHui = todayISO();
+
+    Promise.all([
+      apiGetPin('/commande', { action: 'liste' }).catch(function(){ return { commandes: [] }; }),
+      apiGetPin('/reservation?action=liste', { date: aujourdHui }).catch(function(){ return { reservations: [] }; }),
+      apiGetPin('/fidelite-liste').catch(function(){ return { clients: [] }; }),
+    ]).then(function(resultats){
+      var commandes = (resultats[0].commandes || []).filter(function(c){ return (c.dateCreation || '').slice(0, 10) === aujourdHui; });
+      var reservations = (resultats[1].reservations || []).filter(function(r){ return r.statut !== 'annulee'; });
+      var clients = resultats[2].clients || [];
+
+      var couverts = reservations.reduce(function(s, r){ return s + (r.couverts || 0); }, 0);
+      document.getElementById('accCouverts').textContent = couverts;
+
+      var caJour = commandes.reduce(function(s, c){ return s + (c.montant || 0); }, 0);
+      document.getElementById('accCa').textContent = formatEuros(caJour);
+
+      var prets = clients.filter(function(c){ return c.tampons >= REWARD_STAMPS; }).length;
+      document.getElementById('accPrets').textContent = prets;
+
+      dessinerDonut(commandes);
+    });
+  }
+
+  function dessinerDonut(commandes){
+    var conteneur = document.getElementById('accDonutBloc');
+    if(commandes.length === 0){
+      conteneur.innerHTML = '<div class="vide" style="padding:8px 0;">Aucune commande aujourd\'hui.</div>';
+      return;
+    }
+    var comptes = { nouvelle: 0, a_recuperer: 0, terminee: 0 };
+    commandes.forEach(function(c){ if(comptes[c.statut] !== undefined) comptes[c.statut]++; else comptes.nouvelle++; });
+    var total = commandes.length;
+
+    var degres = 0;
+    var segments = [];
+    ['nouvelle', 'a_recuperer', 'terminee'].forEach(function(statut){
+      var part = comptes[statut] / total * 360;
+      if(part > 0){
+        segments.push(COULEURS_STATUT[statut] + ' ' + degres + 'deg ' + (degres + part) + 'deg');
+        degres += part;
+      }
+    });
+    var gradient = segments.length ? 'conic-gradient(' + segments.join(', ') + ')' : '#eee';
+
+    var legende = ['nouvelle', 'a_recuperer', 'terminee'].map(function(statut){
+      var pct = Math.round(comptes[statut] / total * 100);
+      return '<div class="legende-item"><span class="puce" style="background:' + COULEURS_STATUT[statut] + ';"></span>' +
+        LABELS_STATUT[statut] + '<span class="compte">' + comptes[statut] + ' (' + pct + '%)</span></div>';
+    }).join('');
+
+    conteneur.innerHTML =
+      '<div class="donut-bloc">' +
+        '<div class="donut" style="background:' + gradient + ';"><div class="donut-centre"><div class="n">' + total + '</div><div class="l">commande' + (total > 1 ? 's' : '') + '</div></div></div>' +
+        '<div class="legende">' + legende + '</div>' +
+      '</div>';
+  }
+
+  /* =========================================================
+     RÉSAS
+     ========================================================= */
+  var champDateResa = document.getElementById('champDateResa');
+  champDateResa.value = todayISO();
+  champDateResa.addEventListener('change', chargerResas);
+  document.getElementById('btnResaAujourdhui').addEventListener('click', function(){
+    champDateResa.value = todayISO();
+    chargerResas();
+  });
+
+  function chargerResas(){
+    if(ongletActif !== 'resas') return;
+    var dateStr = champDateResa.value || todayISO();
+    var conteneur = document.getElementById('resaListeContainer');
+    conteneur.innerHTML = '<div class="chargement">Chargement…</div>';
+
+    apiGetPin('/reservation?action=liste', { date: dateStr }).then(function(data){
+      var reservations = data.reservations || [];
+      var actives = reservations.filter(function(r){ return r.statut !== 'annulee'; });
+      var dejeuner = actives.filter(function(r){ return r.service === 'dejeuner'; }).reduce(function(s, r){ return s + r.couverts; }, 0);
+      var diner = actives.filter(function(r){ return r.service === 'diner'; }).reduce(function(s, r){ return s + r.couverts; }, 0);
+
+      document.getElementById('resaDejeuner').textContent = dejeuner;
+      document.getElementById('resaDiner').textContent = diner;
+      document.getElementById('resaTotal').textContent = actives.length;
+
+      if(reservations.length === 0){
+        conteneur.innerHTML = '<div class="vide">Aucune réservation ce jour-là.</div>';
+        return;
+      }
+
+      reservations.sort(function(a, b){ return a.heure < b.heure ? -1 : 1; });
+      var lignes = reservations.map(function(r){
+        var annulee = r.statut === 'annulee';
+        return '<tr>' +
+          '<td' + (annulee ? ' class="annulee"' : '') + '>' + r.heure + '</td>' +
+          '<td' + (annulee ? ' class="annulee"' : '') + '>' + escapeHtml(r.nom) + '</td>' +
+          '<td' + (annulee ? ' class="annulee"' : '') + '>' + r.couverts + '</td>' +
+          '<td' + (annulee ? ' class="annulee"' : '') + '>' + (r.service === 'dejeuner' ? 'Déj.' : 'Dîner') + '</td>' +
+          '<td>' + (annulee ? '' : '<button class="btn-mini" data-id="' + r.id + '">Annuler</button>') + '</td>' +
+          '</tr>';
+      }).join('');
+      conteneur.innerHTML = '<table><thead><tr><th>Heure</th><th>Nom</th><th>Couv.</th><th>Service</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
+
+      conteneur.querySelectorAll('.btn-mini').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if(!confirm('Annuler cette réservation ?')) return;
+          apiPostPin('/reservation?action=annuler', { id: btn.getAttribute('data-id') }).then(chargerResas);
+        });
+      });
+    });
+  }
+
+  document.getElementById('btnNouvelleResa').addEventListener('click', function(){
+    document.getElementById('fResaDate').value = champDateResa.value || todayISO();
+    document.getElementById('formResaMsg').style.display = 'none';
+    ouvrirFeuille('overlayResa');
+  });
+
+  document.getElementById('btnValiderResa').addEventListener('click', function(){
+    var body = {
+      nom: document.getElementById('fResaNom').value.trim(),
+      telephone: document.getElementById('fResaTelephone').value.trim(),
+      email: document.getElementById('fResaEmail').value.trim(),
+      date: document.getElementById('fResaDate').value,
+      service: document.getElementById('fResaService').value,
+      heure: document.getElementById('fResaHeure').value,
+      couverts: Number(document.getElementById('fResaCouverts').value),
+      note: document.getElementById('fResaNote').value.trim(),
+    };
+    var msg = document.getElementById('formResaMsg');
+    msg.style.display = 'none';
+    apiPublic('/reservation?action=creer', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    }).then(function(){
+      document.getElementById('overlayResa').classList.remove('active');
+      champDateResa.value = body.date;
+      chargerResas();
+    }).catch(function(err){
+      msg.textContent = err.message || 'Erreur lors de la création';
+      msg.style.display = 'block';
+    });
+  });
+
+  /* =========================================================
+     FIDÉLITÉ
+     ========================================================= */
+  function chargerFidelite(){
+    if(ongletActif !== 'fidelite') return;
+    var conteneur = document.getElementById('fidListeContainer');
+    conteneur.innerHTML = '<div class="chargement">Chargement…</div>';
+
+    apiGetPin('/fidelite-liste').then(function(data){
+      var clients = data.clients || [];
+      var prets = clients.filter(function(c){ return c.tampons >= REWARD_STAMPS; }).length;
+      var donnees = clients.reduce(function(s, c){ return s + (c.recompenses || 0); }, 0);
+
+      document.getElementById('fidTotal').textContent = clients.length;
+      document.getElementById('fidPrets').textContent = prets;
+      document.getElementById('fidDonnees').textContent = donnees;
+
+      if(clients.length === 0){
+        conteneur.innerHTML = '<div class="vide">Aucun client inscrit pour l\'instant.</div>';
+        return;
+      }
+
+      clients.sort(function(a, b){ return new Date(b.dateInscription) - new Date(a.dateInscription); });
+      var lignes = clients.map(function(c){
+        var pret = c.tampons >= REWARD_STAMPS;
+        return '<tr>' +
+          '<td>' + escapeHtml(c.nom) + '</td>' +
+          '<td>' + escapeHtml(c.telephone) + '</td>' +
+          '<td class="' + (pret ? 'pret' : '') + '">' + c.tampons + ' / ' + REWARD_STAMPS + (pret ? ' — prêt' : '') + '</td>' +
+          '<td><div class="cellule-actions">' +
+            (pret ? '<button class="btn-mini-vert" data-id="' + c.id + '" data-nom="' + escapeHtml(c.nom) + '">Échanger</button>' : '') +
+            '<button class="btn-mini" data-id="' + c.id + '" data-nom="' + escapeHtml(c.nom) + '">Suppr.</button>' +
+          '</div></td>' +
+          '</tr>';
+      }).join('');
+      conteneur.innerHTML = '<table><thead><tr><th>Nom</th><th>Tél.</th><th>Tampons</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table>';
+
+      conteneur.querySelectorAll('.btn-mini').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if(!confirm('Supprimer définitivement la carte de ' + btn.getAttribute('data-nom') + ' ?')) return;
+          apiPostPin('/fidelite-supprimer', { id: btn.getAttribute('data-id') }).then(chargerFidelite);
+        });
+      });
+      conteneur.querySelectorAll('.btn-mini-vert').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if(!confirm('Échanger la récompense de ' + btn.getAttribute('data-nom') + ' ? Son compteur repasse à 0 tampon.')) return;
+          apiPostPin('/fidelite-echanger', { id: btn.getAttribute('data-id') }).then(chargerFidelite);
+        });
+      });
+    });
+  }
+
+  document.getElementById('btnRegle').addEventListener('click', function(){ ouvrirFeuille('overlayRegle'); });
+
+  document.getElementById('btnNouveauClient').addEventListener('click', function(){
+    document.getElementById('formClientMsg').style.display = 'none';
+    document.getElementById('fClientNom').value = '';
+    document.getElementById('fClientTelephone').value = '';
+    document.getElementById('fClientEmail').value = '';
+    document.getElementById('fClientConsentement').checked = false;
+    ouvrirFeuille('overlayClient');
+  });
+
+  document.getElementById('btnValiderClient').addEventListener('click', function(){
+    var body = {
+      nom: document.getElementById('fClientNom').value.trim(),
+      telephone: document.getElementById('fClientTelephone').value.trim(),
+      email: document.getElementById('fClientEmail').value.trim(),
+      consentementMarketing: document.getElementById('fClientConsentement').checked,
+    };
+    var msg = document.getElementById('formClientMsg');
+    msg.style.display = 'none';
+    apiPublic('/fidelite-inscription', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    }).then(function(){
+      document.getElementById('overlayClient').classList.remove('active');
+      chargerFidelite();
+    }).catch(function(err){
+      msg.textContent = err.message || 'Erreur lors de la création';
+      msg.style.display = 'block';
+    });
+  });
+
+  /* ---- Scanner ---- */
+  var html5QrCode = null;
+  var idScanne = null;
+
+  document.getElementById('btnOuvrirScanner').addEventListener('click', function(){
+    ouvrirFeuille('overlayScanner');
+    document.getElementById('resultatScan').style.display = 'none';
+    document.getElementById('scanStatut').style.display = 'block';
+    idScanne = null;
+    if(!html5QrCode){ html5QrCode = new Html5Qrcode('lecteur'); }
+    Html5Qrcode.getCameras().then(function(cameras){
+      if(!cameras || cameras.length === 0){
+        document.getElementById('scanStatut').textContent = 'Aucune caméra détectée sur cet appareil.';
+        return;
+      }
+      var arriere = cameras.find(function(c){ return /back|arri[eè]re|rear|environment/i.test(c.label || ''); });
+      var camera = arriere || cameras[cameras.length - 1];
+      lancerFlux(camera.id);
+    }).catch(function(){ lancerFlux({ facingMode: 'environment' }); });
+  });
+
+  function lancerFlux(cible){
+    html5QrCode.start(cible, { fps: 10, qrbox: 230 }, onScanReussi, function(){}).catch(function(err){
+      document.getElementById('scanStatut').textContent = 'Impossible d\'ouvrir la caméra : ' + err;
+    });
+  }
+
+  function onScanReussi(texteDecode){
+    if(idScanne) return;
+    idScanne = texteDecode;
+    if(html5QrCode) html5QrCode.pause(true);
+    chargerCarteScan(idScanne);
+  }
+
+  document.getElementById('lienRecherche').addEventListener('click', function(e){
+    e.preventDefault();
+    var bloc = document.getElementById('blocRecherche');
+    bloc.style.display = bloc.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('btnChercherTel').addEventListener('click', function(){
+    var tel = document.getElementById('champTelephoneScan').value.trim();
+    if(!tel) return;
+    apiGetPin('/fidelite-recherche', { telephone: tel }).then(function(data){
+      idScanne = data.id;
+      if(html5QrCode) html5QrCode.pause(true);
+      afficherResultatScan(data);
+    }).catch(function(err){ afficherErreurScan(err.message); });
+  });
+
+  function chargerCarteScan(id){
+    apiPublic('/fidelite-carte?id=' + encodeURIComponent(id)).then(afficherResultatScan).catch(function(err){ afficherErreurScan(err.message); });
+  }
+
+  function afficherResultatScan(data){
+    document.getElementById('scanStatut').style.display = 'none';
+    var resultat = document.getElementById('resultatScan');
+    resultat.style.display = 'block';
+    document.getElementById('scanErreur').style.display = 'none';
+    document.getElementById('scanNom').textContent = data.nom;
+    var objectif = data.objectif || REWARD_STAMPS;
+    document.getElementById('scanCompte').innerHTML = '<strong>' + data.tampons + ' / ' + objectif + '</strong> tampons';
+    var pret = data.tampons >= objectif;
+    document.getElementById('badgePretScan').style.display = pret ? 'inline-block' : 'none';
+    document.getElementById('btnScanEchanger').style.display = pret ? 'block' : 'none';
+    document.getElementById('btnScanTampon').style.display = pret ? 'none' : 'block';
+  }
+
+  function afficherErreurScan(message){
+    document.getElementById('scanStatut').style.display = 'none';
+    var resultat = document.getElementById('resultatScan');
+    resultat.style.display = 'block';
+    document.getElementById('scanNom').textContent = 'Carte introuvable';
+    document.getElementById('scanCompte').textContent = '';
+    document.getElementById('badgePretScan').style.display = 'none';
+    document.getElementById('btnScanEchanger').style.display = 'none';
+    document.getElementById('btnScanTampon').style.display = 'none';
+    var err = document.getElementById('scanErreur');
+    err.textContent = message || 'Erreur';
+    err.style.display = 'block';
+  }
+
+  document.getElementById('btnScanTampon').addEventListener('click', function(){
+    apiPostPin('/fidelite-tampon', { id: idScanne }).then(afficherResultatScan).then(chargerFidelite).catch(function(err){ afficherErreurScan(err.message); });
+  });
+  document.getElementById('btnScanEchanger').addEventListener('click', function(){
+    apiPostPin('/fidelite-echanger', { id: idScanne }).then(function(data){
+      afficherResultatScan({ nom: data.nom, tampons: data.tampons, objectif: REWARD_STAMPS });
+      chargerFidelite();
+    }).catch(function(err){ afficherErreurScan(err.message); });
+  });
+  document.getElementById('btnScanReprendre').addEventListener('click', function(){
+    idScanne = null;
+    document.getElementById('resultatScan').style.display = 'none';
+    document.getElementById('scanStatut').style.display = 'block';
+    if(html5QrCode) html5QrCode.resume();
+  });
+
+  /* =========================================================
+     COMMANDES
+     ========================================================= */
+  var PROCHAIN_STATUT = { nouvelle: 'a_recuperer', a_recuperer: 'terminee' };
+  var LABEL_ACTION = { nouvelle: 'Marquer prête à récupérer', a_recuperer: 'Marquer récupérée' };
+
+  function chargerCommandes(){
+    if(ongletActif !== 'commandes') return;
+    var enCoursConteneur = document.getElementById('cmdEnCoursContainer');
+    enCoursConteneur.innerHTML = '<div class="chargement">Chargement…</div>';
+
+    apiGetPin('/commande', { action: 'liste' }).then(function(data){
+      var aujourdHui = todayISO();
+      var commandes = (data.commandes || []).filter(function(c){ return (c.dateCreation || '').slice(0, 10) === aujourdHui; });
+
+      var enCours = commandes.filter(function(c){ return c.statut !== 'terminee'; });
+      var terminees = commandes.filter(function(c){ return c.statut === 'terminee'; });
+      var ca = commandes.reduce(function(s, c){ return s + (c.montant || 0); }, 0);
+
+      document.getElementById('cmdEnCours').textContent = enCours.length;
+      document.getElementById('cmdJour').textContent = commandes.length;
+      document.getElementById('cmdCa').textContent = formatEuros(ca);
+
+      enCoursConteneur.innerHTML = enCours.length === 0
+        ? '<div class="vide">Aucune commande en cours.</div>'
+        : enCours.map(rendreCarteCommande).join('');
+      brancherActionsCommandes(enCoursConteneur);
+
+      var termineesConteneur = document.getElementById('cmdTermineesContainer');
+      termineesConteneur.innerHTML = terminees.length === 0
+        ? '<div class="vide">Aucune commande terminée aujourd\'hui.</div>'
+        : terminees.map(rendreCarteCommande).join('');
+    });
+  }
+
+  function rendreCarteCommande(c){
+    var lignesTexte = (c.lignes || []).map(function(l){ return l.quantite + '× ' + l.description; }).join(', ');
+    var badgeClasse = 'badge-' + c.statut;
+    var boutonAction = PROCHAIN_STATUT[c.statut]
+      ? '<button class="btn-mini" data-id="' + c.id + '" data-prochain="' + PROCHAIN_STATUT[c.statut] + '" style="margin-top:8px;">' + LABEL_ACTION[c.statut] + '</button>'
+      : '';
+    return '<div class="commande-carte">' +
+      '<span class="badge-statut ' + badgeClasse + '">' + (LABELS_STATUT[c.statut] || c.statut) + '</span>' +
+      '<div class="commande-entete">' +
+        '<div><div class="commande-nom">' + escapeHtml(c.nom) + '</div><div class="commande-heure">Retrait ' + escapeHtml(c.jourRetrait) + ' à ' + escapeHtml(c.heureRetrait) + '</div></div>' +
+        '<div class="commande-montant">' + formatEuros(c.montant) + '</div>' +
+      '</div>' +
+      '<div class="commande-lignes">' + escapeHtml(lignesTexte) + '</div>' +
+      boutonAction +
+      '</div>';
+  }
+
+  function brancherActionsCommandes(conteneur){
+    conteneur.querySelectorAll('.btn-mini').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        apiPostPin('/commande?action=statut', { id: btn.getAttribute('data-id'), statut: btn.getAttribute('data-prochain') }).then(chargerCommandes);
+      });
+    });
+  }
+
+  /* =========================================================
+     VEILLE : détection des nouveautés + son, même hors de l'onglet concerné
+     ========================================================= */
+  var dernierNombreCommandes = null;
+  var idsReservationsConnus = null;
+
+  function initialiserVeilleNotifications(){
+    // Premier relevé silencieux, pour ne pas jouer un son sur tout l'existant à la connexion.
+    apiGetPin('/commande', { action: 'liste' }).then(function(data){
+      dernierNombreCommandes = (data.commandes || []).length;
+    }).catch(function(){});
+    apiGetPin('/reservation?action=aVenir').then(function(data){
+      idsReservationsConnus = (data.reservations || []).map(function(r){ return r.id; });
+    }).catch(function(){});
+
+    setInterval(verifierNouveautes, 25000);
+  }
+
+  function verifierNouveautes(){
+    if(!getPin()) return;
+    if(document.getElementById('appPrincipal').style.display !== 'flex') return;
+
+    apiGetPin('/commande', { action: 'liste' }).then(function(data){
+      var nombre = (data.commandes || []).length;
+      if(dernierNombreCommandes !== null && nombre > dernierNombreCommandes){
+        jouerSonNotification('commande');
+        if(ongletActif === 'commandes' || ongletActif === 'accueil') chargerVueActive();
+      }
+      dernierNombreCommandes = nombre;
+    }).catch(function(){});
+
+    apiGetPin('/reservation?action=aVenir').then(function(data){
+      var idsActuels = (data.reservations || []).map(function(r){ return r.id; });
+      var nouveaux = idsReservationsConnus === null ? [] : idsActuels.filter(function(id){ return idsReservationsConnus.indexOf(id) === -1; });
+      if(nouveaux.length > 0){
+        jouerSonNotification('reservation');
+        if(ongletActif === 'resas' || ongletActif === 'accueil') chargerVueActive();
+      }
+      idsReservationsConnus = idsActuels;
+    }).catch(function(){});
+  }
 </script>
 
 </body>
