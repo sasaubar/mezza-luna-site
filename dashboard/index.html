@@ -401,6 +401,43 @@
   var PIN_KEY = 'fidelite-staff-pin';
   var REWARD_STAMPS = 8;
 
+  /* ---------- Notifications sonores ---------- */
+  var MOTIFS_SON = {
+    commande: [880, 1180],        // deux notes montantes, aigu, style "caisse"
+    reservation: [660, 990, 660], // trois notes, plus grave, style "carillon"
+  };
+
+  // Sur mobile (Safari iOS notamment), un AudioContext créé sans interaction utilisateur
+  // reste "suspended" et ne joue aucun son. On garde donc un seul contexte, débloqué dès
+  // le premier clic sur la page, puis réutilisé et relancé (resume) à chaque notification
+  // même quand elle est déclenchée par le rafraîchissement automatique.
+  var contexteAudio = null;
+  function obtenirContexteAudio(){
+    if(!contexteAudio){ contexteAudio = new (window.AudioContext || window.webkitAudioContext)(); }
+    if(contexteAudio.state === 'suspended'){ contexteAudio.resume(); }
+    return contexteAudio;
+  }
+  document.addEventListener('click', obtenirContexteAudio, { once: true });
+
+  function jouerSonNotification(type){
+    try {
+      var ctx = obtenirContexteAudio();
+      var notes = MOTIFS_SON[type] || MOTIFS_SON.commande;
+      notes.forEach(function(frequence, i){
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = frequence;
+        var debut = ctx.currentTime + i * 0.18;
+        gain.gain.setValueAtTime(0.18, debut);
+        gain.gain.exponentialRampToValueAtTime(0.001, debut + 0.3);
+        osc.start(debut);
+        osc.stop(debut + 0.3);
+      });
+    } catch(e) { /* audio non disponible, tant pis */ }
+  }
+
   var titresOnglets = {
     accueil: 'Tableau de bord',
     resas: 'Réservations',
@@ -493,6 +530,7 @@
         document.getElementById('ecranPin').style.display = 'none';
         document.getElementById('appPrincipal').style.display = 'flex';
         chargerVueActive();
+        initialiserVeilleNotifications();
       })
       .catch(function(err){
         document.getElementById('msgErreurPin').textContent = err.message || 'Code incorrect';
@@ -921,6 +959,48 @@
         apiPostPin('/commande?action=statut', { id: btn.getAttribute('data-id'), statut: btn.getAttribute('data-prochain') }).then(chargerCommandes);
       });
     });
+  }
+
+  /* =========================================================
+     VEILLE : détection des nouveautés + son, même hors de l'onglet concerné
+     ========================================================= */
+  var dernierNombreCommandes = null;
+  var idsReservationsConnus = null;
+
+  function initialiserVeilleNotifications(){
+    // Premier relevé silencieux, pour ne pas jouer un son sur tout l'existant à la connexion.
+    apiGetPin('/commande', { action: 'liste' }).then(function(data){
+      dernierNombreCommandes = (data.commandes || []).length;
+    }).catch(function(){});
+    apiGetPin('/reservation?action=aVenir').then(function(data){
+      idsReservationsConnus = (data.reservations || []).map(function(r){ return r.id; });
+    }).catch(function(){});
+
+    setInterval(verifierNouveautes, 25000);
+  }
+
+  function verifierNouveautes(){
+    if(!getPin()) return;
+    if(document.getElementById('appPrincipal').style.display !== 'flex') return;
+
+    apiGetPin('/commande', { action: 'liste' }).then(function(data){
+      var nombre = (data.commandes || []).length;
+      if(dernierNombreCommandes !== null && nombre > dernierNombreCommandes){
+        jouerSonNotification('commande');
+        if(ongletActif === 'commandes' || ongletActif === 'accueil') chargerVueActive();
+      }
+      dernierNombreCommandes = nombre;
+    }).catch(function(){});
+
+    apiGetPin('/reservation?action=aVenir').then(function(data){
+      var idsActuels = (data.reservations || []).map(function(r){ return r.id; });
+      var nouveaux = idsReservationsConnus === null ? [] : idsActuels.filter(function(id){ return idsReservationsConnus.indexOf(id) === -1; });
+      if(nouveaux.length > 0){
+        jouerSonNotification('reservation');
+        if(ongletActif === 'resas' || ongletActif === 'accueil') chargerVueActive();
+      }
+      idsReservationsConnus = idsActuels;
+    }).catch(function(){});
   }
 </script>
 
