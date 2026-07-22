@@ -127,9 +127,28 @@
   .btn-mini-vert:hover{ background:var(--vert); color:#fff; }
   .cellule-actions{ display:flex; gap:6px; flex-wrap:wrap; }
 
-  .barre-date{ display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
-  .barre-date input{ padding:9px 10px; border:1.5px solid rgba(26,26,26,.16); border-radius:8px; font-size:.88rem; flex:1; min-width:150px; }
+  .barre-date{ display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .barre-date input{ padding:9px 10px; border:1.5px solid rgba(26,26,26,.16); border-radius:8px; font-size:.88rem; flex:1; min-width:130px; }
   .barre-date button{ padding:9px 14px; border-radius:8px; border:1.5px solid rgba(26,26,26,.16); background:#fff; cursor:pointer; font-size:.82rem; white-space:nowrap; }
+  .btn-icon-date{ padding:9px 13px !important; font-size:1.1rem !important; line-height:1; font-weight:700; color:var(--rouge-vif); }
+
+  .filtres-service{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .chip{
+    padding:7px 16px; border-radius:50px; border:1.5px solid rgba(26,26,26,.15); background:#fff;
+    color:var(--charbon-doux); font-size:.8rem; font-weight:600; cursor:pointer; font-family:var(--sans);
+  }
+  .chip.active{ background:var(--rouge-vif); border-color:var(--rouge-vif); color:#fff; }
+
+  .graph-service{ display:flex; align-items:flex-end; gap:4px; height:130px; overflow-x:auto; padding-bottom:4px; }
+  .graph-barre-bloc{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; flex-shrink:0; width:30px; height:100%; }
+  .graph-barre{ width:16px; border-radius:4px 4px 0 0; min-height:3px; }
+  .graph-barre.dejeuner{ background:var(--rouge-vif); }
+  .graph-barre.diner{ background:var(--vert); }
+  .graph-valeur{ font-size:.62rem; color:var(--charbon-doux); margin-bottom:2px; font-weight:600; }
+  .graph-label{ font-size:.6rem; color:var(--charbon-doux); margin-top:5px; white-space:nowrap; }
+  .graph-legende{ display:flex; gap:14px; margin-top:10px; font-size:.76rem; color:var(--charbon-doux); }
+  .graph-legende span{ display:inline-flex; align-items:center; gap:5px; }
+  .graph-legende .puce{ width:9px; height:9px; border-radius:50%; display:inline-block; }
 
   /* Donut CSS */
   .donut-bloc{ display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
@@ -261,6 +280,21 @@
         <div class="carte">
           <div id="accDonutBloc" class="chargement">Chargement…</div>
         </div>
+
+        <div class="section-titre">Mémos</div>
+        <div class="section-soustitre">Notes libres pour l'équipe, visibles de tous</div>
+        <div class="carte">
+          <div id="memosListe" class="chargement">Chargement…</div>
+          <div class="champ" style="margin-top:12px;margin-bottom:0;">
+            <input type="text" id="champNouveauMemo" placeholder="Écrire un mémo…" maxlength="500" />
+          </div>
+          <button class="btn btn-petit" id="btnAjouterMemo" style="width:auto;margin-top:10px;">+ Ajouter</button>
+        </div>
+
+        <div class="section-titre">Notes clients du jour</div>
+        <div class="carte">
+          <div id="accNotesClients" class="chargement">Chargement…</div>
+        </div>
       </div>
 
       <!-- RESAS -->
@@ -269,14 +303,24 @@
           <button class="btn" id="btnNouvelleResa">+ Nouvelle réservation</button>
         </div>
         <div class="barre-date">
+          <button class="btn-icon-date" id="btnResaJourPrecedent" aria-label="Jour précédent">‹</button>
           <input type="date" id="champDateResa" />
+          <button class="btn-icon-date" id="btnResaJourSuivant" aria-label="Jour suivant">›</button>
           <button id="btnResaAujourdhui">Aujourd'hui</button>
+        </div>
+        <div class="filtres-service">
+          <button class="chip active" data-filtre="tous">Tous</button>
+          <button class="chip" data-filtre="dejeuner">Déjeuner</button>
+          <button class="chip" data-filtre="diner">Dîner</button>
         </div>
         <div class="stats">
           <div class="stat-carte"><div class="valeur" id="resaDejeuner">0</div><div class="label">Couverts déjeuner</div></div>
           <div class="stat-carte"><div class="valeur" id="resaDiner">0</div><div class="label">Couverts dîner</div></div>
           <div class="stat-carte"><div class="valeur" id="resaTotal">0</div><div class="label">Réservations actives</div></div>
         </div>
+        <div class="section-titre" style="margin-top:0;">Déroulé du service</div>
+        <div class="carte" id="resaGraphique"><div class="vide" style="padding:8px 0;">Aucune réservation ce jour-là.</div></div>
+        <div class="section-titre">Réservations</div>
         <div id="resaListeContainer"><div class="chargement">Chargement…</div></div>
       </div>
 
@@ -613,8 +657,66 @@
       document.getElementById('accPrets').textContent = prets;
 
       dessinerDonut(commandes);
+      afficherNotesClients(reservations);
+    });
+    chargerMemos();
+  }
+
+  function afficherNotesClients(reservations){
+    var conteneur = document.getElementById('accNotesClients');
+    var avecNote = reservations.filter(function(r){ return r.note && r.note.trim(); });
+    if(avecNote.length === 0){
+      conteneur.innerHTML = '<div class="vide" style="padding:8px 0;">Aucune note particulière aujourd\'hui.</div>';
+      return;
+    }
+    avecNote.sort(function(a, b){ return a.heure < b.heure ? -1 : 1; });
+    conteneur.innerHTML = avecNote.map(function(r){
+      return '<div class="commande-carte">' +
+        '<div class="commande-entete">' +
+          '<div><div class="commande-nom">' + escapeHtml(r.nom) + '</div><div class="commande-heure">' + r.heure + ' — ' + (r.service === 'dejeuner' ? 'Déjeuner' : 'Dîner') + ', ' + r.couverts + ' couverts</div></div>' +
+        '</div>' +
+        '<div class="commande-lignes">' + escapeHtml(r.note) + '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  /* ---- Mémos ---- */
+  function chargerMemos(){
+    var conteneur = document.getElementById('memosListe');
+    apiGetPin('/memo', { action: 'liste' }).then(function(data){
+      var memos = data.memos || [];
+      if(memos.length === 0){
+        conteneur.innerHTML = '<div class="vide" style="padding:8px 0;">Aucun mémo pour le moment.</div>';
+        return;
+      }
+      conteneur.innerHTML = memos.map(function(m){
+        return '<div class="commande-carte" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
+          '<div>' + escapeHtml(m.texte) + '</div>' +
+          '<button class="btn-mini" data-id="' + m.id + '">Suppr.</button>' +
+          '</div>';
+      }).join('');
+      conteneur.querySelectorAll('.btn-mini').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          apiPostPin('/memo?action=supprimer', { id: btn.getAttribute('data-id') }).then(chargerMemos);
+        });
+      });
+    }).catch(function(){
+      conteneur.innerHTML = '<div class="vide" style="padding:8px 0;">Impossible de charger les mémos.</div>';
     });
   }
+
+  document.getElementById('btnAjouterMemo').addEventListener('click', function(){
+    var champ = document.getElementById('champNouveauMemo');
+    var texte = champ.value.trim();
+    if(!texte) return;
+    apiPostPin('/memo?action=creer', { texte: texte }).then(function(){
+      champ.value = '';
+      chargerMemos();
+    });
+  });
+  document.getElementById('champNouveauMemo').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ document.getElementById('btnAjouterMemo').click(); }
+  });
 
   function dessinerDonut(commandes){
     var conteneur = document.getElementById('accDonutBloc');
@@ -661,6 +763,25 @@
     chargerResas();
   });
 
+  function decalerJour(delta){
+    var d = new Date(champDateResa.value || todayISO());
+    d.setDate(d.getDate() + delta);
+    champDateResa.value = d.toISOString().slice(0, 10);
+    chargerResas();
+  }
+  document.getElementById('btnResaJourPrecedent').addEventListener('click', function(){ decalerJour(-1); });
+  document.getElementById('btnResaJourSuivant').addEventListener('click', function(){ decalerJour(1); });
+
+  var filtreService = 'tous';
+  document.querySelectorAll('.chip[data-filtre]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filtreService = btn.getAttribute('data-filtre');
+      document.querySelectorAll('.chip[data-filtre]').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      chargerResas();
+    });
+  });
+
   function chargerResas(){
     if(ongletActif !== 'resas') return;
     var dateStr = champDateResa.value || todayISO();
@@ -677,13 +798,17 @@
       document.getElementById('resaDiner').textContent = diner;
       document.getElementById('resaTotal').textContent = actives.length;
 
-      if(reservations.length === 0){
+      var affichees = filtreService === 'tous' ? reservations : reservations.filter(function(r){ return r.service === filtreService; });
+
+      dessinerGrapheService(affichees.filter(function(r){ return r.statut !== 'annulee'; }));
+
+      if(affichees.length === 0){
         conteneur.innerHTML = '<div class="vide">Aucune réservation ce jour-là.</div>';
         return;
       }
 
-      reservations.sort(function(a, b){ return a.heure < b.heure ? -1 : 1; });
-      var lignes = reservations.map(function(r){
+      affichees.sort(function(a, b){ return a.heure < b.heure ? -1 : 1; });
+      var lignes = affichees.map(function(r){
         var annulee = r.statut === 'annulee';
         return '<tr>' +
           '<td' + (annulee ? ' class="annulee"' : '') + '>' + r.heure + '</td>' +
@@ -704,6 +829,37 @@
         });
       });
     });
+  }
+
+  function dessinerGrapheService(reservationsActives){
+    var conteneur = document.getElementById('resaGraphique');
+    if(reservationsActives.length === 0){
+      conteneur.innerHTML = '<div class="vide" style="padding:8px 0;">Aucune réservation ce jour-là.</div>';
+      return;
+    }
+    var parHeure = {};
+    reservationsActives.forEach(function(r){
+      if(!parHeure[r.heure]) parHeure[r.heure] = { couverts: 0, service: r.service };
+      parHeure[r.heure].couverts += r.couverts;
+    });
+    var heures = Object.keys(parHeure).sort();
+    var maxCouverts = Math.max.apply(null, heures.map(function(h){ return parHeure[h].couverts; }));
+
+    var barres = heures.map(function(h){
+      var info = parHeure[h];
+      var hauteurPct = Math.max(8, Math.round(info.couverts / maxCouverts * 100));
+      return '<div class="graph-barre-bloc">' +
+        '<div class="graph-valeur">' + info.couverts + '</div>' +
+        '<div class="graph-barre ' + info.service + '" style="height:' + hauteurPct + '%;"></div>' +
+        '<div class="graph-label">' + h + '</div>' +
+        '</div>';
+    }).join('');
+
+    conteneur.innerHTML = '<div class="graph-service">' + barres + '</div>' +
+      '<div class="graph-legende">' +
+        '<span><span class="puce" style="background:var(--rouge-vif);"></span>Déjeuner</span>' +
+        '<span><span class="puce" style="background:var(--vert);"></span>Dîner</span>' +
+      '</div>';
   }
 
   document.getElementById('btnNouvelleResa').addEventListener('click', function(){
