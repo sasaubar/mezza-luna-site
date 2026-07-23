@@ -429,6 +429,14 @@
     </div>
   </div>
 
+  <!-- Feuille : fiche client fidélité -->
+  <div class="overlay" id="overlayFiche">
+    <div class="feuille">
+      <div class="feuille-entete"><h2 id="ficheNom">Client</h2><button class="feuille-fermer" data-fermer="overlayFiche">×</button></div>
+      <div id="ficheContenu" class="chargement">Chargement…</div>
+    </div>
+  </div>
+
   <!-- Feuille : scanner fidélité -->
   <div class="overlay" id="overlayScanner">
     <div class="feuille" style="background:#111;">
@@ -983,7 +991,7 @@
       var lignes = clients.map(function(c){
         var pret = c.tampons >= REWARD_STAMPS;
         return '<tr>' +
-          '<td>' + escapeHtml(c.nom) + '</td>' +
+          '<td data-fiche="' + c.id + '" style="cursor:pointer;text-decoration:underline;">' + escapeHtml(c.nom) + '</td>' +
           '<td>' + escapeHtml(c.telephone) + '</td>' +
           '<td>' + escapeHtml(c.email || '—') + '</td>' +
           '<td class="' + (pret ? 'pret' : '') + '">' + c.tampons + ' / ' + REWARD_STAMPS + (pret ? ' — prêt' : '') + '</td>' +
@@ -995,6 +1003,9 @@
       }).join('');
       conteneur.innerHTML = '<div class="table-scroll"><table><thead><tr><th>Nom</th><th>Tél.</th><th>Email</th><th>Tampons</th><th></th></tr></thead><tbody>' + lignes + '</tbody></table></div>';
 
+      conteneur.querySelectorAll('[data-fiche]').forEach(function(cellule){
+        cellule.addEventListener('click', function(){ ouvrirFicheClient(cellule.getAttribute('data-fiche')); });
+      });
       conteneur.querySelectorAll('.btn-mini').forEach(function(btn){
         btn.addEventListener('click', function(){
           if(!confirm('Supprimer définitivement la carte de ' + btn.getAttribute('data-nom') + ' ?')) return;
@@ -1011,6 +1022,53 @@
   }
 
   document.getElementById('btnRegle').addEventListener('click', function(){ ouvrirFeuille('overlayRegle'); });
+
+  var LABEL_HISTORIQUE = { tampon: 'Tampon ajouté', echange: 'Récompense échangée' };
+
+  function ouvrirFicheClient(id){
+    ouvrirFeuille('overlayFiche');
+    document.getElementById('ficheNom').textContent = 'Client';
+    document.getElementById('ficheContenu').innerHTML = '<div class="chargement">Chargement…</div>';
+
+    apiGetPin('/fidelite-carte', { action: 'fiche', id: id }).then(function(c){
+      document.getElementById('ficheNom').textContent = c.nom;
+
+      var inscription = new Date(c.dateInscription).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });
+
+      var blocInfos = '<div class="carte" style="margin-bottom:14px;">' +
+        '<div style="margin-bottom:6px;"><strong>Téléphone :</strong> ' + escapeHtml(c.telephone) + '</div>' +
+        '<div style="margin-bottom:6px;"><strong>Email :</strong> ' + escapeHtml(c.email || '—') + '</div>' +
+        '<div style="margin-bottom:6px;"><strong>Inscrit le :</strong> ' + inscription + '</div>' +
+        '<div><strong>Tampons :</strong> ' + c.tampons + ' / ' + c.objectif + ' — <strong>Récompenses données :</strong> ' + c.recompenses + '</div>' +
+        '</div>';
+
+      var blocHistorique = '<div class="section-titre" style="margin-top:0;">Historique</div>';
+      if(!c.historique || c.historique.length === 0){
+        blocHistorique += '<div class="vide">Aucun évènement pour l\'instant.</div>';
+      } else {
+        blocHistorique += '<div class="carte" style="margin-bottom:14px;">' + c.historique.map(function(e){
+          var date = new Date(e.date).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+          return '<div style="padding:6px 0;border-bottom:1px solid rgba(26,26,26,.06);">' + (LABEL_HISTORIQUE[e.type] || e.type) + ' — <span style="color:var(--charbon-doux);">' + date + '</span></div>';
+        }).join('') + '</div>';
+      }
+
+      var blocResas = '<div class="section-titre" style="margin-top:0;">Réservations</div>';
+      if(!c.reservations || c.reservations.length === 0){
+        blocResas += '<div class="vide">Aucune réservation trouvée avec ce téléphone ou cet email.</div>';
+      } else {
+        blocResas += '<div class="carte">' + c.reservations.map(function(r){
+          var annulee = r.statut === 'annulee';
+          return '<div style="padding:6px 0;border-bottom:1px solid rgba(26,26,26,.06);' + (annulee ? 'opacity:.5;text-decoration:line-through;' : '') + '">' +
+            r.date + ' — ' + (r.service === 'dejeuner' ? 'Déjeuner' : 'Dîner') + ' ' + r.heure + ', ' + r.couverts + ' couverts' +
+            '</div>';
+        }).join('') + '</div>';
+      }
+
+      document.getElementById('ficheContenu').innerHTML = blocInfos + blocHistorique + blocResas;
+    }).catch(function(err){
+      document.getElementById('ficheContenu').innerHTML = '<div class="vide">' + escapeHtml(err.message || 'Erreur de chargement') + '</div>';
+    });
+  }
 
   document.getElementById('btnNouveauClient').addEventListener('click', function(){
     document.getElementById('formClientMsg').style.display = 'none';
