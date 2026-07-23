@@ -399,7 +399,7 @@
         <select id="fResaService"><option value="dejeuner">Déjeuner</option><option value="diner">Dîner</option></select>
       </div>
       <div class="champ"><label>Heure</label><input type="time" id="fResaHeure" step="900" /></div>
-      <div class="champ"><label>Couverts</label><input type="number" id="fResaCouverts" min="1" max="12" value="2" /></div>
+      <div class="champ"><label>Couverts</label><input type="number" id="fResaCouverts" min="1" max="200" value="2" /></div>
       <div class="champ"><label>Note (optionnel)</label><textarea id="fResaNote" rows="2"></textarea></div>
       <button class="btn" id="btnValiderResa">Enregistrer la réservation</button>
     </div>
@@ -940,8 +940,11 @@
     };
     var msg = document.getElementById('formResaMsg');
     msg.style.display = 'none';
+    var creds = getIdentifiants();
     apiPublic('/reservation?action=creer', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Staff-Id': creds.identifiant, 'X-Staff-Password': creds.motDePasse },
+      body: JSON.stringify(body),
     }).then(function(){
       document.getElementById('overlayResa').classList.remove('active');
       champDateResa.value = body.date;
@@ -974,7 +977,9 @@
         return;
       }
 
-      clients.sort(function(a, b){ return new Date(b.dateInscription) - new Date(a.dateInscription); });
+      clients.sort(function(a, b){
+        return new Date(b.dateDernierTampon || b.dateInscription) - new Date(a.dateDernierTampon || a.dateInscription);
+      });
       var lignes = clients.map(function(c){
         var pret = c.tampons >= REWARD_STAMPS;
         return '<tr>' +
