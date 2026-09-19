@@ -109,6 +109,13 @@
   .vide{ padding:26px 16px; text-align:center; color:var(--charbon-doux); background:#fff; border-radius:12px; font-size:.9rem; }
   .chargement{ padding:26px 16px; text-align:center; color:var(--charbon-doux); font-size:.9rem; }
 
+  .service-ligne{ display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(26,26,26,.08); }
+  .service-ligne:last-child{ border-bottom:none; }
+  .service-ligne .service-nom{ font-weight:600; font-size:.9rem; min-width:78px; }
+  .service-ligne .service-etat{ flex:1; font-size:.82rem; color:var(--charbon-doux); }
+  .service-ligne .service-etat.complet{ color:var(--rouge-vif); font-weight:600; }
+  .service-ligne .service-etat.ferme{ opacity:.6; }
+
   .table-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:12px; }
   table{ width:100%; min-width:520px; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; font-size:.85rem; }
   th, td{ text-align:left; padding:10px 12px; border-bottom:1px solid rgba(26,26,26,.07); }
@@ -317,6 +324,7 @@
           <button class="btn-icon-date" id="btnResaJourSuivant" aria-label="Jour suivant">›</button>
           <button id="btnResaAujourdhui">Aujourd'hui</button>
         </div>
+        <div class="carte" id="etatServices"><div class="chargement" style="padding:8px 0;">Chargement…</div></div>
         <div class="filtres-service">
           <button class="chip active" data-filtre="tous">Tous</button>
           <button class="chip" data-filtre="dejeuner">Déjeuner</button>
@@ -849,11 +857,52 @@
     });
   });
 
+  // Ouverture des services : permet de couper les réservations en ligne d'un
+  // service précis (salle pleine, privatisation) sans toucher aux horaires.
+  function chargerEtatServices(dateStr){
+    var conteneur = document.getElementById('etatServices');
+    apiGetPin('/reservation?action=etatServices', { date: dateStr }).then(function(data){
+      conteneur.innerHTML = (data.services || []).map(function(s){
+        var nom = s.service === 'dejeuner' ? 'Déjeuner' : 'Dîner';
+        if(!s.ouvert){
+          return '<div class="service-ligne"><span class="service-nom">' + nom + '</span>' +
+            '<span class="service-etat ferme">Pas de service ce jour-là</span></div>';
+        }
+        var etat = s.complet
+          ? '<span class="service-etat complet">Complet, réservations en ligne coupées</span>'
+          : '<span class="service-etat">' + s.restant + ' couverts encore réservables</span>';
+        return '<div class="service-ligne"><span class="service-nom">' + nom + '</span>' + etat +
+          '<button class="btn btn-petit ' + (s.complet ? 'btn-vert' : 'btn-ghost') + '" ' +
+          'data-service="' + s.service + '" data-complet="' + (s.complet ? '0' : '1') + '">' +
+          (s.complet ? 'Rouvrir' : 'Marquer complet') + '</button></div>';
+      }).join('');
+
+      conteneur.querySelectorAll('button[data-service]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var fermer = btn.getAttribute('data-complet') === '1';
+          var nomService = btn.getAttribute('data-service') === 'dejeuner' ? 'le déjeuner' : 'le dîner';
+          var jour = new Date(dateStr + 'T12:00:00').toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+          var question = fermer
+            ? 'Marquer ' + nomService + ' du ' + jour + ' complet ? Les clients ne pourront plus réserver en ligne pour ce service.'
+            : 'Rouvrir ' + nomService + ' du ' + jour + ' aux réservations en ligne ?';
+          if(!confirm(question)) return;
+          btn.disabled = true;
+          apiPostPin('/reservation?action=marquerComplet', { date: dateStr, service: btn.getAttribute('data-service'), complet: fermer })
+            .then(function(){ chargerEtatServices(dateStr); })
+            .catch(function(err){ btn.disabled = false; alert(err.message || 'Erreur'); });
+        });
+      });
+    }).catch(function(){
+      conteneur.innerHTML = '<div class="service-ligne"><span class="service-etat ferme">État des services indisponible.</span></div>';
+    });
+  }
+
   function chargerResas(){
     if(ongletActif !== 'resas') return;
     var dateStr = champDateResa.value || todayISO();
     var conteneur = document.getElementById('resaListeContainer');
     conteneur.innerHTML = '<div class="chargement">Chargement…</div>';
+    chargerEtatServices(dateStr);
 
     apiGetPin('/reservation?action=liste', { date: dateStr }).then(function(data){
       var reservations = data.reservations || [];
