@@ -154,9 +154,6 @@
   #annonce strong{ font-weight:700; }
   #annonce .lune{ color:var(--or); }
   #annonce[hidden]{ display:none; }
-  #annonce .annonce-inner{ flex-wrap:nowrap; }
-  #annonce a{ color:#fff; font-weight:700; text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
-  #annonce a:hover{ color:var(--or); }
 
   /* ===================================================================
      HEADER / NAVIGATION
@@ -1467,31 +1464,15 @@
      actif: false → bannière invisible
      ================================================================ */
   const ANNONCE = {
-    actif: true,
-    icone: "🎃",
-    texte: "<strong>Samedi 31 octobre</strong> : soirée karaoké spéciale Halloween ! <a href=\"/reservation.html\">Réserver ma table &rarr;</a>",
-    // Optionnel : la bannière ne s'affiche qu'entre ces deux dates
-    debut: "2026-10-08T00:00:00",
-    fin: "2026-11-01T02:00:00"
+    actif: false,
+    texte: ""
   };
 
   (function(){
     const el = document.getElementById('annonce');
-    const maintenant = new Date();
-    const dansLaPeriode = (!ANNONCE.debut || maintenant >= new Date(ANNONCE.debut))
-                       && (!ANNONCE.fin || maintenant <= new Date(ANNONCE.fin));
-    if (ANNONCE.actif && ANNONCE.texte && dansLaPeriode) {
-      if (ANNONCE.icone) el.querySelector('.lune').textContent = ANNONCE.icone;
+    if (ANNONCE.actif && ANNONCE.texte) {
       document.getElementById('annonce-texte').innerHTML = ANNONCE.texte;
       el.hidden = false;
-      // Le header est en position fixe : on le décale sous la bannière tant qu'elle est visible
-      const hdr = document.querySelector('header.site');
-      const placerHeader = function(){
-        hdr.style.top = Math.max(0, el.offsetHeight - window.scrollY) + 'px';
-      };
-      window.addEventListener('scroll', placerHeader, { passive:true });
-      window.addEventListener('resize', placerHeader);
-      placerHeader();
     }
   })();
 
@@ -1665,6 +1646,18 @@
       titre: 'Soirée karaoké le 19 septembre !',
       texte: "On sort les micros pour une soirée 100% festive : ambiance de folie, bonne humeur garantie, entre amis ou en famille.",
       infosHtml: "Samedi 19 septembre &mdash; Ouverture à <strong>19h</strong><br>Karaoké jusqu'à <strong>1h du matin</strong>",
+      ctaTexte: 'Réserver ma table',
+      ctaLien: '/reservation.html'
+    },
+    {
+      id: 'karaoke-halloween-2026',
+      debut: '2026-10-08T00:00:00',
+      fin: '2026-10-31T23:59:59',
+      image: 'assets/img/karaoke1.jpg',
+      eyebrow: 'Spécial Halloween 🎃',
+      titre: 'Soirée karaoké le 31 octobre !',
+      texte: "Pour Halloween, on sort les micros : une soirée karaoké frissonnante et 100% festive, entre amis ou en famille.",
+      infosHtml: "<strong>Samedi 31 octobre</strong><br>Réservation conseillée",
       ctaTexte: 'Réserver ma table',
       ctaLien: '/reservation.html'
     },
