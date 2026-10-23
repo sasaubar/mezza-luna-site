@@ -1,0 +1,22 @@
+# La Mezza Luna
+
+> Restaurant italien familial à Clamart (92140, Hauts-de-Seine), tenu par Stéphane et Gwen depuis 2013. Pizzas napolitaines à pâte maison, tagliatelles fraîches, produits italiens DOP et IGP, quelques classiques français, menu ardoise le midi dès 13 €. Le restaurant se privatise pour les groupes de 10 à 120 convives.
+
+- Adresse : 18 rue de Versailles, 92140 Clamart, France (tramway T6 et T10, parking à proximité)
+- Téléphone : 01 46 31 33 31
+- Email : contact@lamezzalunaclamart.com
+- Horaires : du lundi au vendredi 12h-14h30, du lundi au samedi 19h-22h. Fermé le samedi midi et le dimanche.
+- Cuisine : italienne (pizzas napolitaines à pâte maison, tagliatelles fraîches, antipasti, tiramisu maison), quelques plats français (viandes grillées)
+- Prix : €€. Menu ardoise du midi 13 € (plat), 16 € (duo), 18 € (trio). Pizzas napolitaines autour de 16 €.
+- Services : sur place, réservation en ligne, à emporter, livraison (Uber Eats, Deliveroo), privatisation, soirées à thème
+- Points forts : pâte à pizza pétrie sur place chaque matin, sauce tomate maison, plats cuisinés à la minute, ambiance familiale
+
+## Pages principales
+
+- [Accueil](https://lamezzalunaclamart.com/): présentation du restaurant italien, plats phares, menu ardoise, questions fréquentes
+- [La carte](https://lamezzalunaclamart.com/carte.html): carte complète avec les prix (pizzas, pâtes, viandes, desserts, menu enfant)
+- [Pizzeria](https://lamezzalunaclamart.com/pizzeria/): les pizzas napolitaines à pâte maison
+- [Privatisation](https://lamezzalunaclamart.com/privatisation/): privatiser le restaurant à Clamart pour un anniversaire, un repas d'entreprise ou un événement familial
+- [Soirées](https://lamezzalunaclamart.com/soirees/): soirées karaoké, concerts et événements
+- [Réservation](https://lamezzalunaclamart.com/reservation.html): réserver une table en ligne
+- [Questions fréquentes](https://lamezzalunaclamart.com/faq/): livraison, à emporter, parking, options végétariennes et halal, menu enfant
