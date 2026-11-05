@@ -370,6 +370,17 @@
         <div id="cmdTermineesContainer"><div class="vide">—</div></div>
       </div>
 
+      <!-- CHIFFRES (admin uniquement, contrôlé aussi côté serveur) -->
+      <div class="vue" id="vue-chiffres">
+        <div class="barre-date">
+          <button class="btn-icon-date" id="btnCaJourPrecedent" aria-label="Jour précédent">‹</button>
+          <input type="date" id="champDateCa" />
+          <button class="btn-icon-date" id="btnCaJourSuivant" aria-label="Jour suivant">›</button>
+          <button id="btnCaHier">Hier</button>
+        </div>
+        <div id="caContenu"><div class="chargement">Chargement…</div></div>
+      </div>
+
     </div>
 
     <nav class="tabbar">
@@ -390,6 +401,10 @@
         <span class="badge-notif" id="badgeCommandes">0</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2l1.5 5M18 2l-1.5 5M4 7h16l-1.4 11.2A2 2 0 0 1 16.6 20H7.4a2 2 0 0 1-2-1.8L4 7z"/></svg>
         <span>Commandes</span>
+      </button>
+      <button class="tab-item" data-tab="chiffres" id="tabChiffres" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="5" y="11" width="3" height="7"/><rect x="10.5" y="6" width="3" height="12"/><rect x="16" y="9" width="3" height="9"/></svg>
+        <span>Chiffres</span>
       </button>
     </nav>
   </div>
@@ -540,6 +555,7 @@
     resas: 'Réservations',
     fidelite: 'Programme fidélité',
     commandes: 'Commandes click&collect',
+    chiffres: 'Chiffre d\'affaires',
   };
 
   /* ---------- Utilitaires ---------- */
@@ -627,6 +643,7 @@
         document.getElementById('ecranConnexion').style.display = 'none';
         document.getElementById('appPrincipal').style.display = 'flex';
         document.getElementById('btnComptes').style.display = res.data.role === 'admin' ? 'flex' : 'none';
+        document.getElementById('tabChiffres').style.display = res.data.role === 'admin' ? 'flex' : 'none';
         chargerVueActive();
         initialiserVeilleNotifications();
       })
@@ -694,6 +711,7 @@
     if(ongletActif === 'resas') chargerResas();
     if(ongletActif === 'fidelite') chargerFidelite();
     if(ongletActif === 'commandes') chargerCommandes();
+    if(ongletActif === 'chiffres') chargerChiffres();
   }
 
   /* ---------- Feuilles (modales) ---------- */
@@ -1305,6 +1323,125 @@
       });
     });
   }
+
+  /* =========================================================
+     CHIFFRES (admin) : CA lu dans la caisse Popina
+     ========================================================= */
+  var JOURS_SEMAINE = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+  var MOIS_NOMS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+  function dateLocaleISO(d){
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function hierISO(){ var d = new Date(); d.setDate(d.getDate() - 1); return dateLocaleISO(d); }
+  function decalerJour(iso, n){ var d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return dateLocaleISO(d); }
+  function dateLongue(iso){
+    var d = new Date(iso + 'T12:00:00');
+    return JOURS_SEMAINE[(d.getDay() + 6) % 7] + ' ' + d.getDate() + ' ' + MOIS_NOMS[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  function rangDansLeMois(iso){
+    var d = new Date(iso + 'T12:00:00');
+    var rang = Math.ceil(d.getDate() / 7);
+    var mois = MOIS_NOMS[d.getMonth()];
+    return (rang === 1 ? '1er' : rang + 'e') + ' ' + JOURS_SEMAINE[(d.getDay() + 6) % 7] + (/^[aeiou]/.test(mois) ? " d'" : ' de ') + mois + ' ' + d.getFullYear();
+  }
+  function eurosRond(n){ return Math.round(n || 0).toLocaleString('fr-FR') + ' €'; }
+  function evolHtml(n, n1){
+    if(n == null || !n1) return '';
+    var p = Math.round((n - n1) / n1 * 100);
+    var couleur = p >= 0 ? 'var(--vert)' : 'var(--rouge-vif)';
+    return '<span style="color:' + couleur + ';font-weight:700;">' + (p >= 0 ? '+' : '') + p + ' %</span>';
+  }
+  function ligneCa(libelle, n, n1, format){
+    return '<div class="service-ligne"><div class="service-nom">' + libelle + '</div>' +
+      '<div class="service-etat"><strong style="color:var(--charbon);">' + (n == null ? '–' : format(n)) + '</strong>' +
+      (n1 != null ? ' <span style="opacity:.75;">(N-1 ' + format(n1) + ')</span>' : '') + '</div>' +
+      '<div>' + evolHtml(n, n1) + '</div></div>';
+  }
+
+  var dateCaInitialisee = false;
+  function chargerChiffres(){
+    var champ = document.getElementById('champDateCa');
+    if(!dateCaInitialisee){ champ.value = hierISO(); dateCaInitialisee = true; }
+    var jour = champ.value;
+    var conteneur = document.getElementById('caContenu');
+    conteneur.innerHTML = '<div class="chargement">Lecture de la caisse…</div>';
+
+    apiGetPin('/auth', { action: 'ca', date: jour }).then(function(r){
+      if(champ.value !== jour) return; // date changée pendant le chargement
+      var n = r.n, n1 = r.n1, html = '';
+
+      if(!n.ouvert){
+        html += '<div class="vide">Aucune vente le ' + dateLongue(jour) + ' (restaurant fermé).</div>';
+      } else {
+        html += '<div class="stats">' +
+          '<div class="stat-carte stat-rouge"><div class="valeur">' + eurosRond(n.ca) + '</div><div class="label">CA du jour</div></div>' +
+          '<div class="stat-carte stat-or"><div class="valeur">' + (n1.ouvert ? evolHtml(n.ca, n1.ca).replace(/color:[^;]+;/, 'color:var(--charbon);') : '–') + '</div><div class="label">vs N-1</div></div>' +
+          '<div class="stat-carte stat-vert"><div class="valeur">' + n.couverts + '</div><div class="label">Couverts sur place</div></div>' +
+          '</div>';
+        html += '<div class="section-soustitre">Comparé au ' + rangDansLeMois(r.jourN1) + ' (' + dateLongue(r.jourN1) + ')' +
+          (n1.ouvert ? '' : ', restaurant fermé ce jour-là') + '</div>';
+        var v1 = n1.ouvert ? n1 : {};
+        html += '<div class="carte">' +
+          ligneCa('Total', n.ca, v1.ca, eurosRond) +
+          ligneCa('Midi', n.midi, v1.midi, eurosRond) +
+          ligneCa('Soir', n.soir, v1.soir, eurosRond) +
+          ligneCa('Couverts', n.couverts, v1.couverts, String) +
+          ligneCa('Ticket moyen', n.ticketMoyen, v1.ticketMoyen, formatEuros) +
+          ligneCa('À emporter', n.emporter, v1.emporter, function(x){ return x + ' cde' + (x > 1 ? 's' : ''); }) +
+          ligneCa('Panier emp.', n.panierEmporter, v1.panierEmporter, formatEuros) +
+          '</div>';
+      }
+
+      var m = r.mois;
+      var nomMois = MOIS_NOMS[new Date(jour + 'T12:00:00').getMonth()];
+      html += '<div class="section-titre">Cumul ' + nomMois + '</div>';
+      html += '<div class="section-soustitre">Du 1er au ' + Number(jour.slice(8)) + ', comparé à la même période l\'an dernier</div>';
+      html += '<div class="carte">' +
+        ligneCa('CA', m.ca, m.joursN1 ? m.caN1 : null, eurosRond) +
+        ligneCa('Jours ouverts', m.jours, m.joursN1 || null, String) +
+        '</div>';
+
+      var s = r.semaine;
+      var max = Math.max.apply(null, s.n.concat(s.n1).map(function(x){ return x ? x.moyenne : 0; })) || 1;
+      html += '<div class="section-titre">CA moyen par jour</div>';
+      html += '<div class="section-soustitre">3 derniers mois, comparés à la même période l\'an dernier</div>';
+      html += '<div class="carte"><div class="graph-service" style="height:150px;">' +
+        JOURS_SEMAINE.map(function(nom, i){
+          var a = s.n[i], b = s.n1[i];
+          if(!a && !b) return '';
+          var hA = a ? Math.max(3, a.moyenne / max * 100) : 0, hB = b ? Math.max(3, b.moyenne / max * 100) : 0;
+          return '<div class="graph-barre-bloc" style="width:44px;">' +
+            '<div class="graph-valeur">' + (a && b ? evolHtml(a.moyenne, b.moyenne) : '') + '</div>' +
+            '<div style="display:flex;align-items:flex-end;gap:3px;height:100px;">' +
+              '<div class="graph-barre diner" title="N-1 : ' + (b ? eurosRond(b.moyenne) : '–') + '" style="height:' + hB + '%;width:12px;opacity:.45;"></div>' +
+              '<div class="graph-barre dejeuner" title="Cette année : ' + (a ? eurosRond(a.moyenne) : '–') + '" style="height:' + hA + '%;width:12px;"></div>' +
+            '</div>' +
+            '<div class="graph-label">' + nom.slice(0, 3) + '.</div>' +
+            '<div class="graph-label" style="margin-top:1px;font-weight:600;">' + (a ? eurosRond(a.moyenne) : '–') + '</div>' +
+          '</div>';
+        }).join('') +
+        '</div><div class="graph-legende">' +
+          '<span><span class="puce" style="background:var(--rouge-vif);"></span>Cette année</span>' +
+          '<span><span class="puce" style="background:var(--vert);opacity:.45;"></span>Année précédente</span>' +
+        '</div></div>';
+
+      conteneur.innerHTML = html;
+    }).catch(function(err){
+      conteneur.innerHTML = '<div class="vide">Impossible de lire la caisse : ' + escapeHtml(err.message) + '</div>';
+    });
+  }
+
+  document.getElementById('champDateCa').addEventListener('change', chargerChiffres);
+  document.getElementById('btnCaHier').addEventListener('click', function(){
+    document.getElementById('champDateCa').value = hierISO(); chargerChiffres();
+  });
+  document.getElementById('btnCaJourPrecedent').addEventListener('click', function(){
+    var c = document.getElementById('champDateCa'); c.value = decalerJour(c.value || hierISO(), -1); chargerChiffres();
+  });
+  document.getElementById('btnCaJourSuivant').addEventListener('click', function(){
+    var c = document.getElementById('champDateCa'); c.value = decalerJour(c.value || hierISO(), 1); chargerChiffres();
+  });
 
   /* =========================================================
      COMPTES (admin)
