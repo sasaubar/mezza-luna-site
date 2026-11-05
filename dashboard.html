@@ -1403,28 +1403,15 @@
         '</div>';
 
       var s = r.semaine;
-      var max = Math.max.apply(null, s.n.concat(s.n1).map(function(x){ return x ? x.moyenne : 0; })) || 1;
-      html += '<div class="section-titre">CA moyen par jour</div>';
-      html += '<div class="section-soustitre">3 derniers mois, comparés à la même période l\'an dernier</div>';
-      html += '<div class="carte"><div class="graph-service" style="height:150px;">' +
+      html += '<div class="section-titre">Vos jours forts et faibles</div>';
+      html += '<div class="section-soustitre">Combien rapporte en moyenne chaque jour de la semaine, sur les 3 derniers mois, comparé à la même période l\'an dernier</div>';
+      html += '<div class="carte">' +
         JOURS_SEMAINE.map(function(nom, i){
           var a = s.n[i], b = s.n1[i];
           if(!a && !b) return '';
-          var hA = a ? Math.max(3, a.moyenne / max * 100) : 0, hB = b ? Math.max(3, b.moyenne / max * 100) : 0;
-          return '<div class="graph-barre-bloc" style="width:44px;">' +
-            '<div class="graph-valeur">' + (a && b ? evolHtml(a.moyenne, b.moyenne) : '') + '</div>' +
-            '<div style="display:flex;align-items:flex-end;gap:3px;height:100px;">' +
-              '<div class="graph-barre diner" title="N-1 : ' + (b ? eurosRond(b.moyenne) : '–') + '" style="height:' + hB + '%;width:12px;opacity:.45;"></div>' +
-              '<div class="graph-barre dejeuner" title="Cette année : ' + (a ? eurosRond(a.moyenne) : '–') + '" style="height:' + hA + '%;width:12px;"></div>' +
-            '</div>' +
-            '<div class="graph-label">' + nom.slice(0, 3) + '.</div>' +
-            '<div class="graph-label" style="margin-top:1px;font-weight:600;">' + (a ? eurosRond(a.moyenne) : '–') + '</div>' +
-          '</div>';
+          return ligneCa('Un ' + nom, a ? a.moyenne : null, b ? b.moyenne : null, eurosRond);
         }).join('') +
-        '</div><div class="graph-legende">' +
-          '<span><span class="puce" style="background:var(--rouge-vif);"></span>Cette année</span>' +
-          '<span><span class="puce" style="background:var(--vert);opacity:.45;"></span>Année précédente</span>' +
-        '</div></div>';
+        '</div>';
 
       conteneur.innerHTML = html;
     }).catch(function(err){
