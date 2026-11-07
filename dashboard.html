@@ -1399,7 +1399,8 @@
       var m = r.mois;
       var nomMois = MOIS_NOMS[new Date(jour + 'T12:00:00').getMonth()];
       html += '<div class="section-titre">Cumul ' + nomMois + '</div>';
-      html += '<div class="section-soustitre">Du 1er au ' + Number(jour.slice(8)) + ', comparé à la même période l\'an dernier</div>';
+      html += '<div class="section-soustitre">Du 1er au ' + Number(jour.slice(8)) + ' (' + m.jours + ' jour' + (m.jours > 1 ? 's' : '') + ' ouvert' + (m.jours > 1 ? 's' : '') + '), comparé aux ' +
+        (m.joursN1 ? (m.joursN1 > 1 ? m.joursN1 + ' premiers jours ouverts' : 'premier jour ouvert') + ' de ' + nomMois + ' ' + m.auN1.slice(0, 4) + ' (du 1er au ' + Number(m.auN1.slice(8)) + ')' : 'mêmes jours l\'an dernier') + '</div>';
       html += '<div class="carte">' +
         ligneCa('CA', m.ca, m.joursN1 ? m.caN1 : null, eurosRond) +
         ligneCa('Jours ouverts', m.jours, m.joursN1 || null, String) +
