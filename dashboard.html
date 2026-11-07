@@ -1354,8 +1354,8 @@
   }
   function ligneCa(libelle, n, n1, format){
     return '<div class="service-ligne"><div class="service-nom">' + libelle + '</div>' +
-      '<div class="service-etat"><strong style="color:var(--charbon);">' + (n == null ? '–' : format(n)) + '</strong>' +
-      (n1 != null ? ' <span style="opacity:.75;">(N-1 ' + format(n1) + ')</span>' : '') + '</div>' +
+      '<div class="service-etat"><strong style="color:var(--charbon);font-size:1.05em;">' + (n == null ? '–' : format(n)) + '</strong>' +
+      (n1 != null ? '<div style="color:var(--charbon);font-size:.85em;font-weight:600;margin-top:2px;">l\'an dernier : ' + format(n1) + '</div>' : '') + '</div>' +
       '<div>' + evolHtml(n, n1) + '</div></div>';
   }
 
@@ -1371,7 +1371,9 @@
       if(champ.value !== jour) return; // date changée pendant le chargement
       var n = r.n, n1 = r.n1, html = '';
 
-      if(!n.ouvert){
+      if(!n.ouvert && r.provisoire){
+        html += '<div class="vide">Le Z du ' + dateLongue(jour) + ' n\'est pas encore clôturé : les chiffres apparaîtront après la clôture.</div>';
+      } else if(!n.ouvert){
         html += '<div class="vide">Aucune vente le ' + dateLongue(jour) + ' (restaurant fermé).</div>';
       } else {
         html += '<div class="stats">' +
@@ -1381,6 +1383,7 @@
           '</div>';
         html += '<div class="section-soustitre">Comparé au ' + rangDansLeMois(r.jourN1) + ' (' + dateLongue(r.jourN1) + ')' +
           (n1.ouvert ? '' : ', restaurant fermé ce jour-là') + '</div>';
+        if(r.provisoire) html += '<div class="section-soustitre" style="color:var(--rouge-vif);font-weight:600;">Le Z de cette journée n\'est pas encore clôturé : chiffres provisoires.</div>';
         var v1 = n1.ouvert ? n1 : {};
         html += '<div class="carte">' +
           ligneCa('Total', n.ca, v1.ca, eurosRond) +
