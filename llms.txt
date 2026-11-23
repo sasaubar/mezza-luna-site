@@ -18,5 +18,6 @@
 - [Pizzeria](https://lamezzalunaclamart.com/pizzeria/): les pizzas napolitaines à pâte maison
 - [Privatisation](https://lamezzalunaclamart.com/privatisation/): privatiser le restaurant à Clamart pour un anniversaire, un repas d'entreprise ou un événement familial
 - [Soirées](https://lamezzalunaclamart.com/soirees/): soirées karaoké, concerts et événements
+- [Réveillon du Nouvel An](https://lamezzalunaclamart.com/reveillon/): soirée du 31 décembre 2026, menu unique à 79 € (49 € moins de 10 ans), karaoké dansant de 19h à 2h, réservation obligatoire
 - [Réservation](https://lamezzalunaclamart.com/reservation.html): réserver une table en ligne
 - [Questions fréquentes](https://lamezzalunaclamart.com/faq/): livraison, à emporter, parking, options végétariennes et halal, menu enfant
