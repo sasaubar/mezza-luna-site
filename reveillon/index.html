@@ -362,9 +362,12 @@
   .timeline li:first-child{ border-top:none; }
   .timeline .h{ font-family:var(--serif); font-weight:700; font-size:1.35rem; color:var(--rouge-vif); min-width:66px; }
   .timeline .t{ font-size:.97rem; color:var(--charbon-doux); }
-  .resa{ position:relative; background:var(--rouge-profond) url("/assets/img/soiree-ambiance.jpg") center/cover no-repeat; color:#fff; padding:clamp(64px,9vw,110px) 0; }
-  .resa .wrap{ position:relative; z-index:1; }
-  .resa-inner{ max-width:680px; margin:0 auto; text-align:center; background:var(--rouge-profond); border-radius:var(--radius); padding:clamp(28px,5vw,48px) clamp(20px,4vw,44px); box-shadow:0 20px 60px rgba(0,0,0,.35); }
+  .resa{ background:var(--rouge-profond); color:#fff; padding:clamp(64px,9vw,100px) 0; }
+  .resa-grid{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px,5vw,72px); align-items:center; }
+  .resa-photo{ border-radius:var(--radius); overflow:hidden; aspect-ratio:4/3; box-shadow:0 20px 60px rgba(0,0,0,.35); }
+  .resa-photo img{ width:100%; height:100%; object-fit:cover; }
+  .resa-inner{ text-align:center; }
+  @media (max-width:900px){ .resa-grid{ grid-template-columns:1fr; } .resa-photo{ order:-1; aspect-ratio:16/10; } }
   .resa .eyebrow{ color:var(--or); }
   .resa h2{ font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.4vw,2.9rem); margin:14px 0 14px; color:#fff; }
   .resa p{ font-size:.97rem; color:rgba(255,255,255,.85); margin-bottom:12px; }
@@ -602,7 +605,10 @@
      RÉSERVATION
      ================================================================ -->
 <section class="resa" id="reservation">
-  <div class="wrap">
+  <div class="wrap resa-grid">
+    <div class="resa-photo">
+      <img loading="lazy" height="840" width="1120" src="/assets/img/reveillon-karaoke-fond.jpg" alt="Des amies chantent au karaoké à La Mezza Luna, Clamart" />
+    </div>
     <div class="resa-inner">
       <span class="eyebrow filet">Réservation obligatoire</span>
       <h2>Réservez votre table du 31 décembre</h2>
