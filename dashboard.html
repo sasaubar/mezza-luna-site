@@ -291,6 +291,12 @@
           <div class="stat-carte stat-vert" data-aller-vers="fidelite"><div class="valeur" id="accPrets">–</div><div class="label">Récompenses prêtes</div></div>
         </div>
 
+        <div class="section-titre">Réservations à venir</div>
+        <div class="section-soustitre">Toutes les réservations, jour par jour (aujourd'hui inclus)</div>
+        <div class="carte" data-aller-vers="resas">
+          <div id="accResumeResas" class="chargement">Chargement…</div>
+        </div>
+
         <div class="section-titre">Click &amp; collect</div>
         <div class="section-soustitre">Répartition des commandes du jour</div>
         <div class="carte" data-aller-vers="commandes">
@@ -753,6 +759,41 @@
       afficherNotesClients(reservations);
     });
     chargerMemos();
+    chargerResumeResas();
+  }
+
+  // Résumé de toutes les réservations (aujourd'hui + à venir), regroupées par jour.
+  function chargerResumeResas(){
+    var conteneur = document.getElementById('accResumeResas');
+    Promise.all([
+      apiGetPin('/reservation?action=liste', { date: todayISO() }).catch(function(){ return { reservations: [] }; }),
+      apiGetPin('/reservation?action=aVenir').catch(function(){ return { reservations: [] }; }),
+    ]).then(function(res){
+      var actives = (res[0].reservations || []).concat(res[1].reservations || [])
+        .filter(function(r){ return r.statut !== 'annulee'; });
+      if(actives.length === 0){
+        conteneur.className = '';
+        conteneur.innerHTML = '<div class="vide" style="padding:8px 0;">Aucune réservation à venir.</div>';
+        return;
+      }
+      var jours = {};
+      actives.forEach(function(r){
+        var j = jours[r.date] || (jours[r.date] = { nb: 0, midi: 0, soir: 0 });
+        j.nb++;
+        if(r.service === 'dejeuner') j.midi += r.couverts || 0; else j.soir += r.couverts || 0;
+      });
+      var total = actives.reduce(function(s, r){ return s + (r.couverts || 0); }, 0);
+      var lignes = Object.keys(jours).sort().map(function(d){
+        var j = jours[d];
+        var libelle = new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+        return '<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid rgba(26,26,26,.08);">' +
+          '<strong>' + libelle + '</strong>' +
+          '<span>' + j.nb + ' résa · midi ' + j.midi + ' · soir ' + j.soir + '</span></div>';
+      }).join('');
+      conteneur.className = '';
+      conteneur.innerHTML = '<div style="margin-bottom:6px;color:var(--charbon-doux);font-size:.9rem;">' +
+        actives.length + ' réservation(s), ' + total + ' couverts au total</div>' + lignes;
+    });
   }
 
   function afficherNotesClients(reservations){
