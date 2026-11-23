@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Réveillon du Nouvel An à Clamart | Soirée karaoké, menu 79 € | La Mezza Luna</title>
-<meta name="description" content="La Mezza Luna organise un réveillon le 31 décembre à Clamart avec un menu unique à 79 € (49 € pour les enfants de moins de 10 ans), du karaoké dansant de 19h à 2h et des cotillons à minuit. La réservation est obligatoire." />
+<meta name="description" content="La Mezza Luna organise un réveillon le 31 décembre à Clamart avec un menu unique à 79 € hors boissons (49 € pour les enfants de moins de 10 ans), du karaoké dansant de 19h à 2h et des cotillons à minuit. La réservation est obligatoire." />
 <link rel="canonical" href="https://lamezzalunaclamart.com/reveillon/" />
 <link rel="icon" href="/assets/img/logo-red.png" type="image/png" />
 <link rel="preload" as="image" href="/assets/img/reveillon-hero.jpg" />
@@ -19,7 +19,9 @@
 <meta property="og:title" content="Réveillon du Nouvel An à La Mezza Luna, Clamart" />
 <meta property="og:description" content="Menu unique à 79 €, karaoké dansant de 19h à 2h et cotillons à minuit. La réservation est obligatoire, au 01 46 31 33 31." />
 <meta property="og:url" content="https://lamezzalunaclamart.com/reveillon/" />
-<meta property="og:image" content="https://lamezzalunaclamart.com/assets/img/reveillon-hero.jpg" />
+<meta property="og:image" content="https://lamezzalunaclamart.com/assets/img/reveillon-affiche.jpg" />
+<meta property="og:image:width" content="1414" />
+<meta property="og:image:height" content="2000" />
 <meta property="og:locale" content="fr_FR" />
 <meta property="og:site_name" content="La Mezza Luna Clamart" />
 
@@ -27,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Réveillon du Nouvel An à La Mezza Luna, Clamart" />
 <meta name="twitter:description" content="Menu unique à 79 €, karaoké dansant de 19h à 2h et cotillons à minuit. La réservation est obligatoire." />
-<meta name="twitter:image" content="https://lamezzalunaclamart.com/assets/img/reveillon-hero.jpg" />
+<meta name="twitter:image" content="https://lamezzalunaclamart.com/assets/img/reveillon-affiche.jpg" />
 
 <!-- Schema.org -->
 <script type="application/ld+json">
@@ -35,6 +37,7 @@
   "@context": "https://schema.org",
   "@type": "Event",
   "name": "Réveillon du Nouvel An à La Mezza Luna",
+  "image": ["https://lamezzalunaclamart.com/assets/img/reveillon-affiche.jpg", "https://lamezzalunaclamart.com/assets/img/reveillon-hero.jpg"],
   "description": "Menu unique avec un amuse-bouche, deux entrées, un plat, un fromage et un dessert, suivi d'un karaoké dansant et de cotillons à minuit.",
   "startDate": "2026-12-31T19:00:00+01:00",
   "endDate": "2027-01-01T02:00:00+01:00",
@@ -368,6 +371,24 @@
   .resa .btn-gold{ background:var(--or); color:var(--charbon); box-shadow:0 6px 18px rgba(0,0,0,.25); }
   .resa .btn-gold:hover{ background:#fff; transform:translateY(-2px); }
   .resa small{ display:block; font-size:.8rem; color:rgba(255,255,255,.55); }
+  /* ---- Affiche ---- */
+  .affiche{ background:#14100a; color:#fff; padding:clamp(40px,6vw,72px) 0; }
+  .affiche-inner{ display:grid; grid-template-columns:minmax(0,420px) 1fr; gap:clamp(32px,5vw,80px); align-items:center; justify-content:center; }
+  .affiche-img{ display:block; border-radius:var(--radius); overflow:hidden; box-shadow:0 24px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(246,198,103,.35); transition:transform .25s ease; }
+  .affiche-img:hover{ transform:translateY(-4px); }
+  .affiche-img img{ width:100%; height:auto; }
+  .affiche-txt .eyebrow{ color:var(--or); }
+  .affiche-txt h2{ font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.2vw,3rem); line-height:1.08; margin:14px 0 22px; color:#fff; }
+  .affiche-points{ list-style:none; margin-bottom:22px; }
+  .affiche-points li{ display:flex; flex-direction:column; padding:14px 0; border-top:1px solid rgba(246,198,103,.25); }
+  .affiche-points li:last-child{ border-bottom:1px solid rgba(246,198,103,.25); }
+  .affiche-points strong{ font-family:var(--serif); font-size:1.5rem; font-weight:700; color:var(--or); }
+  .affiche-points span{ font-size:.9rem; color:rgba(255,255,255,.75); }
+  .affiche-txt p{ font-size:1rem; color:rgba(255,255,255,.85); max-width:480px; }
+  .affiche-txt .actions{ display:flex; gap:14px; flex-wrap:wrap; margin-top:28px; }
+  .btn-ghost-dark{ background:transparent; color:#fff; border-color:rgba(255,255,255,.6); }
+  .btn-ghost-dark:hover{ background:rgba(255,255,255,.12); border-color:#fff; }
+  @media (max-width:900px){ .affiche-inner{ grid-template-columns:1fr; } .affiche-img{ max-width:420px; margin:0 auto; } }
   #menu, #ambiance{ position:relative; overflow:hidden; }
   #menu .wrap, #ambiance .wrap{ position:relative; z-index:1; }
   .fete{ position:absolute; inset:0; width:100%; height:100%; z-index:2; pointer-events:none; }
@@ -375,12 +396,6 @@
 </style>
 <script src="/assets/js/metricool.js" defer></script>
 </head>
-<body>
-
-<a href="tel:+33146313331" class="cta-mobile-call" aria-label="Appeler La Mezza Luna">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-3 2a12 12 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" stroke-linejoin="round"/></svg>
-</a>
-
 <body>
 
 <a href="tel:+33146313331" class="cta-mobile-call" aria-label="Appeler La Mezza Luna">
@@ -446,7 +461,7 @@
       <div class="strip-item">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         <div class="titre">79 € par personne</div>
-        <div class="detail">49 € pour les moins de 10 ans.<br>Menu unique pour toute la salle.</div>
+        <div class="detail">49 € pour les moins de 10 ans.<br>Boissons non comprises.</div>
       </div>
       <div class="strip-item">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -458,6 +473,39 @@
 </div>
 
 <div style="background:#900C27;line-height:0;display:block;">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:80px;">
+    <path d="M0,40 C300,80 700,0 1000,45 C1200,75 1340,18 1440,40 L1440,80 L0,80 Z" fill="#14100a"/>
+  </svg>
+</div>
+
+<!-- ================================================================
+     AFFICHE
+     ================================================================ -->
+<section class="affiche" id="affiche">
+  <div class="wrap">
+    <div class="affiche-inner">
+      <a class="affiche-img reveal" href="/assets/img/reveillon-affiche.jpg" target="_blank" rel="noopener" aria-label="Voir l'affiche du réveillon en grand">
+        <img loading="lazy" height="2000" width="1414" src="/assets/img/reveillon-affiche.jpg" alt="Affiche du réveillon karaoké de La Mezza Luna : jeudi 31 décembre, menu unique à 79 euros hors boissons, uniquement sur réservation, 18 rue de Versailles à Clamart" />
+      </a>
+      <div class="affiche-txt reveal">
+        <span class="eyebrow filet">L'affiche</span>
+        <h2>Karaoké, réveillon du Nouvel An</h2>
+        <ul class="affiche-points">
+          <li><strong>Jeudi 31 décembre</strong><span>de 19h à 2h</span></li>
+          <li><strong>Menu unique à 79 €</strong><span>49 € pour les moins de 10 ans, hors boissons</span></li>
+          <li><strong>Uniquement sur réservation</strong><span>places limitées, un seul service</span></li>
+        </ul>
+        <p>Retrouvez-nous au 18 rue de Versailles à Clamart pour passer en 2027 en chantant, avec des cotillons à minuit.</p>
+        <div class="actions">
+          <a href="#reservation" class="btn btn-primary">Réserver ma table</a>
+          <a href="/assets/img/reveillon-affiche.jpg" download class="btn btn-ghost-dark">Télécharger l'affiche</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div style="background:#14100a;line-height:0;display:block;">
   <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:80px;">
     <path d="M0,40 C300,80 700,0 1000,45 C1200,75 1340,18 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/>
   </svg>
@@ -482,6 +530,7 @@
           <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Menu unique</span>
           <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Un seul service</span>
           <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Fait maison</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Boissons non comprises</span>
         </div>
       </div>
       <div class="reveal">
@@ -500,6 +549,7 @@
             <div class="tarif"><div class="prix">79 €</div><div class="qui">Par personne</div></div>
             <div class="tarif"><div class="prix">49 €</div><div class="qui">Moins de 10 ans</div></div>
           </div>
+          <p style="text-align:center;font-size:.85rem;color:var(--charbon-doux);margin:16px 0 0;">Les tarifs s'entendent hors boissons.</p>
         </div>
       </div>
     </div>
