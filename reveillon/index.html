@@ -38,7 +38,7 @@
   "@type": "Event",
   "name": "Réveillon du Nouvel An à La Mezza Luna",
   "image": ["https://lamezzalunaclamart.com/assets/img/reveillon-affiche.jpg", "https://lamezzalunaclamart.com/assets/img/reveillon-hero.jpg"],
-  "description": "Menu unique avec un amuse-bouche, deux entrées, un plat, un fromage et un dessert, suivi d'un karaoké dansant et de cotillons à minuit.",
+  "description": "Menu unique avec amuse-bouches, duo d'entrées, trou italien, plat au choix (magret de canard ou cabillaud), fromages AOP et trompe-l'œil de poire Belle Hélène, suivi d'un karaoké dansant et de cotillons à minuit.",
   "startDate": "2026-12-31T19:00:00+01:00",
   "endDate": "2027-01-01T02:00:00+01:00",
   "eventStatus": "https://schema.org/EventScheduled",
@@ -362,7 +362,9 @@
   .timeline li:first-child{ border-top:none; }
   .timeline .h{ font-family:var(--serif); font-weight:700; font-size:1.35rem; color:var(--rouge-vif); min-width:66px; }
   .timeline .t{ font-size:.97rem; color:var(--charbon-doux); }
-  .resa{ background:var(--rouge-profond); color:#fff; padding:clamp(64px,9vw,100px) 0; }
+  .resa{ position:relative; background:var(--rouge-profond) url("/assets/img/reveillon-fete.jpg") center/cover no-repeat; color:#fff; padding:clamp(64px,9vw,100px) 0; }
+  .resa::before{ content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(144,12,39,.93) 0%, rgba(120,10,32,.80) 50%, rgba(90,6,24,.90) 100%); }
+  .resa .wrap{ position:relative; z-index:1; }
   .resa-inner{ max-width:680px; margin:0 auto; text-align:center; }
   .resa .eyebrow{ color:var(--or); }
   .resa h2{ font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.4vw,2.9rem); margin:14px 0 14px; color:#fff; }
@@ -524,7 +526,7 @@
           Le menu
         </span>
         <h2>Le menu du réveillon</h2>
-        <p>Stéphane cuisine un menu unique pour toute la salle, avec des plats faits maison et préparés à la minute comme d'habitude. Le repas comprend un amuse-bouche, deux entrées, un plat, un fromage et un dessert.</p>
+        <p>Stéphane cuisine un menu unique pour toute la salle, avec des plats faits maison et préparés à la minute comme d'habitude. Le repas comprend des amuse-bouches, un duo d'entrées, un trou italien, un plat au choix (magret de canard ou cabillaud), des fromages AOP et un trompe-l'œil de poire Belle Hélène en dessert.</p>
         <p>Nous faisons un seul service, ce qui permet à tout le monde de commencer et de finir le repas en même temps, puis de profiter ensemble du karaoké.</p>
         <div class="chips">
           <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Menu unique</span>
@@ -539,11 +541,12 @@
           <h3>Menu du réveillon</h3>
           <div class="sous">31 décembre 2026</div>
           <ul class="menu-liste">
-            <li><span class="num">1</span><span class="nom-plat">Un amuse-bouche</span></li>
-            <li><span class="num">2</span><span class="nom-plat">Deux entrées</span></li>
-            <li><span class="num">3</span><span class="nom-plat">Un plat</span></li>
-            <li><span class="num">4</span><span class="nom-plat">Un fromage</span></li>
-            <li><span class="num">5</span><span class="nom-plat">Un dessert</span></li>
+            <li><span class="num">1</span><span class="nom-plat">Apéritif<span class="det">Amuse-bouches en folie</span></span></li>
+            <li><span class="num">2</span><span class="nom-plat">Duo d'entrées<span class="det">Œuf poché sur crème de foie gras, bresaola de bœuf, croûtons<br>et<br>Tartare de saumon, chantilly à l'aneth</span></span></li>
+            <li><span class="num">3</span><span class="nom-plat">Trou italien<span class="det">Sorbet citron de Sicile, limoncello</span></span></li>
+            <li><span class="num">4</span><span class="nom-plat">Plat<span class="det">Magret de canard, sauce miel<br>ou<br>Pavé de cabillaud sauce vierge<br>accompagné d'un risotto au prosecco et scamorza</span></span></li>
+            <li><span class="num">5</span><span class="nom-plat">Fromages<span class="det">Déclinaison de fromages AOP, fruits confits, noix et salade</span></span></li>
+            <li><span class="num">6</span><span class="nom-plat">Dessert<span class="det">Trompe-l'œil de poire Belle Hélène</span></span></li>
           </ul>
           <div class="tarifs">
             <div class="tarif"><div class="prix">79 €</div><div class="qui">Par personne</div></div>
